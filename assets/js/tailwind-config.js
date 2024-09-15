@@ -17,7 +17,8 @@ tailwind.config = {
             },
             fontFamily: {
                 default: ['Orbit'],
-                code: ["Nanum Gothic Coding"],
+                code: ['Nanum Gothic Coding'],
+                footer: ['Nanum Myeongjo']
             },
             boxShadow: {
                 'layout': 'rgba(0, 0, 0, 0.15) 10px 0 15px 0px;',
@@ -25,13 +26,14 @@ tailwind.config = {
                 'navbar-dark': '#fde04780 0px 13px 27px -5px, #fefce890 0px 8px 16px -8px;',
                 'paper-styled': 'rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;',
                 'hr-light': '0 0 10px 1px #fb7185',
-                'hr-dark': '0 0 10px 1px #fde047'
+                'hr-dark': '0 0 10px 1px #fde047',
+                'footer-light': '#fde04780 0px -20px 50px -12px;'
             },
             minWidth: {
-                default: "600px"
+                default: '600px'
             },
             maxWidth: {
-                default: "800px"
+                default: '800px'
             }
         },
     }

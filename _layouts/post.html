@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
     {% include common/head.html %}
-    <body>
+    <body class="relative">
         {% include common/navbar.html %}
-        
 
         <div class="
             flex justify-center align-center
@@ -11,7 +10,7 @@
         ">
             <div class="
                 w-full xl:min-w-default xl:max-w-default
-                px-7 py-mobileY xl:py-desktopY
+                px-7 pt-mobileY xl:pt-desktopY xl:pb-52
                 xl:dark:border-x-[2px] dark:border-dashed dark:border-yellow-100
                 shadow-layout dark:shadow-[transparent 0 0 0 0]
                 bg-white dark:bg-zinc-950
@@ -19,6 +18,8 @@
                 {{ content }}
             </div>
         </div>
+
+        {% include common/footer.html %}
 
         {% include common/foot.html %}
     </body>
