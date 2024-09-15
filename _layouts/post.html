@@ -3,8 +3,21 @@
     {% include common/head.html %}
     <body>
         {% include common/navbar.html %}
-    
-        <div class="px-mobileX xl:px-desktopX py-desktopY z-0">{{ content }}</div>
+        
+
+        <div class="
+            flex justify-center align-center
+            px-0 xl:px-desktopX z-0
+        ">
+            <div class="
+                w-full xl:min-w-default xl:max-w-default
+                px-7 py-mobileY xl:py-desktopY
+                xl:border-x-[2px] border-dashed border-yellow-700 dark:border-yellow-100
+                bg-white dark:bg-zinc-800
+            ">
+                {{ content }}
+            </div>
+        </div>
 
         {% include common/foot.html %}
     </body>

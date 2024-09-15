@@ -1,6 +1,6 @@
 const colors = {
     light: {
-        primary: { /* tailwind color-rose */
+        primary: { /* tailwind colorset - red */
             default: '#db2777',
             50: '#fdf2f8',
             100: '#fce7f3',
