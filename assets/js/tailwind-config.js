@@ -20,13 +20,15 @@ tailwind.config = {
                 code: ["Nanum Gothic Coding"],
             },
             boxShadow: {
-                'navbar': 'rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;',
-                'blockquote': 'rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;',
+                'layout': 'rgba(0, 0, 0, 0.15) 10px 0 15px 0px;',
+                'navbar-light': '#d946ef80 0px 13px 27px -5px, #701a7590 0px 8px 16px -8px;',
+                'navbar-dark': '#fde04780 0px 13px 27px -5px, #fefce890 0px 8px 16px -8px;',
+                'paper-styled': 'rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;',
                 'hr-light': '0 0 10px 1px #fb7185',
                 'hr-dark': '0 0 10px 1px #fde047'
             },
             minWidth: {
-                deafult: "600px"
+                default: "600px"
             },
             maxWidth: {
                 default: "800px"
