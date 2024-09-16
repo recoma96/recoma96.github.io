@@ -17,3 +17,15 @@ const setTheme = (theme) => {
     $('html').addClass(theme);
     localStorage.setItem(KEY_THEME, theme);
 }
+
+const randomizeAllTags = () => {
+    const lightThemes = ['red', 'orange', 'amber', 'lime', 'teal', 'cyan', 'violet', 'fuchsia'];
+
+    const size = lightThemes.length;
+
+    $('.tag').each(function() {
+        const idx = Math.floor(Math.random() * size);
+        $(this).addClass(`bg-${lightThemes[idx]}-100 hover:bg-${lightThemes[idx]}-200`);
+        $(this).addClass('dark:bg-transparent dark:border dark:border-yellow-200 dark:hover:border-yellow-50 dark:rounded-md')
+    });
+}

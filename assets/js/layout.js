@@ -1,5 +1,5 @@
 $(() => {
-    (() => {
-        $('html').addClass(getTheme());
-    })();
+    $('html').addClass(getTheme());
+    randomizeAllTags();
+
 });
