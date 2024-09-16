@@ -1,7 +1,6 @@
 const colors = {
     light: {
-        primary: { /* tailwind colorset - red */
-            default: '#db2777',
+        primary: { /* tailwind colorset - rose */
             50: '#fdf2f8',
             100: '#fce7f3',
             200: '#fbcfe8',
@@ -15,7 +14,7 @@ const colors = {
         },
     },
     dark: {
-        primary: {
+        primary: { /* tailwind colorset - orange */
             default: '#fde047',
             50: '#fefce8',
             100: '#fef9c3',

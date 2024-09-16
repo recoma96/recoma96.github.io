@@ -10,10 +10,10 @@ tailwind.config = {
             colors: colors,
             padding: {
                 desktopX: '32em',
-                desktopY: '4em',
+                desktopY: '6em',
                 
                 mobileX: '3em',
-                mobileY: '4em',
+                mobileY: '6em',
             },
             fontFamily: {
                 default: ['Orbit'],

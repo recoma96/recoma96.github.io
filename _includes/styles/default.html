@@ -7,7 +7,7 @@
                                 bg-yellow-50 dark:bg-zinc-800
                                 text-zinc-800 dark:text-zinc-200 }
         h1          { @apply    text-4xl mt-7 mb-5 
-                                text-light-primary-default dark:text-dark-primary-200 }
+                                text-light-primary-600 dark:text-dark-primary-200 }
         h2          { @apply    text-2xl mt-3 mb-2 
                                 text-orange-500 dark:text-rose-300 }
         h3          { @apply    font-semibold mt-2 mb-1
@@ -30,5 +30,12 @@
         ol          { @apply    list-decimal }
         ul          { @apply    list-disc }
         .footnotes  { @apply    pt-4 text-xs border-t border-orange-500 dark:border-gray-400 }
+
+        .layout-container   { @apply    flex justify-center px-mobileX xl:px-desktopX }
+        .layout-item        { @apply    w-full xl:min-w-default xl:max-w-default }
+        .web-main-container { @apply    layout-container px-0 z-0 }
+        .web-main-item      { @apply    layout-item shadow-layout 
+                                        px-7 pb-64 pt-mobileY xl:pt-desktopY
+                                        bg-white dark:bg-zinc-950 }
     }
 </style>
