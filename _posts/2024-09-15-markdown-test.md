@@ -36,6 +36,10 @@ hello_world()
 hello_2022()
 ```
 
+# 단어속 코드
+
+hello `world!`
+
 # 이미지
 이미지 불러오기
 기존 마크다운과 일치하나 이미지 루트 의 맨 앞에 site.baseurl 을 붙입니다.

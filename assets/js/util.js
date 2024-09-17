@@ -18,8 +18,16 @@ const setTheme = (theme) => {
     localStorage.setItem(KEY_THEME, theme);
 }
 
+const randomizeAllThemes = (themes, className) => {
+    const size = themes.length;
+    $(`.${className}`).each(function() {
+        const idx = Math.floor(Math.random() * size);
+        $(this).addClass(themes[idx]);
+    });
+}
+
 const randomizeAllTags = () => {
-    const tagThemes = [
+    const themes = [
         'tag-random-red',
         'tag-random-orange',
         'tag-random-amber',
@@ -30,11 +38,20 @@ const randomizeAllTags = () => {
         'tag-random-fuchsia'
     ]
 
+    randomizeAllThemes(themes, 'tag');
+}
 
-    const size = tagThemes.length;
+const randomizeAllPostCards = () => {
+    const themes = [
+        'form-random-red',
+        'form-random-orange',
+        'form-random-amber',
+        'form-random-lime',
+        'form-random-teal',
+        'form-random-cyan',
+        'form-random-violet',
+        'form-random-fuchsia'
+    ]
 
-    $('.tag').each(function() {
-        const idx = Math.floor(Math.random() * size);
-        $(this).addClass(tagThemes[idx]);
-    });
+    randomizeAllThemes(themes, 'post-card');
 }
