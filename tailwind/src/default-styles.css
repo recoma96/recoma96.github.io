@@ -59,19 +59,19 @@
 /* Random Tag Styles */
 @layer components {
     .tag-random-red     {   @apply    bg-red-100 hover:bg-red-200
-                                        dark:bg-transparent dark:border dark:border-red-200 dark:text-red-200 dark:hover:border-red-300 dark:hover:text-red-300; }
+                                        dark:bg-transparent dark:border dark:border-red-200 dark:text-red-200 dark:hover:border-red-300 dark:hover:text-zinc-600; }
     .tag-random-orange  {   @apply    bg-orange-100 hover:bg-orange-200
-                                        dark:bg-transparent dark:border dark:border-orange-200 dark:text-orange-200 dark:hover:border-orange-300 dark:hover:text-orange-300; }
+                                        dark:bg-transparent dark:border dark:border-orange-200 dark:text-orange-200 dark:hover:border-orange-300 dark:hover:text-zinc-600;; }
     .tag-random-amber   {   @apply    bg-amber-100 hover:bg-amber-200
-                                        dark:bg-transparent dark:border dark:border-amber-200 dark:text-amber-200 dark:hover:border-amber-300 dark:hover:text-amber-300; }
+                                        dark:bg-transparent dark:border dark:border-amber-200 dark:text-amber-200 dark:hover:border-amber-300 dark:hover:text-zinc-600; }
     .tag-random-lime    {   @apply    bg-lime-100 hover:bg-lime-200
-                                        dark:bg-transparent dark:border dark:border-lime-200 dark:text-lime-200 dark:hover:border-lime-300 dark:hover:text-lime-300; }
+                                        dark:bg-transparent dark:border dark:border-lime-200 dark:text-lime-200 dark:hover:border-lime-300 dark:hover:text-zinc-600; }
     .tag-random-teal    {   @apply    bg-teal-100 hover:bg-teal-200
-                                        dark:bg-transparent dark:border dark:border-teal-200 dark:text-teal-200 dark:hover:border-teal-300 dark:hover:text-teal-300; }
+                                        dark:bg-transparent dark:border dark:border-teal-200 dark:text-teal-200 dark:hover:border-teal-300 dark:hover:text-zinc-600; }
     .tag-random-cyan    {   @apply    bg-cyan-100 hover:bg-cyan-200
-                                        dark:bg-transparent dark:border dark:border-cyan-200 dark:text-cyan-200 dark:hover:border-cyan-300 dark:hover:text-cyan-300; }
+                                        dark:bg-transparent dark:border dark:border-cyan-200 dark:text-cyan-200 dark:hover:border-cyan-300 dark:hover:text-zinc-600; }
     .tag-random-violet  {   @apply    bg-violet-100 hover:bg-violet-200
-                                        dark:bg-transparent dark:border dark:border-violet-200 dark:text-violet-200 dark:hover:border-violet-300 dark:hover:text-violet-300; }
+                                        dark:bg-transparent dark:border dark:border-violet-200 dark:text-violet-200 dark:hover:border-violet-300 dark:hover:text-zinc-600; }
     .tag-random-fuchsia {   @apply    bg-fuchsia-100 hover:bg-fuchsia-200
-                                        dark:bg-transparent dark:border dark:border-fuchsia-200 dark:text-fuchsia-200 dark:hover:border-fuchsia-300 dark:hover:text-fuchsia-300; }
+                                        dark:bg-transparent dark:border dark:border-fuchsia-200 dark:text-fuchsia-200 dark:hover:border-fuchsia-300 dark:hover:text-zinc-600; }
 }
