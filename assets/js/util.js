@@ -19,13 +19,22 @@ const setTheme = (theme) => {
 }
 
 const randomizeAllTags = () => {
-    const lightThemes = ['red', 'orange', 'amber', 'lime', 'teal', 'cyan', 'violet', 'fuchsia'];
+    const tagThemes = [
+        'tag-random-red',
+        'tag-random-orange',
+        'tag-random-amber',
+        'tag-random-lime',
+        'tag-random-teal',
+        'tag-random-cyan',
+        'tag-random-violet',
+        'tag-random-fuchsia'
+    ]
 
-    const size = lightThemes.length;
+
+    const size = tagThemes.length;
 
     $('.tag').each(function() {
         const idx = Math.floor(Math.random() * size);
-        $(this).addClass(`bg-${lightThemes[idx]}-100 hover:bg-${lightThemes[idx]}-200`);
-        $(this).addClass('dark:bg-transparent dark:border dark:border-yellow-200 dark:hover:border-yellow-50 dark:rounded-md')
+        $(this).addClass(tagThemes[idx]);
     });
 }
