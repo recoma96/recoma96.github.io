@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
-    {% include common/head.html %}
+    {% include head.html %}
     <body class="relative">
-        {% include common/navbar.html %}
+        {% include navbar.html %}
 
         <div class="web-main-container">
             <div class="web-main-item">
                 <div class="mt-10 grid grid-cols-1 gap-8">
-                    {% for post in site.posts %}
+                    {% for post in paginator.posts %}
                     <div class="post-card
                                 px-10 py-6
                                 shadow-paper-styled dark:shadow-[transparent 0 0 0 0]
@@ -46,13 +46,15 @@
                         from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
                     "></div>
                     {% endfor %}
+                    
+                    {% include paginator.html %}
                 </div>
             </div>
         </div>
 
-        {% include common/footer.html %}
+        {% include footer.html %}
 
-        {% include common/foot.html %}
+        {% include foot.html %}
         <script type="text/javascript" src="{{ "/assets/js/post-list.js" | absolute_url }}"></script>
     </body>
 </html>

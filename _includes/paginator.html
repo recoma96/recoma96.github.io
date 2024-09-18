@@ -1,0 +1,15 @@
+<div class="flex justify-center text-[0.8em] gap-x-4">
+    {% if paginator.previous_page %}
+    <a href="{{ site.absolute_url | append: paginator.previous_page_path }}" class="no-underline">< previous</a>
+    {% else %}
+    <a class="no-underline cursor-not-allowed text-zinc-400 dark:text-zinc-500"">< previous</a>
+    {% endif %}
+
+    <div>{{ paginator.page }} of {{ paginator.total_pages }}</div>
+
+    {% if paginator.next_page %}
+    <a  href="{{ site.absolute_url | append: paginator.next_page_path }}" class="no-underline">next ></a>
+    {% else %}
+    <a class="no-underline cursor-not-allowed text-zinc-400 dark:text-zinc-500">next ></a>
+    {% endif %}
+</div>
