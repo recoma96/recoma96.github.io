@@ -1,5 +1,5 @@
-<div>
-    <div class="text-center mb-6">
+<div class="mb-20">
+    <div class="text-center">
         <h2 class="
             px-10 py-4 inline-block
             bg-orange-100 text-orange-600 dark:text-yellow-200
@@ -11,9 +11,9 @@
         <p class="font-semibold"><a href="{{ site.baseurl | append: '/series?name=' | append: page.series }}" class="no-underline text-orange-700 dark:text-blue-200">{{ page.series }}</a></p>
     </div>
     
-    <div class="">
+    <div class="mt-10">
         <p class="text-[0.8em]">Posted <strong class="text-zinc-800 dark:text-zinc-200">{{ page.date | date: "%Y.%m.%d %H:%M"  }}</strong></p>
-        <p class="text-[0.8em]">By <strong class="text-zinc-800 dark:text-zinc-200">{{ site.nickname }}</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="text-zinc-800 dark:text-zinc-200">{{ site.nickname }}</strong></p>
     </div>
 
     <div class="

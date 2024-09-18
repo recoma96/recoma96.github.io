@@ -7,14 +7,14 @@
     .MathJax_SVG_Display { @apply whitespace-pre-wrap }
     mjx-container {mjx-math { @apply whitespace-pre-wrap }}
 
-    body        { @apply    m-0 font-default break-words text-[0.93em]
+    body        { @apply    m-0 leading-7 font-default break-words text-[1em]
                             bg-yellow-50 dark:bg-zinc-800
                             text-zinc-800 dark:text-zinc-200 }
-    h1          { @apply    text-4xl mt-7 mb-5 
+    h1          { @apply    text-4xl mt-8 mb-5
                             text-light-primary-600 dark:text-dark-primary-200 }
-    h2          { @apply    text-2xl mt-3 mb-2 
+    h2          { @apply    text-2xl mt-8 mb-3
                             text-orange-500 dark:text-violet-200 }
-    h3          { @apply    font-semibold mt-2 mb-1
+    h3          { @apply    font-semibold mt-8 mb-2
                             text-green-600 dark:text-green-200 }
     a           { @apply    underline decoration-wavy text-blue-600 dark:text-blue-300  }
     img         { @apply    max-w-full my-6 shadow-paper-styled }
@@ -34,8 +34,8 @@
     ol          { @apply    list-decimal }
     ul          { @apply    list-disc }
 
-    .footnotes  { @apply    pt-4 text-xs border-t border-orange-500 dark:border-gray-400 }
-    .tag        { @apply    px-3 py-1 text-[0.8em] cursor-pointer
+    .footnotes  { @apply    p-4 text-xs shadow-paper-styled bg-cyan-50 dark:bg-zinc-800 }
+    .tag        { @apply    px-3 text-[0.8em] cursor-pointer
                             bg-zinc-100 text-zinc-700 dark:text-zinc-200
                             shadow-paper-styled rounded-sm no-underline }
     .post-card .tag { @apply text-light-text-default dark:text-dark-text-default }
