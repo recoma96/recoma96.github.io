@@ -13,9 +13,9 @@
     h1          { @apply    text-4xl mt-7 mb-5 
                             text-light-primary-600 dark:text-dark-primary-200 }
     h2          { @apply    text-2xl mt-3 mb-2 
-                            text-orange-500 dark:text-rose-300 }
+                            text-orange-500 dark:text-violet-200 }
     h3          { @apply    font-semibold mt-2 mb-1
-                            text-green-600 dark:text-zinc-200 }
+                            text-green-600 dark:text-green-200 }
     a           { @apply    underline decoration-wavy text-blue-600 dark:text-blue-300  }
     img         { @apply    max-w-full my-6 shadow-paper-styled }
     pre         { @apply    my-6 p-7 whitespace-pre-wrap leading-tight shadow-paper-styled
