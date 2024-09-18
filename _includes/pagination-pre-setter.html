@@ -1,0 +1,28 @@
+{% assign filtered_posts_size = filtered_posts | size %}
+{% assign page_size = filtered_posts_size | divided_by: paginator.per_page %}
+
+{% assign _x = filtered_posts_size | modulo: paginator.per_page %}
+{% if _x > 0 %}
+    {% assign page_size = page_size | plus : 1 %}
+{% else %}
+{% endif %}
+
+{% assign current_arr_idx = paginator.previous_page | times: paginator.per_page %}
+{% assign posts = filtered_posts | slice: current_arr_idx, paginator.per_page %}
+
+
+{% if paginator.page == 1 %}
+    {% assign prev_url = nil %}
+{% else if paginator.page == 2 %}
+    {% assign prev_url = post_base_url %}
+{% else %}
+    {% assign prev_idx = paginator.page | minus: 1 %}
+    {% assign prev_url = post_base_url | append: "/" | append: prev_idx %}
+{% endif %}
+
+{% if paginator.page == page_size %}
+    {% assign next_url = nil %}
+{% else %}
+    {% assign next_idx = paginator.page | plus: 1 %}
+    {% assign next_url = post_base_url | append: "/" | append: next_idx %}
+{% endif %}
