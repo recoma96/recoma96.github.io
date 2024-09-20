@@ -1,6 +1,6 @@
 <nav class="
         fixed layout-container align-center
-        w-full h-16 z-50
+        w-full h-16 z-navbar
         text-light-primary-600 dark:text-dark-primary-default
         bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
         dark:border-b dark:border-yellow-100
@@ -10,17 +10,17 @@
         layout-item
         flex justify-between items-center
     ">
-        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl"></i>
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
 
-        <p id="navbar-title" class="
+        <a id="navbar-title" href="{{ site.base_url }}" class="
             text-lg
             hidden xl:block
             cursor-pointer
+            no-underline
         "><strong class="text-white dark:text-dark-primary-200">
             {{ site.title }}
-        </strong></p>
+        </strong></a>
 
         <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
     </div>
-
 </nav>

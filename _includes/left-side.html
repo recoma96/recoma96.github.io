@@ -1,0 +1,35 @@
+<div id="left-side-bar" class="
+    hidden xl:block z-left-side
+    fixed min-h-full h-[120vh] w-[350px] py-[75px] px-4
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="{{ site.base_url | append: site.profile_image }}" width="240px" height="240px"
+            class="mx-auto border-[10px] border-yellow-100 dark:border-zinc-700" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">{{ site.nickname }}</h2>
+        <p>{{ site.user_description }}</p>
+    </div>
+    <div class="w-full mt-10 flex justify-center gap-8">
+        {% if site.social.github %}
+        <a href="{{ site.social.github }}" class="social-icon"><i class="bi bi-github" alt="github"></i></a>
+        {% endif %}
+
+        {% if site.social.email %}
+        <a href="{{ site.social.email }}" class="social-icon"><i class="bi bi-envelope-fill" alt="email"></i></a>
+        {% endif %}
+
+        {% if site.social.x %}
+        <a href="{{ site.social.x }}" class="social-icon"><i class="bi bi-twitter-x" alt="x"></i></a>
+        {% endif %}
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="{{ site.base_url | append: '/posts' }}">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="{{ site.base_url | append: '/series' }}">Series</a>
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="{{ site.base_url | append: '/about' }}">About</a>
+    </div>
+</div>

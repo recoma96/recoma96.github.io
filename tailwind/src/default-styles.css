@@ -5,11 +5,11 @@
 /* Default Tag Styles (Post Styles) */
 @layer components {
     .MathJax_SVG_Display { @apply whitespace-pre-wrap }
-    mjx-container {mjx-math { @apply whitespace-pre-wrap }}
+    mjx-container {mjx-math { @apply whitespace-pre-wrap; }}
 
     body        { @apply    m-0 leading-7 font-default break-words text-[1em]
                             bg-yellow-50 dark:bg-zinc-800
-                            text-zinc-800 dark:text-zinc-200 }
+                            text-light-text-default dark:text-dark-text-default }
     h1          { @apply    text-4xl mt-8 mb-5
                             text-light-primary-600 dark:text-dark-primary-200 }
     h2          { @apply    text-2xl mt-8 mb-3
@@ -40,9 +40,9 @@
                             shadow-paper-styled rounded-sm no-underline }
     .post-card .tag { @apply text-light-text-default dark:text-dark-text-default }
 
-    .layout-container   { @apply    flex justify-center px-mobileX xl:px-desktopX }
+    .layout-container   { @apply    flex justify-center px-mobileX xl:px-desktopX; }
     .layout-item        { @apply    w-full xl:min-w-default xl:max-w-default }
-    .web-main-container { @apply    layout-container px-0 z-0 }
+    .web-main-container { @apply    layout-container px-0 z-main-container; }
     .web-main-item      { @apply    layout-item shadow-layout 
                                     px-7 pb-60 pt-mobileY xl:pt-desktopY
                                     bg-white dark:bg-zinc-950 }
@@ -95,4 +95,9 @@
                                             dark:bg-transparent dark:border dark:border-violet-200 rounded-md; a { @apply text-rose-700 dark:text-violet-200; } }
     .form-random-fuchsia    {   @apply  bg-fuchsia-100 text-pink-700 dark:text-fuchsia-200
                                             dark:bg-transparent dark:border dark:border-fuchsia-200 rounded-md; a { @apply text-pink-700 dark:text-fuchsia-200; } }
+}
+
+/* Social Icon Style */
+@layer components {
+    .social-icon        {   @apply text-cyan-500 hover:text-cyan-700 dark:text-zinc-200 dark:hover:text-zinc-400; i { @apply text-4xl cursor-pointer;} }
 }

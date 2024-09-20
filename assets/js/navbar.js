@@ -17,4 +17,13 @@ $(() => {
         icon.removeClass(prevIconClass);
         icon.addClass(getCurrentIconClass());
     });
+
+    $('#navbar-menu-button').click(() => {
+        const leftSideBar = $('#left-side-bar');
+        if (leftSideBar.hasClass('hidden')) {
+            leftSideBar.removeClass('hidden');
+        } else {
+            leftSideBar.addClass('hidden');
+        }
+    });
 });
