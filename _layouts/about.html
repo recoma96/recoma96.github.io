@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    {% include head.html %}
+    <body>
+        {% include navbar.html %}
+        {% include left-side.html %}
+
+        <div class="web-main-container">
+            <div class="web-main-item">
+                <div class="pt-12">
+                    {{ content }}
+                </div>
+            </div>
+        </div>
+
+        {% include footer.html %}
+        {% include foot.html %}
+        <script type="text/javascript" src="{{ "/assets/js/post-list.js" | absolute_url }}"></script>
+    </body>
+</html>
