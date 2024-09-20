@@ -68,8 +68,8 @@ module.exports = {
         },
         zIndex: {
             navbar: '50',
-            footer: '30',
-            'left-side': '20',
+            footer: '20',
+            'left-side': '30',
             'main-container': '0',
         }
       },

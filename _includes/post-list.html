@@ -14,9 +14,9 @@
         ">
             {{ post.title }}
         </a>
-        <div class="mt-2 flex justify-between">
+        <div class="flex justify-between">
             <a href="{{ site.baseurl | append: '/series?name=' | append: post.series }}"
-                class="text-[0.9em] text-light-text-default no-underline hover:underline">
+                class="text-[0.9em] text-light-text-default no-underline hover:underline font-bold">
                 {{ post.series }}
             </a>
             <p class="text-[0.9em]">{{ post.date | date: "%Y.%m.%d %H:%M"}}</p>

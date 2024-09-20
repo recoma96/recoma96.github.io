@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
     {% include head.html %}
-    <body class="relative min-h-screen h-auto">
+    <body>
         {% include navbar.html %}
-
         {% include left-side.html %}
 
-        <div class="web-main-container h-full">
+        <div class="web-main-container">
             <div class="web-main-item">
                 {% assign filtered_posts = site.posts %}
                 {% assign post_base_url = "/posts" %}
@@ -15,7 +14,6 @@
         </div>
 
         {% include footer.html %}
-
         {% include foot.html %}
         <script type="text/javascript" src="{{ "/assets/js/post-list.js" | absolute_url }}"></script>
     </body>
