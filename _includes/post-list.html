@@ -13,9 +13,9 @@
             {{ post.title }}
         </a>
         <div class="flex justify-between">
-            <a href="{{ site.baseurl | append: '/series?name=' | append: post.series }}"
+            <a href="{{ site.baseurl | append: '/categories/#' | append: post.categories[0] }}"
                 class="text-[0.9em] text-light-text-default no-underline hover:underline font-bold">
-                {{ post.series }}
+                {{ post.categories[0] | replace: '_', ' ' }}
             </a>
             <p class="text-[0.9em]">{{ post.date | date: "%Y.%m.%d %H:%M"}}</p>
         </div>

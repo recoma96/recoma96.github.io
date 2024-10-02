@@ -1,0 +1,26 @@
+{% if page.type == 'categories' %}
+    {% assign items = site.categories %}
+{% elsif page.type == 'tags' %}
+    {% assign items = site.tags %}
+{% else %}
+    {% assign posts = '' | split: ',' %}
+{% endif %}
+
+<!DOCTYPE html>
+<html>
+    {% include head.html %}
+    <body>
+        {% include navbar.html %}
+        {% include left-side.html %}
+
+        <div class="web-main-container">
+            <div class="web-main-item">
+                <h1 class="text-center">{{ page.type }}</h1>
+                {% include filtered-post-list.html %}
+            </div>
+        </div>
+
+        {% include footer.html %}
+        {% include foot.html %}
+    </body>
+</html>

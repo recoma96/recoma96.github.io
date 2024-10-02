@@ -2,7 +2,7 @@
 layout: post
 title:  "[백준, leetcode] 연결리스트로 팰린드롬 확인하기"
 date:   2023-12-08 01:04:25 +0900
-series: "코테 뽀개기!"
+categories: "코테_뽀개기!"
 summary: "연결리스트로도 팰린드롬인지 확인할 수가 있어요."
 tags: ["coding-test", "python", "palindrome", "linked-list", "beakjoon", "leetcode"]
 image: ""

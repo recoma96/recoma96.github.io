@@ -2,7 +2,7 @@
 layout: post
 title:  "시스템 정보 및 구조"
 date:   2021-12-01 01:04:25 +0900
-series: "Project Report: Microcloudchip"
+categories: "Project_Report_Microcloudchip"
 summary: "프로젝트보고서: 시스템 구조"
 tags: ["project", "system-structure", "design-pattern" ]
 ---

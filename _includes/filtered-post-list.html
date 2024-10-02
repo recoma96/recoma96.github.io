@@ -1,0 +1,26 @@
+<div class="mt-[80px]">
+    {% for item in items %}
+    {% assign key = item[0] | replace: '_', ' ' %}
+    {% assign posts = item[1] %}
+
+    <div>
+        <h2>{{ key }}</h2>
+        <ol class="list-decimal">
+            {% for post in posts %}
+            <li class="hover:text-rose-600 dark:hover:text-rose-200">
+                <div class="flex justify-between">
+                    <a class="text-inherit no-underline" href="{{ base_url | append: post.url }}" class="text-left">{{ post.title }}</a>
+                    <span class=text-right>{{ post.date | date: "%Y.%m.%d %H:%M"  }}</span>
+                </div>
+            </li>
+            {% endfor%}
+        </ol>
+    </div>
+
+    <div class="
+        h-[1px] border-0 bg-gradient-to-r
+        from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
+        mt-[40px]
+    "></div>
+    {% endfor %}
+</div>

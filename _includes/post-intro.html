@@ -8,7 +8,7 @@
         ">
             {{ page.title }}
         </h2>
-        <p class="font-semibold"><a href="{{ site.baseurl | append: '/series?name=' | append: page.series }}" class="no-underline text-orange-700 dark:text-blue-200">{{ page.series }}</a></p>
+        <p class="font-semibold"><a href="{{ site.baseurl | append: '/categories/#' | append: page.categories[0] }}" class="no-underline text-orange-700 dark:text-blue-200">{{ page.categories[0] | replace: '_', ' ' }}</a></p>
     </div>
     
     <div class="mt-10">
