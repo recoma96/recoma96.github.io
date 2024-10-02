@@ -1,18 +1,19 @@
-title: Angeline Words
+# User Setting Area
+title: LolliNeon
 email: seokbong60@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  This is the Angeline Words
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 nickname: recoma
-email: seokbong60@gmail.com
-user_description: 아 인생 날로 먹고 싶다 ㅠㅠ
+user_description: Lightmode is Lollipop, and darkmode is Neon Sign
 profile_image: /assets/img/profile.jpg
 
 social:
   github: https://github.com/recoma96
   email: seokbong60@gmail.com
+
+
+# System Setting Area (Don't touch this!)
 
 # Build settings
 theme: minima
