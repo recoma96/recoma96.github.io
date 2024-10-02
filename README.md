@@ -18,7 +18,8 @@
 
 ### Install Packages
 
-Just [fork this repo](https://github.com/recoma96/lollineon/fork).
+* Just [fork this repo](https://github.com/recoma96/lollineon/fork).
+* If you use this by deploying github page. You must using **`release` branch**. Because css file compiled by tailwindcss is existed only `release`
 
 
 
@@ -108,3 +109,9 @@ Sometimes, You need to import some images into post and about page. To import th
 2. Run `bundle install` for install packages.
 3. Run `tailwind-compiler-dev.sh` and don't terminate while develop this. Because this theme use [tailwindcss](https://tailwindcss.com/). while running it. CSS is compiled automticlly when you modify html files.
 3. Run `jekyll serve` for run this.
+
+
+### Roll of Pull Request
+
+* PR to `main` branch. no others.
+* **DO NOT** add `assets/main.css` compiled from taimwindcss. All of branches except release don't have `main.css`. this file is for only deploy.
