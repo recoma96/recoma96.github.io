@@ -3,7 +3,6 @@ $(() => {
 
     if (_data.length == 2) {
         const id = decodeURIComponent(_data[1]);
-        console.log(id);
 
         const targetPosition = $('#' + id).offset().top;
 
