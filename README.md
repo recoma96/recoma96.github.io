@@ -48,15 +48,15 @@ social:
 
 
 
-### About Page
+### Home (About) Page
 
-Modify `about.md` file and add the following
+Modify `index.md` file and add the following
 
 ```
 ---
-layout: about
-title: About
-permalink: /about/
+layout: home
+title: Home
+permalink: /
 ---
 
 # This is My Blog
@@ -93,7 +93,7 @@ tags: ["tag1", "tag2"]
 
 ### Upload And Import Image Into markdown files
 
-Sometimes, You need to import some images into post and about page. To import this following this
+Sometimes, You need to import some images into post and index page. To import this following this
 
 1. add image you want into `assets/img/post`
 2. write this into markdown file

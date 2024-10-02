@@ -3,13 +3,18 @@
     {% include head.html %}
     <body>
         {% include navbar.html %}
+        {% include left-side.html %}
 
+        <div class="web-main-container">
+            <div class="web-main-item">
+                <div class="pt-12">
+                    {{ content }}
+                </div>
+            </div>
+        </div>
+
+        {% include footer.html %}
         {% include foot.html %}
-        <script>
-            $(() => {
-                // TODO 메인 페이지에 어떤게 들어가야 할지 고민중이라 일단 포스트 페이지로 리다이렉함 ㅇㅇ
-                window.location.href = window.location.href + "posts"
-            })
-        </script>
+        <script type="text/javascript" src="{{ "/assets/js/post-list.js" | absolute_url }}"></script>
     </body>
 </html>
