@@ -1,10 +1,11 @@
 <div class="mt-[80px]">
     {% for item in items %}
-    {% assign key = item[0] | replace: '_', ' ' %}
+    {% assign raw_key = item[0] %}
+    {% assign key = raw_key | replace: '_', ' ' %}
     {% assign posts = item[1] %}
 
     <div>
-        <h2>{{ key }}</h2>
+        <h2 id="{{ raw_key }}">{{ key }}</h2>
         <ol class="list-decimal">
             {% for post in posts %}
             <li class="hover:text-rose-600 dark:hover:text-rose-200">
