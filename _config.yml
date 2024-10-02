@@ -1,8 +1,8 @@
 # User Setting Area
 title: LolliNeon
 email: seokbong60@gmail.com
-baseurl: "https://recoma96.github.io" # the subpath of your site, e.g. /blog
-url: "/lollineon" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/lollineon" # the subpath of your site, e.g. /blog
+url: "https://recoma96.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 nickname: recoma
 user_description: Lightmode is Lollipop, and darkmode is Neon Sign
