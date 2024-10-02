@@ -1,13 +1,18 @@
 # LolliNeon
 
+![logo](./readme-assets/logo.png)
+
+**Lollineon** is jekyll engined blog that is LolliPop styled in light-mode and NeonSign styled in dark-mode
+
+
+## 👓 Preview
+
 ![light-mode](./readme-assets/light-mode.png)
 
-<br > <br >
+<br >
 
 ![dark-mode](./readme-assets/dark-mode.png)
 
-
-**Lollineon** is jekyll engined blog that is LolliPop styled in light-mode and NeonSign styled in dark-mode
 
 ## 💿 How To install
 
