@@ -10,7 +10,7 @@
             {% for post in posts %}
             <li class="hover:text-rose-600 dark:hover:text-rose-200">
                 <div class="flex justify-between">
-                    <a class="text-inherit no-underline" href="{{ baseurl | append: post.url }}" class="text-left">{{ post.title }}</a>
+                    <a class="text-inherit no-underline" href="{{ site.baseurl | append: post.url }}" class="text-left">{{ post.title }}</a>
                     <span class=text-right>{{ post.date | date: "%Y.%m.%d %H:%M"  }}</span>
                 </div>
             </li>
