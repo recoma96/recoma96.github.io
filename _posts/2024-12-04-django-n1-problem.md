@@ -29,6 +29,19 @@ Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 
 그렇기 때문에, 유동적으로 쿼리에 쿼리를 추가할 수가 있어 코드를 재활용할 수 있다는 장점이 있다. 하지만 이는 곧, 하위 테이블 데이터의 정보가 필요할 때마다
 SQL문을 날리는 N + 1 Problem에 직면하게 된다.
 
+예를 들어 어떤 사용자가 작성한 짧은 게시물들을 조회한다고 할때, 아래와 같이 코드를 작성할 것이다.
+
+```python
+user = User.objects.first()
+diaries = ShortDiary.objects.filter(user=user).all()
+print(diaries)
+```
+
+```
+(0.000) SELECT * FROM `user` ORDER BY `user`.`id` ASC LIMIT 1; args=(); alias=default
+(0.000) SELECT * FROM `short_diary` WHERE `short_diary`.`user_id` = 12 LIMIT 21; args=(12,); alias=default
+```
+
 
 # 해결 방법 
 
