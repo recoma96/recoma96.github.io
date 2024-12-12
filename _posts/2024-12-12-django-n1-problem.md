@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "DJango에서 N + 1 Problem 해결하는 방법"
-date:   2024-12-10 16:00:00 +0900
+date:   2024-12-12 10:00:00 +0900
 categories: "Django"
 summary: "ORM을 사용하다 보면 두 개 이상의 테이블을 조회하는데 있어 N + 1 문제를 한번씩 마주친다. DJango에서는 어떻게 해결하는지 알아보자."
 tags: ["django", "database"]
@@ -59,7 +59,7 @@ mccarthydouglas@example.net - debbiecarr
 (0.000) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user` WHERE `user`.`id` = 20 LIMIT 21; args=(20,); alias=default
 ```
 
-ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 출력은 하는 코드다. RAW Query라면 JOIN문 한번에 가져올 수 있지만 여기는 ORM이다. Lazy Loading 방식이기 때문에 일기장 주인(User)을 출력하기 전 까지 아무것도 안하다가. 출력하는 순간 (`print(diary.user)`)이 되서야 SQL문을 날린다. 이걸 일기 갯수(diaries)대로 반복을 하게 되고 결국 N + 1 Problem이 발생하게 된다. 결국 DB에 불필요한 요청을 보내는 꼴이 되고, 이는 서버와 DB 둘다 불필요한 트래픽으로 인해 성능저하가 될 상황에 처하게 되었다.
+ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 출력 하는 코드다. RAW Query라면 JOIN문 한번에 가져올 수 있지만 여기는 ORM이다. Lazy Loading 방식이기 때문에 일기장 주인(User)을 출력하기 전 까지 아무것도 안하다가. 출력하는 순간 (`print(diary.user)`)이 되서야 SQL문을 날린다. 이걸 일기 갯수(diaries)대로 반복을 하게 되고 결국 N + 1 Problem이 발생하게 된다. 결국 DB에 불필요한 요청을 보내는 꼴이 되고, 이는 서버와 DB 둘다 불필요한 트래픽으로 인해 성능저하가 발생하게 된다.
 
 <br>
 
@@ -102,6 +102,8 @@ class ShortDiary(models.Model):
 
 ## select_related
 
+정참조 또는 1대1에서 주로 사용되는 함수다.
+
 ```python
 >>> diaries = ShortDiary.objects.select_related("user")
 >>> for diary in diaries:
@@ -125,7 +127,7 @@ class ShortDiary(models.Model):
 django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'short_diaries'. Choices are: (none)
 ```
 
-short_diaries라는 이름의 field name이 없다는 문구가 뜬다. 이 경우, prefetch_related를 사용해야 한다.
+short_diaries라는 이름의 field name이 없다는 문구가 뜬다. User Model에 선언된 멤버변수 들 중 short_diaries라는 이름의 변수는 없기 때문이다. 이 경우, prefetch_related를 사용해야 한다.
 
 
 ## prefetch_related
@@ -144,8 +146,60 @@ short_diaries라는 이름의 field name이 없다는 문구가 뜬다. 이 경�
 `select_related`에서는 되지 않았던 역참조가 `prefetch_related` 에서는 정상작동이 되었다.
 
 
-## 사용시 주의해야 할 점
 
-### 하위 테이블 정렬
+# 사용시 주의해야 할 점
 
-조회를 할 경우
+
+## prefetch_related 와 함께 하위 테이블에 대한 정렬을 하려는 경우
+
+간혹 하위 테이블을 기준으로 정렬을 하려는 경우가 있다. 그런데 위에서 언급했다시피 prefetch_related는 역참조 또는 1..n대다에서 사용되는 함수다. 즉, 하위 테이블의 데이터가 여러개 존재할 수 있다는 얘기가 된다. 결국, 하위 테이블의 모든 데이터들을 참조할 수 밖에 없고, 그 결과 하위 테이블의 갯수대로 상위 테이블 데이터가 중복이 된다. 따라서 prefetch_related를 사용할 경우, 하위 테이블을 기준으로 정렬하는 것을 권장하지 않고, 어쩔 수 없이 사용하게 된다면, 쿼리 결과를 그대로 사용하는게 아니라 별도의 로직을 통해 데이터를 가공해야 할 필요가 있다.
+
+
+### 예시
+
+*  각 User에는 5개의 ShortDiary가 있음
+
+```python
+users = User.objects.prefetch_related("short_diaries").all()
+prefetched_users = User.objects.prefetch_related("short_diaries").order_by("short_diaries__id")
+print(f"Users: {len(users)}")
+print(f"Prefetched Users: {len(prefetched_users)}")
+
+# 결과
+Users: 2
+Prefetched Users: 10 # 2 x 5 = 10
+```
+
+
+### first(), get() 사용
+
+참조된 하위 테이블 중 가장 위에 있는 데이터를 사용하기 위해 `first()` 또는 `get()`을 사용을 하는 경우가 생기는데, 이 두개의 함수를 사용하게 되면 Eager Loading을 했음에도 불구하고 다시 N + 1 Problem 이 발생하는 사고가 생긴다.
+
+```python
+users = User.objects.prefetch_related("short_diaries").order_by("short_diaries__id")
+for user in users:
+    diary = user.short_diaries.first()
+    print(diary.title)
+
+(0.000) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user`; args=(); alias=default
+(0.000) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary` WHERE `short_diary`.`user_id` IN (26, 27); args=(26, 27); alias=default
+
+# User 갯수대로 추가 SQL문 요청 
+(0.000) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary` WHERE `short_diary`.`user_id` = 26 ORDER BY `short_diary`.`id` ASC LIMIT 1; args=(26,); alias=default
+radio
+(0.000) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary` WHERE `short_diary`.`user_id` = 27 ORDER BY `short_diary`.`id` ASC LIMIT 1; args=(27,); alias=default
+```
+
+`diary = user.short_diaries.first()`에서 short_diary 테이블을 한번 더 조회하고 있다. 즉, 유저 갯수 마다 short_diary를 한번 씩 데이터베이스에 직접 조회하고 있다는 것이다. 그렇기 때문에 `first()` 대신 `all()[0]` 을 사용해야 한다.
+
+```python
+users = User.objects.prefetch_related("short_diaries")
+for user in users:
+    diary = user.short_diaries.all()[0]
+    print(diary.title)
+
+(0.000) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user`; args=(); alias=default
+(0.000) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary` WHERE `short_diary`.`user_id` IN (26, 27); args=(26, 27); alias=default
+radio
+man
+```
