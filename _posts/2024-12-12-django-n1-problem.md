@@ -17,7 +17,7 @@ image: ""
 ## N + 1이 뭐에요?
 
 **N + 1 Problem** 이란, 두 개의 연결된 테이블을 조회할 때, 하위 테이블을 참조해서 조회하기 위해 상위 테이블에서
-조회된 N개의 테이블들을 하나씩 순회하면서 추가로 DB에 요청을 하는 것을 의미한다. 즉, 상위 테이블을 **1번** 조회하고, 조회된 데이터들을 순회하면서 **하위 테이블에 조회된 레코드 갯수 대로 요청함으로써** 총 DB에 **N + 1** 개의 요청을 하게 된다고 보면 된다. 이렇게 N이 기하급수적으로 커지게 되면 DB 부하가 커지게 됨은 물론, 서버 성능에도 영향을 미치게 된다.
+조회된 N개의 테이블들을 하나씩 순회하면서 추가로 DB에 요청을 하는 것을 의미한다. 즉, 상위 테이블을 **1번** 조회하고, 조회된 데이터들을 순회하면서 **하위 테이블들을 각각 조회하게 된다.** 결국 DB에 **N + 1** 개의 요청을 하게 된다고 보면 된다. 이렇게 N이 기하급수적으로 커지게 되면 DB 부하가 커지게 됨은 물론, 서버 성능에도 영향을 미치게 된다.
 
 ## 원인
 
@@ -30,8 +30,6 @@ Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 
 예를 들어 어떤 사용자가 작성한 짧은 게시물들을 조회한다고 할때, 아래와 같이 코드를 작성할 것이다.
 
 ```python
->>> user = User.objects.first()
-(0.001) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user` ORDER BY `user`.`id` ASC LIMIT 1; args=(); alias=default
 >>> diaries = ShortDiary.objects.filter(user=user).all()
 >>> print(diaries)
 (0.001) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary` WHERE `short_diary`.`user_id` = 16 LIMIT 21; args=(16,); alias=default
@@ -59,7 +57,7 @@ mccarthydouglas@example.net - debbiecarr
 (0.000) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user` WHERE `user`.`id` = 20 LIMIT 21; args=(20,); alias=default
 ```
 
-ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 출력 하는 코드다. RAW Query라면 JOIN문 한번에 가져올 수 있지만 여기는 ORM이다. Lazy Loading 방식이기 때문에 일기장 주인(User)을 출력하기 전 까지 아무것도 안하다가. 출력하는 순간 (`print(diary.user)`)이 되서야 SQL문을 날린다. 이걸 일기 갯수(diaries)대로 반복을 하게 되고 결국 N + 1 Problem이 발생하게 된다. 결국 DB에 불필요한 요청을 보내는 꼴이 되고, 이는 서버와 DB 둘다 불필요한 트래픽으로 인해 성능저하가 발생하게 된다.
+ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 출력 하는 코드다. RAW Query라면 JOIN문 한번에 가져올 수 있지만 여기는 ORM이다. Lazy Loading 방식이기 때문에 일기장 주인(User)을 출력하기 전 까지 아무것도 안하다가. 출력하는 순간(`print(diary.user)`)이 되서야 SQL문을 날린다. 이걸 일기 갯수(diaries)대로 반복을 하게 되고 결국 N + 1 Problem이 발생하게 된다. 결국 DB에 불필요한 요청을 보내는 꼴이 되고, 이는 서버와 DB 둘다 불필요한 트래픽으로 인해 성능저하가 발생하게 된다.
 
 <br>
 
@@ -68,7 +66,7 @@ ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 �
 
 # 해결 방법 
 
-사실 해결 방법은 간단하다. JOIN을 사용하면 된다. 이렇게 되면 쿼리문 1번으로 끝내는 것이 가능하다. 하지만 여기는 RAW Query가 아닌 ORM이기 때문에 다른 방법을 사용해야 한다. Django에서는 **select_related**와 **prefetch_related**를 지원한다. `select_related`는 JOIN문 1번으로 모든 데이터르들을 한꺼번에 불러오고, `prefetch_related`는 상위 테이블 한번, 그 상위 테이블에서 조회된 고유키를 가지고 하위 테이블 조회 두번 이렇게 총 2번 요청을 한다. 이렇게 Lazy Loading이 아닌, 미리미리 데이터를 불러와서 활용하는 방식을 **Eager Loading** 이라고 한다.
+사실 해결 방법은 간단하다. JOIN을 사용하면 된다. 이렇게 되면 쿼리문 1번으로 끝내는 것이 가능하다. 하지만 여기는 RAW Query가 아닌 ORM이기 때문에 다른 방법을 사용해야 한다. Django에서는 **select_related**와 **prefetch_related**를 지원한다. `select_related`는 JOIN문 1번으로 모든 데이터르들을 한꺼번에 불러오고, `prefetch_related`는 상위 테이블 한번, 그 상위 테이블에서 조회된 고유키를 가지고 하위 테이블 조회 함으로써 총 2번 요청을 한다. 이렇게 Lazy Loading이 아닌, 미리미리 데이터를 불러와서 활용하는 방식을 **Eager Loading** 이라고 한다.
 
 
 ## 모델 구조
@@ -152,7 +150,7 @@ short_diaries라는 이름의 field name이 없다는 문구가 뜬다. User Mod
 
 ## prefetch_related 와 함께 하위 테이블에 대한 정렬을 하려는 경우
 
-간혹 하위 테이블을 기준으로 정렬을 하려는 경우가 있다. 그런데 위에서 언급했다시피 prefetch_related는 역참조 또는 1..n대다에서 사용되는 함수다. 즉, 하위 테이블의 데이터가 여러개 존재할 수 있다는 얘기가 된다. 결국, 하위 테이블의 모든 데이터들을 참조할 수 밖에 없고, 그 결과 하위 테이블의 갯수대로 상위 테이블 데이터가 중복이 된다. 따라서 prefetch_related를 사용할 경우, 하위 테이블을 기준으로 정렬하는 것을 권장하지 않고, 어쩔 수 없이 사용하게 된다면, 쿼리 결과를 그대로 사용하는게 아니라 별도의 로직을 통해 데이터를 가공해야 할 필요가 있다.
+간혹 하위 테이블을 기준으로 정렬을 하려는 경우가 있다. 그런데 위에서 언급했다시피 prefetch_related는 역참조 또는 1..n대다에서 사용되는 함수다. 즉, 하위 테이블의 데이터가 여러개 존재할 수 있다는 얘기가 된다. 결국, 하위 테이블의 모든 데이터들을 참조할 수 밖에 없고, 그 결과 **하위 테이블의 갯수대로 상위 테이블 데이터가 중복이 된다.** 따라서 prefetch_related를 사용할 경우, 하위 테이블을 기준으로 정렬하는 것을 권장하지 않고, 어쩔 수 없이 사용하게 된다면, 쿼리 결과를 그대로 사용하는게 아니라 별도의 로직을 통해 데이터를 가공해야 할 필요가 있다.
 
 
 ### 예시
@@ -176,7 +174,7 @@ Prefetched Users: 10 # 2 x 5 = 10
 참조된 하위 테이블 중 가장 위에 있는 데이터를 사용하기 위해 `first()` 또는 `get()`을 사용을 하는 경우가 생기는데, 이 두개의 함수를 사용하게 되면 Eager Loading을 했음에도 불구하고 다시 N + 1 Problem 이 발생하는 사고가 생긴다.
 
 ```python
-users = User.objects.prefetch_related("short_diaries").order_by("short_diaries__id")
+users = User.objects.prefetch_related("short_diaries")
 for user in users:
     diary = user.short_diaries.first()
     print(diary.title)
