@@ -2,7 +2,7 @@
 layout: post
 title:  "매직 넘버(Magic Number)의 의미와 유의해야 할 점"
 date:   2024-12-13 09:30:00 +0900
-categories: "Arhitecture-Cleancode"
+categories: "Software_Arhitecture"
 summary: "스파게티 코드의 주범인 매직 넘버에 대해서 알아보자."
 tags: ["clean-code"]
 image: ""
