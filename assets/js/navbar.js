@@ -19,11 +19,11 @@ $(() => {
     });
 
     $('#navbar-menu-button').click(() => {
-        const leftSideBar = $('#left-side-bar');
-        if (leftSideBar.hasClass('hidden')) {
-            leftSideBar.removeClass('hidden');
+        const navbarMenu = $('#navbar-menu');
+        if (navbarMenu.hasClass('hidden')) {
+            navbarMenu.removeClass('hidden');
         } else {
-            leftSideBar.addClass('hidden');
+            navbarMenu.addClass('hidden');
         }
     });
 });

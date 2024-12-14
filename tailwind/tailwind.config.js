@@ -59,6 +59,7 @@ module.exports = {
             'hr-light': '0 0 10px 1px #fb7185',
             'hr-dark': '0 0 10px 1px #fde047',
             'footer-light': '#fde04780 0px -20px 50px -12px;',
+            'navbar-menu': 'rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;'
         },
         minWidth: {
             default: '600px'
@@ -67,7 +68,7 @@ module.exports = {
             default: '800px'
         },
         zIndex: {
-            navbar: '50',
+            navbar: '40',
             footer: '20',
             'left-side': '30',
             'main-container': '0',
