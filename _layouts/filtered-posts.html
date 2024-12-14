@@ -11,9 +11,8 @@
     {% include head.html %}
     <body>
         {% include navbar.html %}
-        {% include left-side.html %}
-
         <div class="web-main-container">
+            {% include left-side.html %}
             <div class="web-main-item">
                 <h1 class="text-center">{{ page.type }}</h1>
                 {% include filtered-post-list.html %}
