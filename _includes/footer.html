@@ -1,12 +1,15 @@
 <div class="
     absolute layout-container
-    w-full h-40 bottom-0
+    w-full bottom-0 flex flex-col pb-10
     text-ornage-800 text-sm text-white font-footer
     bg-lime-600 dark:bg-zinc-900 bg-opacity-80
     dark:border-t shadow-footer-light
     z-footer
 ">
-    <div class="layout-item pt-6 leading-relaxed justify-between flex px-4">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        {% include default-social-list.html %}
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
         <div>
             <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
             <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>

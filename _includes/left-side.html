@@ -1,40 +1,19 @@
 <div id="left-side-bar" class="
-    hidden xl:block z-left-side
-    fixed min-h-full h-[120vh] w-[350px] py-[100px] px-4
+    hidden xl:block
+    w-[300px] py-[100px] px-6
     bg-white dark:bg-zinc-900
     shadow-layout
 ">
     <div class="w-full text-center">
-        <img src="{{ site.baseurl | append: site.profile_image }}" width="240px" height="240px"
-            class="mx-auto border-[10px] border-yellow-100 dark:border-zinc-700" alt="profile"
+        <img src="{{ site.baseurl | append: site.profile_image }}" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
         />
         <h2 class="font-bold text-rose-400 dark:text-yellow-200">{{ site.nickname }}</h2>
         <p>{{ site.user_description }}</p>
     </div>
-    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
-        {% if site.social.github %}
-        <a href="{{ site.social.github }}" class="social-icon"><i class="bi bi-github" alt="github"></i></a>
-        {% endif %}
 
-        {% if site.social.email %}
-        <a href="{{ 'mailto:' | append: site.social.email }}" class="social-icon"><i class="bi bi-envelope-fill" alt="email"></i></a>
-        {% endif %}
-
-        {% if site.social.x %}
-        <a href="{{ site.social.x }}" class="social-icon"><i class="bi bi-twitter-x" alt="x"></i></a>
-        {% endif %}
-
-        {% if site.social.instagram %}
-        <a href="{{ site.social.instagram }}" class="social-icon"><i class="bi bi-instagram"></i></a>
-        {% endif %}
-
-        {% if site.social.youtube %}
-        <a href="{{ site.social.youtube }}" class="social-icon"><i class="bi bi-youtube"></i></a>
-        {% endif %}
-
-        {% if site.social.website %}
-        <a href="{{ site.social.website }}" class="social-icon"><i class="bi bi-globe-asia-australia"></i></a>
-        {% endif %}
+    <div class="sidebar-social-icon-color w-full mt-10 flex flex-wrap justify-center gap-8">
+        {% include default-social-list.html %}
     </div>
 
     <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
@@ -45,3 +24,4 @@
         <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="{{ site.baseurl | append: '/categories' }}">Categories</a>
     </div>
 </div>
+<div class="w-[1px] bg-gray"></div>
