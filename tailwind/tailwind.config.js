@@ -47,7 +47,7 @@ module.exports = {
             mobileY: '6em',
         },
         fontFamily: {
-            default: ['Orbit'],
+            default: ['Noto Serif KR'],
             code: ['Nanum Gothic Coding'],
             footer: ['Nanum Myeongjo']
         },
