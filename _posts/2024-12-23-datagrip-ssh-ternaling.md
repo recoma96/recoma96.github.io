@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Datagrip에서 SSH 터널링으로 데이터베이스 접근하기"
-date:   2024-12-23 14:00:00 +0900
+date:   2024-12-23 13:00:00 +0900
 categories: "개발도구_사용법"
 summary: "Datagrip에서 사방이 막혀 있는 데이터베이스를 SSH를 통해 접근하는 방법을 알아보자."
 tags: ["database", "ide", "datagrip"]
