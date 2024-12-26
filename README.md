@@ -14,13 +14,41 @@
 ![dark-mode](./readme-assets/dark-mode.png)
 
 
-## 💿 How To install
+## 💿 Installation
 
-### Install Packages
+### Fork This
 
 * Just [fork this repo](https://github.com/recoma96/lollineon/fork).
-* If you use this by deploying github page. You must using **`release` branch**. Because css file compiled by tailwindcss is existed only `release`
+* If you use this by deploying github page. Use **`release` branch**. Because `release` is published branch.
 
+### Set Github Token
+
+1. For deploy this. Save "Github Token" as secret key.
+2. Goto Repository -> Settings -> Secrets and variables -> Actions -> New Repository secret
+3. Write Name as `ACCOUNT_GITHUB_TOKEN` and Secret as your github token. then click "Add secret".
+
+### Download to local
+
+0. Download this repo.
+1. Install `ruby`
+2. Run `bundle install` for install packages.
+3. install tailwindcss compiler
+    ```
+    $ cd tailwind
+    $ npm i
+    $ cd ..
+    ```
+4. Run `tailwind-compiler-dev.sh` and don't terminate while develop this. Because this theme use [tailwindcss](https://tailwindcss.com/). while running it. CSS is compiled automticlly when you modify html files.
+5. Run `jekyll serve` for run this. and write your story or custom styles.
+
+
+### Change Deployment branch
+
+After building by using github action. The new branch named as 'gh-pages' is added to your github repository. `gh-pages` is result of build. For deploy this. you change deploy branch as `gh-pages`
+
+1. Goto Github Repo -> Settings -> Pages
+2. change branch to `gh-pages`
+3. re push or re-run github action.
 
 
 ## ✔️ Usage
@@ -101,17 +129,7 @@ Sometimes, You need to import some images into post and index page. To import th
   ![testimage](/assets/img/post/{image filename})
   ```
 
-
-## 🔧 Development
-
-0. Download this repo.
-1. Install `ruby`
-2. Run `bundle install` for install packages.
-3. Run `tailwind-compiler-dev.sh` and don't terminate while develop this. Because this theme use [tailwindcss](https://tailwindcss.com/). while running it. CSS is compiled automticlly when you modify html files.
-3. Run `jekyll serve` for run this.
-
-
-### Roll of Pull Request
+## Roll of Pull Request
 
 * PR to `main` branch. no others.
 * **DO NOT** add `assets/main.css` compiled from taimwindcss. All of branches except release don't have `main.css`. this file is for only deploy.
