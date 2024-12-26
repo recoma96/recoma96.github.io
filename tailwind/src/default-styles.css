@@ -7,7 +7,7 @@
     .MathJax_SVG_Display { @apply whitespace-pre-wrap }
     mjx-container {mjx-math { @apply whitespace-pre-wrap; }}
 
-    body        { @apply    m-0 leading-7 font-default break-words text-[0.93em]
+    body        { @apply    leading-7 font-default break-words text-[0.93em]
                             bg-yellow-50 dark:bg-zinc-800
                             text-light-text-default dark:text-dark-text-default
                             relative min-h-screen h-auto; }
@@ -42,6 +42,7 @@
     .post-card .tag { @apply text-light-text-default dark:text-dark-text-default }
 
     .layout-container   { @apply    flex justify-center px-mobileX xl:px-desktopX; }
+    .layout-navbar      { @apply    flex justify-center px-mobileX xl:px-[140px]; }
     .layout-item        { @apply    w-full xl:min-w-default xl:max-w-default }
     .web-main-container { @apply    layout-container px-0 z-main-container min-h-screen; }
     .web-main-item      { @apply    layout-item shadow-layout 
