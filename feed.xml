@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://sweetcase-production.github.io/lollineon/feed.xml" rel="self" type="application/atom+xml" /><link href="https://sweetcase-production.github.io/lollineon/" rel="alternate" type="text/html" /><updated>2024-12-26T01:27:20+00:00</updated><id>https://sweetcase-production.github.io/lollineon/feed.xml</id><title type="html">LolliNeon</title><entry><title type="html">Markdown Test 마크다운 테스트</title><link href="https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test.html" rel="alternate" type="text/html" title="Markdown Test 마크다운 테스트" /><published>2024-09-14T16:04:25+00:00</published><updated>2024-09-14T16:04:25+00:00</updated><id>https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test</id><content type="html" xml:base="https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test.html"><![CDATA[<h1 id="h1">H1</h1>
+<p>첫번째 내용</p>
+
+<h2 id="h2">H2</h2>
+<p>두번째 내용</p>
+
+<h3 id="h3">H3</h3>
+<p>세번째 내용</p>
+
+<h1 id="테스트">테스트</h1>
+<p>해당 문법은 kramdown입니다.</p>
+<hr />
+
+<h1 id="로렘-입숨">로렘 입숨</h1>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<h1 id="코드">코드</h1>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 파이썬이 짱이쥐 ㅋㅋㅋ
+</span><span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello World!</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_2022</span><span class="p">():</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello 2022!</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="nf">hello_world</span><span class="p">()</span>
+<span class="nf">hello_2022</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h1 id="단어속-코드">단어속 코드</h1>
+
+<p>hello <code class="language-plaintext highlighter-rouge">world!</code></p>
+
+<h1 id="이미지">이미지</h1>
+<p>이미지 불러오기
+기존 마크다운과 일치하나 이미지 루트 의 맨 앞에 site.baseurl 을 붙입니다.</p>
+<ul>
+  <li>Example</li>
+</ul>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span><span class="p">[</span><span class="n">testimage</span><span class="p">](</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">img</span><span class="o">/</span><span class="n">post</span><span class="o">/</span><span class="n">example1</span><span class="p">.</span><span class="n">gif</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>이 아래에 있는 건 이미지다</p>
+
+<p><img src="/assets/img/post/example1.gif" alt="testimage" /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbccccccccccccccccdfdddddddddddddddddd
+</code></pre></div></div>
+
+<h1 id="글씨-">글씨 👌</h1>
+<ul>
+  <li>Normal</li>
+  <li><em>italics</em></li>
+  <li><del>Strikethrough</del></li>
+  <li>– endash –</li>
+  <li>— em-dash —</li>
+  <li>« guilemet »</li>
+  <li>… ellipsis</li>
+  <li>Emoji: 👌</li>
+  <li><strong>bold</strong></li>
+</ul>
+
+<h1 id="paragraph">paragraph</h1>
+
+<blockquote>
+  <p>This is quote
+Quote 2
+Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3</p>
+</blockquote>
+
+<p>This is a<br />
+line break</p>
+
+<hr />
+
+<h1 id="ordered-list">Ordered List</h1>
+<ul>
+  <li>Numbering
+    <ol>
+      <li>Num1
+        <ul>
+          <li>Pay Attention</li>
+        </ul>
+      </li>
+      <li>Num2</li>
+      <li>Num3</li>
+    </ol>
+  </li>
+</ul>
+
+<h1 id="foot-notes">Foot Notes</h1>
+<p>Here’s a simple footnote,<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup> and here’s a longer one.<sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">2</a></sup></p>
+
+<h1 id="links">Links</h1>
+<p><a href="https://www.google.com">google</a></p>
+
+<p><a href="http://google.com">google</a></p>
+
+<h1 id="table">Table</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Header1</th>
+      <th style="text-align: left">Header2</th>
+      <th style="text-align: right">Header3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td style="text-align: left">2</td>
+      <td style="text-align: right">3</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td style="text-align: left">5</td>
+      <td style="text-align: right">6</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td>8</td>
+      <td style="text-align: left">95</td>
+      <td style="text-align: right">106</td>
+    </tr>
+    <tr>
+      <td>894</td>
+      <td style="text-align: left">345</td>
+      <td style="text-align: right">866</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>Foot1</td>
+      <td style="text-align: left">Foot2</td>
+      <td style="text-align: right">Foot3</td>
+    </tr>
+  </tfoot>
+</table>
+
+<h1 id="math">MATH</h1>
+
+\[a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha \\
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha \\
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha
+a^2 = b^2 + c^2 - 2bc\cos\alpha\]
+
+<p><br />
+<br /></p>
+
+\[\begin{aligned}
+\sqrt{37} &amp; = \sqrt{\frac{73^2-1}{12^2}} \\
+ &amp; = \sqrt{\frac{73^2}{12^2}\cdot\frac{73^2-1}{73^2}} \\ 
+ &amp; = \sqrt{\frac{73^2}{12^2}}\sqrt{\frac{73^2-1}{73^2}} \\
+ &amp; = \frac{73}{12}\sqrt{1 - \frac{1}{73^2}} \\ 
+ &amp; \approx \frac{73}{12}\left(1 - \frac{1}{2\cdot73^2}\right)
+\end{aligned}\]
+
+<h1 id="코드-1">코드</h1>
+
+<p>아래 있는 건 코드다</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">sys</span>
+<span class="kn">import</span> <span class="n">heapq</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">stdin</span><span class="p">.</span><span class="n">readline</span>
+<span class="n">MAX</span> <span class="o">=</span> <span class="mi">100_001</span>
+
+<span class="n">N</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="nf">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nf">input</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="nf">split</span><span class="p">())</span>
+<span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">)]</span> <span class="o">*</span> <span class="n">MAX</span>
+
+
+<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">)]</span>
+    <span class="c1"># (횟수, 위치)
+</span>
+
+    <span class="c1"># 예외처리
+</span>    <span class="k">if</span> <span class="n">N</span> <span class="o">==</span> <span class="n">K</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sh">"</span><span class="s">0</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">1</span><span class="sh">"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="n">K</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">K</span><span class="p">),</span> <span class="sh">"</span><span class="s">1</span><span class="sh">"</span><span class="p">]</span>
+
+    <span class="n">min_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+    <span class="k">def</span> <span class="nf">__move</span><span class="p">(</span><span class="n">cnt</span><span class="p">,</span> <span class="n">next_n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">next_n</span> <span class="o">&lt;=</span> <span class="mi">100_000</span> <span class="ow">and</span> <span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="p">.</span><span class="nf">heappush</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">next_n</span><span class="p">))</span>
+            
+    <span class="k">while</span> <span class="n">Q</span><span class="p">:</span>
+        <span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">=</span> <span class="n">heapq</span><span class="p">.</span><span class="nf">heappop</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+
+        <span class="c1"># 도착 지점인 지 확인
+</span>        <span class="k">if</span> <span class="n">cur_n</span> <span class="o">==</span> <span class="n">K</span> <span class="ow">and</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">)</span> <span class="ow">or</span> <span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="n">cur_cnt</span><span class="p">):</span>
+            <span class="n">min_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">times</span><span class="p">[</span><span class="n">cur_n</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">cur_cnt</span><span class="p">:</span>
+            <span class="c1"># 처음 도달하거나 더 빠른 시간으로 도달한 경우
+</span>            <span class="c1"># 근데 어차피 힙을 돌리기 때문에 그럴 일은 없다
+</span>            <span class="c1"># 적립 후 움직이기
+</span>            <span class="n">times</span><span class="p">[</span><span class="n">cur_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_cnt</span>
+            <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cur_n</span> <span class="o">&lt;</span> <span class="n">K</span><span class="p">:</span>
+                <span class="c1"># 작을 때만 가자
+</span>                <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+            
+
+
+        <span class="c1"># 도달했는 지 확인
+</span>        <span class="c1"># 힙으로 돌렸기 때문에 맨 처음 도착하는 순이 가장 빠른 부분
+</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]),</span> <span class="nf">str</span><span class="p">(</span><span class="n">min_cnt</span><span class="p">)]</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\n</span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">process</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">)))</span>
+</code></pre></div></div>
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1" role="doc-endnote">
+      <p>And here is the definition. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:2" role="doc-endnote">
+
+      <p>Second Definition</p>
+      <blockquote>
+        <p>with using quote</p>
+      </blockquote>
+      <p><a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://sweetcase-production.github.io/lollineon" /><media:content medium="image" url="https://sweetcase-production.github.io/lollineon" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[백준, leetcode] 연결리스트로 팰린드롬 확인하기</title><link href="https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" rel="alternate" type="text/html" title="[백준, leetcode] 연결리스트로 팰린드롬 확인하기" /><published>2023-12-07T16:04:25+00:00</published><updated>2023-12-07T16:04:25+00:00</updated><id>https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome</id><content type="html" xml:base="https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html"><![CDATA[<h1 id="문제">문제</h1>
+<p><a href="https://www.acmicpc.net/problem/1259">백준: 팰린드롬수 [브론즈 1]</a> <br />
+<a href="https://leetcode.com/problems/palindrome-linked-list">leetcode: palindrome linked list [Easy]</a></p>
+
+<p><br /></p>
+
+<h1 id="팰린드롬이란">팰린드롬이란?</h1>
+<p><img src="https://media.vlpt.us/images/vector7/post/3a8305c6-bc65-4eee-97aa-690c2056f9e6/blog-Page-3.drawio.png" alt="palin" /></p>
+
+<p>“회문”이라고도 하며 문장 또는 단어의 왼쪽 오른쪽이 대칭인 것을 말합니다. 예를들어 단어로는 <strong>12321</strong> 이 있고 문장으로는 <strong>a man, a plan, a canal: panama (amanaplana c analpanama)</strong> 가 있습니다.</p>
+
+<p><br /><br /></p>
+
+<h1 id="문제-1">문제</h1>
+<h2 id="공통">공통</h2>
+<p>입력으로 자연수가 주어집니다. 해당 자연수가 팰린드롬인지 확인하는 문제 입니다.</p>
+<h2 id="백준">백준</h2>
+<p>범위가 1부터 99999 까지 이고, 문자열 형태로 주어집니다.</p>
+<h2 id="leetcode">leetcode</h2>
+<p>1부터 100000 까지가 범위이고 <strong>문자열이 아닌 연결 리스트로 주어집니다.</strong></p>
+<h2 id="접근">접근</h2>
+<p><strong>백준-팰린드롬수</strong>에서는 팰린드롬을 구할 수 있는 방법이 여러가지 있습니다. 문자열을 하나 복사한 다음 뒤집어서 팰린드롬을 확인한다거나, 파이썬에서는 문자열을 collections.deque로 변환한 다음에 양쪽으로 하나 씩 pop 하면서 문자 일치/불일치를 확인할 수 있습니다. 하지만 이번 장에서는 <strong>단일 연결 리스트</strong>로 풀어보려 합니다.</p>
+
+<p><br /><br /></p>
+
+<h1 id="풀이">풀이</h1>
+<p><strong>leetcode 기준으로 설명합니다.</strong></p>
+
+<p><img src="https://media.vlpt.us/images/vector7/post/f1915148-79de-4b7e-99bf-47368daf7a69/blog-Page-3.drawio%20(1).png" alt="" /></p>
+
+<p>위의 문제를 푸는 데 크게 두 가지의 방법이 있습니다.</p>
+
+<h2 id="deque로-변환">Deque로 변환</h2>
+<p>연결리스트로 되어있는 데이터를 순환해서 deque를 형성한 다음 아까 문제-접근에서 설명한 방법데로 deque를 이용해서 풀 수 있습니다. 그러나 이는 연결리스트를 제대로 활용하지 못한 풀이로 문제에서 원하는 풀이법이 아닙니다. 게다가 한번 순회를 해서 deque를 생성한 다음 다시 문자열 길이의 1/2를 또 순회해서 확인을 해야 할 뿐만 아니라, 노드의 값들을 복사해서 deque에 삽입하기 때문에 추가로 시간이 발생하게 됩니다.</p>
+
+<h2 id="러너-기법을-이용한-풀이">러너 기법을 이용한 풀이</h2>
+<p>러너 기법을 이용해서 다른 자료구조를 따로 생성할 필요 없이 문제를 풀 수 있습니다.</p>
+
+<h3 id="러너-기법이란">러너 기법이란?</h3>
+<p><img src="https://media.vlpt.us/images/vector7/post/742bbed0-e78e-4f61-9c05-b4b47128e604/blog-Page-3.drawio%20(2).png" alt="" /></p>
+
+<p>러너 기법이란 출발 노드(head)를 두개 선언하고 하나는 한칸, 다른 하나는 두 칸 씩 이동해서 연결 리스트의 중간 지점을 찾는 기법 입니다.
+이 문제에서는 left가 중간 지점으로 이동하면서 기존 노드를 이용해 역순 리스트를 만든 다음, left 지점과 역순 리스트를 이용해 팰린드롬을 확인합니다.</p>
+
+<p><br /></p>
+
+<h3 id="순서">순서</h3>
+<h4 id="역순-리스트-만들기">역순 리스트 만들기</h4>
+<h5 id="turn-1">[Turn 1]</h5>
+<ol>
+  <li>
+    <p>left, right전부 head에 위치합니다</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/8d9e1a00-3a0c-474f-9c24-0c1a58809342/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>right를 2칸 이동하고 left지점에 tmp를 선언한 다음, left를 한 칸 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/ada623dd-a6bb-42da-b1e2-612b694c31b7/blog-Page-3.drawio%20(1).png" alt="" /></p>
+  </li>
+  <li>
+    <p>tmp에 위치해 있는 노드를 역순 연결 리스트로 이동시킵니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/5b9bcd14-b29a-4328-8981-3d48f36c347b/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+</ol>
+
+<h5 id="turn-1-1">[Turn 1]</h5>
+<ol>
+  <li>
+    <p>아까와 마찬가지로 right 2칸, left위치에 tmp, left를 1칸 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/ce780f5c-42c7-4ba7-9e00-0e3069f43dd9/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>tmp에 위치해 있는 노드를 reverse head 뒷부분에 추가합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/2f9ed9ff-a64b-4b7e-bee7-5ee5aed2b017/blog-Page-3.drawio%20(1).png" alt="" /></p>
+  </li>
+</ol>
+
+<h5 id="turn-3">[Turn 3]</h5>
+<ol>
+  <li>
+    <p>right의 next부분이 Null인 상태, 즉 맨 끝에 위치해 있기 때문에 턴을 종료합니다.</p>
+
+    <blockquote>
+      <p>홀수 길이일 경우 right는 있지만 next가 Null이고 짝수 길이일 경우 right가 Null입니다. 따라서 밑에 코드에서도 쓰여져 있지만 while문을 돌릴 때 right and right.next를 조건으로 잡습니다.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h4 id="팰린드롬-확인하기">팰린드롬 확인하기</h4>
+
+<ol>
+  <li>
+    <p>이제 left와 reverse로 팰린드롬을 확인할 일만 남았습니다. 그전에 right의 상태를 파악해야 합니다. 홀수 길이일 경우, left는 말 그대로 정중앙에 위치해 있기 때문에 한 칸 더 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/e7084b21-1e60-4b47-9c99-33864a44d27f/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>left와 reverse에서의 연결리스트 길이는 일치하기 때문에 맨 끝에 다다를 때 까지 데이터가 일치하는 지만 확인하면 됩니다. 중간에 값이 틀리면 반복문에서 나가기 때문에 reverse가 None이면 False, None이 아니면 True로 출력하면 됩니다.</p>
+  </li>
+</ol>
+
+<p><br /></p>
+
+<h1 id="코드">코드</h1>
+
+<h2 id="leetcode-1">Leetcode</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListNode</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="nb">next</span>
+<span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">isPalindrome</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ListNode</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        
+        <span class="n">rev</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
+        
+        <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 2칸씩
+</span>            
+            <span class="c1"># 한 칸 씩, 그리고 역순 리스트에 데이터 추가
+</span>            <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+            
+            <span class="n">prev_node</span><span class="p">,</span> <span class="n">new_node</span> <span class="o">=</span> <span class="n">rev</span><span class="p">,</span> <span class="n">tmp</span>
+            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_node</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="n">new_node</span>
+        
+        <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+            <span class="c1"># 해당 문자열은 홀수, 따라서 left가 한 칸 더 이동해서 맞춘다
+</span>            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+            
+        
+        <span class="k">while</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">rev</span><span class="p">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="n">rev</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">rev</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+        
+        <span class="c1"># rev가 None일 경우 끝까지 확인했기 때문에 True다
+</span>        <span class="c1"># 따라서 not rev -&gt; 팰린드롬 O
+</span>        <span class="k">return</span> <span class="ow">not</span> <span class="n">rev</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<h2 id="baekjoon">BaekJoon</h2>
+
+<p>연결 리스트로 들어오지 않기 때문에 연결리스트를 생성하는 작업을 추가해야 합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="bp">None</span>        
+<span class="k">class</span> <span class="nc">LinkedList</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="c1"># 입력 연산을 줄이기 위해 Queue 스타일로 구현
+</span>        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_node</span><span class="p">,</span> <span class="n">next_node</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span>
+            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">next_node</span><span class="p">,</span> <span class="n">new_node</span>
+
+<span class="k">def</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">LinkedList</span><span class="p">):</span>
+
+    <span class="n">head</span> <span class="o">=</span> <span class="n">L</span><span class="p">.</span><span class="n">head</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
+    <span class="n">reverse</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
+</span>
+    <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
+        <span class="c1"># 오른쪽 두칸 이동
+</span>        <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span>
+        
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span> <span class="c1"># 역순 리스트를 만들기 위한 node
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 한 칸 이동
+</span>        
+        <span class="c1"># 역순 리스트 생성
+</span>        <span class="n">prev_reverse</span><span class="p">,</span> <span class="n">new_reverse</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">tmp</span>
+        <span class="n">new_reverse</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_reverse</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="n">new_reverse</span>
+
+        <span class="c1"># 또는 이렇게 표현 가능
+</span>        <span class="c1"># reverse, reverse.next, left = left, reverse, left.next
+</span>
+    <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+        <span class="c1"># right에 노드가 남아있는 경우 -&gt; 노드 길이가 홀수
+</span>        <span class="c1"># 한칸 이동한다
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+
+    <span class="k">while</span> <span class="n">reverse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span> <span class="o">!=</span> <span class="n">reverse</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="c1"># 다르면 팰린드롬이 아니다
+</span>            <span class="k">return</span> <span class="sh">"</span><span class="s">no</span><span class="sh">"</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">reverse</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">reverse</span><span class="p">.</span><span class="nb">next</span>
+    <span class="k">return</span> <span class="sh">"</span><span class="s">yes</span><span class="sh">"</span>
+
+<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+    <span class="c1"># 연결 리스트 생성
+</span>    <span class="n">l</span> <span class="o">=</span> <span class="nc">LinkedList</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>
+        <span class="n">l</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
+<span class="n">R</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="n">S</span> <span class="o">!=</span> <span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">:</span>
+
+    <span class="c1"># Check 펠린드롬
+</span>    <span class="n">R</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
+
+
+</code></pre></div></div>]]></content><author><name></name></author><category term="코테_뽀개기" /><category term="algorithm" /><summary type="html"><![CDATA[문제 백준: 팰린드롬수 [브론즈 1] leetcode: palindrome linked list [Easy]]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://sweetcase-production.github.io/lollineon" /><media:content medium="image" url="https://sweetcase-production.github.io/lollineon" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>

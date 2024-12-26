@@ -1,0 +1,4 @@
+$(() => {
+    $('html').addClass(getTheme());
+    randomizeAllTags();
+});

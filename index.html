@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://sweetcase-production.github.io/lollineon/assets/css/main.css">
+    <link rel="stylesheet" href="https://sweetcase-production.github.io/lollineon/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/lollineon/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            LolliNeon
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/"">Home</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/categories">Categories</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/lollineon/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>Lightmode is Lollipop, and darkmode is Neon Sign</p>
+    </div>
+
+    <div class="sidebar-social-icon-color w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/">Home</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/categories">Categories</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="pt-12">
+                    <h1 id="lollineon">LolliNeon</h1>
+
+<p><strong>Lollineon</strong> is jekyll engined blog that is LolliPop styled in light-mode and NeonSign styled in dark-mode</p>
+
+<h2 id="️-usage">✔️ Usage</h2>
+
+<h3 id="setting-configuration">Setting Configuration</h3>
+
+<p>Add following to the <code class="language-plaintext highlighter-rouge">_config.yml</code></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">title</span><span class="pi">:</span> <span class="s">&lt;Your blog name&gt;</span>
+<span class="na">email</span><span class="pi">:</span> <span class="s">&lt;Your email&gt;</span>
+
+<span class="na">nickname</span><span class="pi">:</span> <span class="s">&lt;Your nickname&gt;</span>
+<span class="na">user_description</span><span class="pi">:</span> <span class="s">&lt;Write short description about you&gt;</span>
+<span class="na">profile_image</span><span class="pi">:</span> <span class="s">&lt;url of your profile image&gt;</span> <span class="c1"># width and height of your image must be same!</span>
+
+<span class="na">social</span><span class="pi">:</span>
+  <span class="na">github</span><span class="pi">:</span>
+  <span class="na">email</span><span class="pi">:</span>
+  <span class="na">x</span><span class="pi">:</span> <span class="s">&lt;Your twitter page&gt;</span>
+  <span class="na">instagram</span><span class="pi">:</span>
+  <span class="na">youtube</span><span class="pi">:</span>
+  <span class="na">website</span><span class="pi">:</span> <span class="s">&lt;Your other website&gt;</span>
+</code></pre></div></div>
+
+<h3 id="home-about-page">Home (About) Page</h3>
+
+<p>Modify <code class="language-plaintext highlighter-rouge">index.md</code> file and add the following</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: home
+title: Home
+permalink: /
+---
+
+# This is My Blog
+
+This name is LolliLemon!
+
+</code></pre></div></div>
+
+<h3 id="posting">Posting</h3>
+
+<p>Create markdown file into <code class="language-plaintext highlighter-rouge">_posts</code> file. This filename following this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>YYYY-mm-dd-{this is post title}.md
+</code></pre></div></div>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">YYYY-mm-dd</code> is Date (ex: 2024-09-13)</li>
+  <li><code class="language-plaintext highlighter-rouge">post-title</code> is only english and hipen <code class="language-plaintext highlighter-rouge">-</code></li>
+</ul>
+
+<p>Post header following this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post
+title:  &lt;Post title name&gt;
+date:   YYYY-mm-dd HH:MM:SS (+0000)
+categories: &lt;Category-name of this post&gt;
+summary: &lt;short summary of this post&gt;
+tags: ["tag1", "tag2"]
+---
+</code></pre></div></div>
+
+<h3 id="upload-and-import-image-into-markdown-files">Upload And Import Image Into markdown files</h3>
+
+<p>Sometimes, You need to import some images into post and index page. To import this following this</p>
+
+<ol>
+  <li>add image you want into <code class="language-plaintext highlighter-rouge">assets/img/post</code></li>
+  <li>write this into markdown file
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ![testimage](/assets/img/post/{image filename})
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/util.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/navbar.js"></script>
+        <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/post-list.js"></script>
+    </body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[백준, leetcode] 연결리스트로 팰린드롬 확인하기</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://sweetcase-production.github.io/lollineon/assets/css/main.css">
+    <link rel="stylesheet" href="https://sweetcase-production.github.io/lollineon/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/lollineon/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            LolliNeon
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/"">Home</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/categories">Categories</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/lollineon/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>Lightmode is Lollipop, and darkmode is Neon Sign</p>
+    </div>
+
+    <div class="sidebar-social-icon-color w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/">Home</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/lollineon/categories">Categories</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            [백준, leetcode] 연결리스트로 팰린드롬 확인하기
+        </h2>
+        <p class="font-semibold"><a href="/lollineon/categories/#코테_뽀개기" class="no-underline text-orange-700 dark:text-blue-200">코테 뽀개기</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2023.12.07 16:04</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+</div>
+                <h1 id="문제">문제</h1>
+<p><a href="https://www.acmicpc.net/problem/1259">백준: 팰린드롬수 [브론즈 1]</a> <br />
+<a href="https://leetcode.com/problems/palindrome-linked-list">leetcode: palindrome linked list [Easy]</a></p>
+
+<p><br /></p>
+
+<h1 id="팰린드롬이란">팰린드롬이란?</h1>
+<p><img src="https://media.vlpt.us/images/vector7/post/3a8305c6-bc65-4eee-97aa-690c2056f9e6/blog-Page-3.drawio.png" alt="palin" /></p>
+
+<p>“회문”이라고도 하며 문장 또는 단어의 왼쪽 오른쪽이 대칭인 것을 말합니다. 예를들어 단어로는 <strong>12321</strong> 이 있고 문장으로는 <strong>a man, a plan, a canal: panama (amanaplana c analpanama)</strong> 가 있습니다.</p>
+
+<p><br /><br /></p>
+
+<h1 id="문제-1">문제</h1>
+<h2 id="공통">공통</h2>
+<p>입력으로 자연수가 주어집니다. 해당 자연수가 팰린드롬인지 확인하는 문제 입니다.</p>
+<h2 id="백준">백준</h2>
+<p>범위가 1부터 99999 까지 이고, 문자열 형태로 주어집니다.</p>
+<h2 id="leetcode">leetcode</h2>
+<p>1부터 100000 까지가 범위이고 <strong>문자열이 아닌 연결 리스트로 주어집니다.</strong></p>
+<h2 id="접근">접근</h2>
+<p><strong>백준-팰린드롬수</strong>에서는 팰린드롬을 구할 수 있는 방법이 여러가지 있습니다. 문자열을 하나 복사한 다음 뒤집어서 팰린드롬을 확인한다거나, 파이썬에서는 문자열을 collections.deque로 변환한 다음에 양쪽으로 하나 씩 pop 하면서 문자 일치/불일치를 확인할 수 있습니다. 하지만 이번 장에서는 <strong>단일 연결 리스트</strong>로 풀어보려 합니다.</p>
+
+<p><br /><br /></p>
+
+<h1 id="풀이">풀이</h1>
+<p><strong>leetcode 기준으로 설명합니다.</strong></p>
+
+<p><img src="https://media.vlpt.us/images/vector7/post/f1915148-79de-4b7e-99bf-47368daf7a69/blog-Page-3.drawio%20(1).png" alt="" /></p>
+
+<p>위의 문제를 푸는 데 크게 두 가지의 방법이 있습니다.</p>
+
+<h2 id="deque로-변환">Deque로 변환</h2>
+<p>연결리스트로 되어있는 데이터를 순환해서 deque를 형성한 다음 아까 문제-접근에서 설명한 방법데로 deque를 이용해서 풀 수 있습니다. 그러나 이는 연결리스트를 제대로 활용하지 못한 풀이로 문제에서 원하는 풀이법이 아닙니다. 게다가 한번 순회를 해서 deque를 생성한 다음 다시 문자열 길이의 1/2를 또 순회해서 확인을 해야 할 뿐만 아니라, 노드의 값들을 복사해서 deque에 삽입하기 때문에 추가로 시간이 발생하게 됩니다.</p>
+
+<h2 id="러너-기법을-이용한-풀이">러너 기법을 이용한 풀이</h2>
+<p>러너 기법을 이용해서 다른 자료구조를 따로 생성할 필요 없이 문제를 풀 수 있습니다.</p>
+
+<h3 id="러너-기법이란">러너 기법이란?</h3>
+<p><img src="https://media.vlpt.us/images/vector7/post/742bbed0-e78e-4f61-9c05-b4b47128e604/blog-Page-3.drawio%20(2).png" alt="" /></p>
+
+<p>러너 기법이란 출발 노드(head)를 두개 선언하고 하나는 한칸, 다른 하나는 두 칸 씩 이동해서 연결 리스트의 중간 지점을 찾는 기법 입니다.
+이 문제에서는 left가 중간 지점으로 이동하면서 기존 노드를 이용해 역순 리스트를 만든 다음, left 지점과 역순 리스트를 이용해 팰린드롬을 확인합니다.</p>
+
+<p><br /></p>
+
+<h3 id="순서">순서</h3>
+<h4 id="역순-리스트-만들기">역순 리스트 만들기</h4>
+<h5 id="turn-1">[Turn 1]</h5>
+<ol>
+  <li>
+    <p>left, right전부 head에 위치합니다</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/8d9e1a00-3a0c-474f-9c24-0c1a58809342/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>right를 2칸 이동하고 left지점에 tmp를 선언한 다음, left를 한 칸 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/ada623dd-a6bb-42da-b1e2-612b694c31b7/blog-Page-3.drawio%20(1).png" alt="" /></p>
+  </li>
+  <li>
+    <p>tmp에 위치해 있는 노드를 역순 연결 리스트로 이동시킵니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/5b9bcd14-b29a-4328-8981-3d48f36c347b/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+</ol>
+
+<h5 id="turn-1-1">[Turn 1]</h5>
+<ol>
+  <li>
+    <p>아까와 마찬가지로 right 2칸, left위치에 tmp, left를 1칸 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/ce780f5c-42c7-4ba7-9e00-0e3069f43dd9/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>tmp에 위치해 있는 노드를 reverse head 뒷부분에 추가합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/2f9ed9ff-a64b-4b7e-bee7-5ee5aed2b017/blog-Page-3.drawio%20(1).png" alt="" /></p>
+  </li>
+</ol>
+
+<h5 id="turn-3">[Turn 3]</h5>
+<ol>
+  <li>
+    <p>right의 next부분이 Null인 상태, 즉 맨 끝에 위치해 있기 때문에 턴을 종료합니다.</p>
+
+    <blockquote>
+      <p>홀수 길이일 경우 right는 있지만 next가 Null이고 짝수 길이일 경우 right가 Null입니다. 따라서 밑에 코드에서도 쓰여져 있지만 while문을 돌릴 때 right and right.next를 조건으로 잡습니다.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h4 id="팰린드롬-확인하기">팰린드롬 확인하기</h4>
+
+<ol>
+  <li>
+    <p>이제 left와 reverse로 팰린드롬을 확인할 일만 남았습니다. 그전에 right의 상태를 파악해야 합니다. 홀수 길이일 경우, left는 말 그대로 정중앙에 위치해 있기 때문에 한 칸 더 이동합니다.</p>
+
+    <p><img src="https://media.vlpt.us/images/vector7/post/e7084b21-1e60-4b47-9c99-33864a44d27f/blog-Page-3.drawio.png" alt="" /></p>
+  </li>
+  <li>
+    <p>left와 reverse에서의 연결리스트 길이는 일치하기 때문에 맨 끝에 다다를 때 까지 데이터가 일치하는 지만 확인하면 됩니다. 중간에 값이 틀리면 반복문에서 나가기 때문에 reverse가 None이면 False, None이 아니면 True로 출력하면 됩니다.</p>
+  </li>
+</ol>
+
+<p><br /></p>
+
+<h1 id="코드">코드</h1>
+
+<h2 id="leetcode-1">Leetcode</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListNode</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="nb">next</span>
+<span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">isPalindrome</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ListNode</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        
+        <span class="n">rev</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
+        
+        <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 2칸씩
+</span>            
+            <span class="c1"># 한 칸 씩, 그리고 역순 리스트에 데이터 추가
+</span>            <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+            
+            <span class="n">prev_node</span><span class="p">,</span> <span class="n">new_node</span> <span class="o">=</span> <span class="n">rev</span><span class="p">,</span> <span class="n">tmp</span>
+            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_node</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="n">new_node</span>
+        
+        <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+            <span class="c1"># 해당 문자열은 홀수, 따라서 left가 한 칸 더 이동해서 맞춘다
+</span>            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+            
+        
+        <span class="k">while</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">rev</span><span class="p">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="n">rev</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">rev</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+        
+        <span class="c1"># rev가 None일 경우 끝까지 확인했기 때문에 True다
+</span>        <span class="c1"># 따라서 not rev -&gt; 팰린드롬 O
+</span>        <span class="k">return</span> <span class="ow">not</span> <span class="n">rev</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<h2 id="baekjoon">BaekJoon</h2>
+
+<p>연결 리스트로 들어오지 않기 때문에 연결리스트를 생성하는 작업을 추가해야 합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="bp">None</span>        
+<span class="k">class</span> <span class="nc">LinkedList</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="c1"># 입력 연산을 줄이기 위해 Queue 스타일로 구현
+</span>        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_node</span><span class="p">,</span> <span class="n">next_node</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span>
+            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">next_node</span><span class="p">,</span> <span class="n">new_node</span>
+
+<span class="k">def</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">LinkedList</span><span class="p">):</span>
+
+    <span class="n">head</span> <span class="o">=</span> <span class="n">L</span><span class="p">.</span><span class="n">head</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
+    <span class="n">reverse</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
+</span>
+    <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
+        <span class="c1"># 오른쪽 두칸 이동
+</span>        <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span>
+        
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span> <span class="c1"># 역순 리스트를 만들기 위한 node
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 한 칸 이동
+</span>        
+        <span class="c1"># 역순 리스트 생성
+</span>        <span class="n">prev_reverse</span><span class="p">,</span> <span class="n">new_reverse</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">tmp</span>
+        <span class="n">new_reverse</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_reverse</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="n">new_reverse</span>
+
+        <span class="c1"># 또는 이렇게 표현 가능
+</span>        <span class="c1"># reverse, reverse.next, left = left, reverse, left.next
+</span>
+    <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+        <span class="c1"># right에 노드가 남아있는 경우 -&gt; 노드 길이가 홀수
+</span>        <span class="c1"># 한칸 이동한다
+</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
+
+    <span class="k">while</span> <span class="n">reverse</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span> <span class="o">!=</span> <span class="n">reverse</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
+            <span class="c1"># 다르면 팰린드롬이 아니다
+</span>            <span class="k">return</span> <span class="sh">"</span><span class="s">no</span><span class="sh">"</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">reverse</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">reverse</span><span class="p">.</span><span class="nb">next</span>
+    <span class="k">return</span> <span class="sh">"</span><span class="s">yes</span><span class="sh">"</span>
+
+<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+    <span class="c1"># 연결 리스트 생성
+</span>    <span class="n">l</span> <span class="o">=</span> <span class="nc">LinkedList</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>
+        <span class="n">l</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+<span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
+<span class="n">R</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="n">S</span> <span class="o">!=</span> <span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">:</span>
+
+    <span class="c1"># Check 펠린드롬
+</span>    <span class="n">R</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/lollineon/tags/#algorithm">algorithm</a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/util.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/navbar.js"></script>
+    </body>
+</html>
