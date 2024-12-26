@@ -1,0 +1,46 @@
+name: Deploy LolliNeon
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'  # 필요에 따라 Ruby 버전을 변경하세요.
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'  # 필요에 따라 Node.js 버전을 변경하세요.
+
+      - name: Install Tailwind CSS
+        run: npm i
+        working-directory: ./tailwind
+
+      - name: Compile CSS
+        run: sh tailwind-compiler.sh
+        working-directory: ./
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.ACCOUNT_GITHUB_TOKEN }}
+          publish_dir: ./_site
