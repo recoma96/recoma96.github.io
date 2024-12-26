@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매직 넘버(Magic Number)의 의미와 유의해야 할 점</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/"">Home</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="sidebar-social-icon-color w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/">Home</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            매직 넘버(Magic Number)의 의미와 유의해야 할 점
+        </h2>
+        <p class="font-semibold"><a href="/categories/#Software_Arhitecture" class="no-underline text-orange-700 dark:text-blue-200">Software Arhitecture</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2024.12.13 00:30</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+</div>
+                <h1 id="매직-넘버의-의미와-문제점">매직 넘버의 의미와 문제점</h1>
+
+<p>매직 넘버(Magic Number)란 <strong>아무런 설명 없이 임의로 들어가는 상수 또는 기타 데이터</strong>를 의미한다. 즉, 개발자 입장에서는 코드상에 상수가 노출되어 있다는 뜻이 되기도 한다. 처음엔 뭔 소린지 와닿지 않겠지만 우리가 처음 코딩을 공부할 때 쥐도새도 모르게 밥먹듯이 썼던 개념이다. 밑의 예시를 보자.</p>
+
+<h2 id="예시1">예시1</h2>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kt">int</span> <span class="n">score</span><span class="p">;</span>
+<span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">score</span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'A'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">80</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'B'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">70</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'C'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'D'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"미달"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">if</code>문을 처음 공부할 때 국룰로 나오는 <code class="language-plaintext highlighter-rouge">grade</code>관련 분기 예시다. 이렇게 특정 설명 없이 90, 80, 70, 60 상수로 적혀 있는 것을 <strong>매직넘버</strong> 라고 한다. 하지만 이 상수들의 무엇을 의미하는지는 이미 코드에 명확하게 명시되어 있다. 90점 이상이면 A, 80점대면 B, 70점대면 C, 60점대면 D, 그 이하는 미달이다. 그렇기에 겉으로는 문제가 없어 보인다.</p>
+
+<blockquote>
+  <p>경우에 따라서는 ‘A’, ‘B’, ‘C’, ‘D’ 도 매직넘버로 보는 견해가 있다. 얘네들도 특정한 설명이 따로 없기 때문이다.</p>
+</blockquote>
+
+<h2 id="예시2">예시2</h2>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">input</span>
+
+<span class="nf">if</span><span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"남성입니다."</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"여성입니다."</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>코드를 보아하니 input이 3이면 남성이고 input이 4이면 여성으로 판정을 하고 있는 모양이다. 겉으로는 문제가 없어 보인다. 3이 남자고 4이 여자인게 명확하니까. 하지만 이건 어떨까?</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">send_fcm_to_single_user</code> 함수는 성별이 남성이면서(<code class="language-plaintext highlighter-rouge">user.gender == 3</code>) 동시에 특수유저(<code class="language-plaintext highlighter-rouge">user.is_specialist</code>)일때 중요 푸시알림을 보내고 그렇지 않으면 일반 푸시알림을 보낸다. 하지만 도메인을 모르는 사람 또는 신규 개발자가 이 코드를 보면 어떤 조건으로 중요 푸시알림을 발송하는지 전혀 모른다. <strong><code class="language-plaintext highlighter-rouge">user.gender == 3</code>이 도대체 어떤 것을 의미하는 지 모르기 때문이다.</strong> 당장 이 코드만 봐도 의도를 모르겠는데, 이러한 매직넘버들이 서비스 코드 도처에 깔려있다고 생각해 보자. 아마 담당자한테 일일이 반복적으로 이게 뭔 소린지 물어봐야 할 것이다. 게다가 만약에 남성을 지칭하는 상수가 3에서 5로 바뀐다면, <strong>파일 하나하나씩 뒤져가면서 3을 5로 바꿔야 하는 끔찍한 사태가 벌어질 것이다.</strong> 다 바꿨다 해도 결국 <strong>사람이 코드를 수정했기 때문에 휴먼에러가 일어날 가능성이 생기게 되고 이는 결국 서비스 장애로 이어지게 된다.</strong></p>
+
+<h1 id="제대로-사용하려면">제대로 사용하려면?</h1>
+
+<h2 id="고정-변수-형한정어-const-사용">고정 변수 (형한정어, const) 사용</h2>
+
+<p>매직 넘버를 고정변수로 변경을 해서, 다른 개발자들이 금방 알아볼 수 있게 하면 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// gender.cpp</span>
+<span class="k">const</span> <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">FEMAILE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+<span class="c1">// fcm.cpp</span>
+<span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="n">MALE</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>이제 <code class="language-plaintext highlighter-rouge">user.gender == MALE</code>로 바뀜으로써 누구한테 중요 알림을 보내는지 처음 보는 사람도 정확히 알 수 있게 되었다. 뿐만 아니라 남성 코드가 3에서 5로 바뀔 때, 일일이 3에서 5로 바꾸는 것이 아닌 <code class="language-plaintext highlighter-rouge">gender.cpp</code>의 <code class="language-plaintext highlighter-rouge">MALE</code>의 값만 변경하면 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">FEMAILE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">OTHER_SERVICE_MALE</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="k">const</span> <span class="n">OTHER_SERVICE_FEMAILE</span> <span class="o">=</span> <span class="mi">6</span>
+</code></pre></div></div>
+
+<p>하지만 특정 서비스에서의 성별 코드가 다르다면 동일 변수 이름을 피하기 위해 <code class="language-plaintext highlighter-rouge">OTHER_SERVICE_MALE</code> 처럼 앞에 접두사를 붙여야 한다. 이렇게 되면 변수명은 복잡해지게 되고 코드를 읽기가 힘들어지게 된다. 그래서 나온게 <code class="language-plaintext highlighter-rouge">Enum</code>이라는 구조체(클래스)다.</p>
+
+<h2 id="enum-사용">Enum 사용</h2>
+
+<p>좀더 나아가서 Enum 계열의 자료구조 또는 클래스를 활용할 수도 있다.
+Enum을 사용하게 되면 코드가 좀더 깔끔하게 정리가 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// gender.cpp</span>
+<span class="k">enum</span> <span class="n">Gender</span> <span class="p">{</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">enum</span> <span class="n">OtherServiceGender</span> <span class="p">{</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// fcm.cpp</span>
+<span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="o">::</span><span class="n">MALE</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="python의-경우-dict-vs-enum">Python의 경우 (dict vs Enum)</h3>
+
+<p>Python 에서도 <code class="language-plaintext highlighter-rouge">Enum</code>을 지원하기 하지만 상수 비교하는 과정이 다른 언어보다 약간 복잡하기 때문에 일부 Python 개발자들 사이에서는 <code class="language-plaintext highlighter-rouge">Enum</code>을 쓸지 <code class="language-plaintext highlighter-rouge">dict</code>를 쓸지 논란이 되기도 한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Gender</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">input_gender</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">input_gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="p">.</span><span class="n">MALE</span><span class="p">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">Gender</span><span class="p">.</span><span class="n">MALE</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Gender.MALE == input_gender</code>로 하면 비교 연산이 정상적으로 작동이 되지 않는다. <code class="language-plaintext highlighter-rouge">Gender.MALE</code>을 Enum 클래스로 인식하기 때문이다. <code class="language-plaintext highlighter-rouge">Gender.MALE.value</code> 까지 가야 상수와 비교 연산이 가능하다. <code class="language-plaintext highlighter-rouge">Gender.MALE.name</code>으로 하면 열거형 이름인 ‘MALE’ 이라는 문자열이 나온다. <code class="language-plaintext highlighter-rouge">.value</code>와 <code class="language-plaintext highlighter-rouge">.name</code>에 대해서 유용하게 사용할 수 있다는 긍정적인 시각도 있지만, 한편으로는 코드가 길어진다는 부정적인 시각도 존재한다. 내가 다니는 회사 역시 이러한 이유로 <code class="language-plaintext highlighter-rouge">Enum</code> 사용에 부정적이고 대신에 순수 변수나 <code class="language-plaintext highlighter-rouge">dict</code>를 사용한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Gender</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sh">"</span><span class="s">MALE</span><span class="sh">"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="sh">"</span><span class="s">FEMALE</span><span class="sh">"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">input_gender</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">input_gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="p">[</span><span class="sh">"</span><span class="s">MALE</span><span class="sh">"</span><span class="p">]:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">남성입니다.</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">dict</code>형을 사용하면 <code class="language-plaintext highlighter-rouge">.value</code>를 추가로 사용할 필요가 없어 코드가 짧아진다. 그러나 <code class="language-plaintext highlighter-rouge">Gender.MALE</code>이 아닌 <code class="language-plaintext highlighter-rouge">Gender["MALE"]</code>은 보는 사람에 따라 가독성에 방해가 될 수 있고. <code class="language-plaintext highlighter-rouge">Enum</code>처럼 열거 전용 자료구조가 아닌 범용으로 사용되는 <code class="language-plaintext highlighter-rouge">dict</code>를 사용했기 때문에 이게 열거형인지 아닌지 헷갈리는 경우가 생긴다는 단점이 있다. 따라서 <strong>파이썬의 경우 열거형을 구현할 때 <code class="language-plaintext highlighter-rouge">dict</code>를 쓸건지 <code class="language-plaintext highlighter-rouge">Enum</code>을 쓸건지, 그리고 어떻게 코드네이밍을 정할 지 고민 또는 팀원들 간에 논의를 할 필요가 있다.</strong></p>
+
+<h1 id="마치며">마치며</h1>
+
+<p>그동안 나를 포함한 대부분의 개발자들은 프로그래밍을 처음 공부를 하는 과정에 무의식적으로 매직넘버를 사용해 왔다. 그리고 그게 버릇이 되어 실무에서도 역시 무의식적으로 매직넘버를 사용하는 일도 생긴다. 나 역시 이런 실수를 여러번 해 왔고 이로 인해 일일이 상수를 변경해야 하는 등 여러번 댓가를 치루기도 했다. 매직넘버를 100% 사용하지 않는 것은 매우 힘들긴 하지만 그래도 가능한 사용하지 않는 방향으로 버릇을 고치는 일은 개발에 있어서 매우 중요한 요소이다.</p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#clean-code">clean-code</a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>

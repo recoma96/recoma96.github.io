@@ -3,7 +3,7 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Datagrip에서 SSH 터널링으로 데이터베이스 접근하기</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,20 +100,73 @@
 </div>
 <div class="w-[1px] bg-gray"></div>
             <div class="web-main-item">
-                <div class="pt-12">
-                    <h1 id="hello-">HELLO! 👋</h1>
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            Datagrip에서 SSH 터널링으로 데이터베이스 접근하기
+        </h2>
+        <p class="font-semibold"><a href="/categories/#개발도구_사용법" class="no-underline text-orange-700 dark:text-blue-200">개발도구 사용법</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2024.12.23 04:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
 
-<ul>
-  <li>My name is <strong>“Ha Jeong-Hyun”</strong> (a.k.a “recoma” from development field)</li>
-  <li>I am <strong>Backend Developer</strong>. Building server by using <strong>python</strong>. But, <strong>Sometimes others</strong>. (NodeJS, Golang etc..)</li>
-  <li>My main language is <strong>python</strong>. But, I like to study and use <strong>other lagnuages</strong>.</li>
-  <li>I persue to track errors and performace by <strong>using Test Codes</strong>.</li>
-  <li>I am interested In <strong>FE</strong>. So, I can using <strong>React, NextJS and TailwindCSS</strong> too.</li>
-  <li>I have romance developing <strong>embeded system firmware</strong>.</li>
-  <li>I like <strong>composing Music.</strong> and <strong>researching about harmonics</strong>.</li>
-  <li>My Account has only experimental developments. If you want to see my toy-projects, Please goto <a href="https://github.com/sweetcase-production">here</a></li>
-</ul>
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+</div>
+                <h1 id="개요">개요</h1>
 
+<p>데이터베이스는 고객의 중요 데이터를 저장하는 매우매우 중요한 시설이다. 그렇기 때문에 어지간한 기업에서는 데이터베이스 보안을 철처히 해놓는다. 내가 다니고 있는 회사도 마찬가지인데,
+일단 데이터베이스를 VPC에 포함시켜 VPC에 포함되는 서비스에서만 사용할 수 있게 했고, Publicy accessible을 False로 세팅함으로써 Security Group에서 0.0.0.0으로 범위를 설정해도 접속하지 못하게 막아놨다. 즉, 사내 IP로는 직접 접속이 불가능하고, 접속할 수 있는 유일한 방법은 오로지 SSH를 통해 운영서버에 접속을 한 다음, 그 운영서버에서 데이터베이스에 접속(mysql-client)해서 SQL문을 타이핑하는 방법이다. 보안상으로는 좋긴 하지만, 데이터베이스 접속을 터미널로 하는 것에 대해 불편함을 가진 적이 많았다. 하지만 데이터베이스 IDE중 하나인 <strong>DataGrip</strong> 에서는 SSH를 통해 데이터베이스를 접속하는 <strong>SSH 터널링</strong>을 지원한다.</p>
+
+<h1 id="사용법">사용법</h1>
+
+<ol>
+  <li>
+    <p>SSH/SSL 탭에 들어간다. 여기서 <strong>Use SSH Tunnel</strong> 을 체크하고 오른쪽에 …을 클릭한다.
+<img src="/assets/img/20241223/1.png" alt="1" /></p>
+  </li>
+  <li>
+    <p>SSH Configuration이라는 창이 뜨는데, 여기서는 데이터베이스에 접속할 서버 정보를 입력하면 된다. 즉 SSH 정보를 입력하면 되는데, 패스워드가 아니니 pem key를 사용할 경우 “Authentication type”에 “Key pair”를 선택하고 Private Key File에 pem키 경로를 입력하면 된다.
+<img src="/assets/img/20241223/2.png" alt="2" /></p>
+  </li>
+  <li>
+    <p>“Test Connection”을 클릭해 접속 여부를 확인한다. 성공했으면 아래와 같은 문구가 뜬다. <strong>데이터베이스에 접속할 서버와의 SSH 연동이 정상적으로 완료되었다는 뜻이다. 절대 데이터베이스 접속에 성공했다는 뜻이 아니다.</strong> 성공했으면 OK를 눌러 다시 뒤로 간다.</p>
+  </li>
+</ol>
+
+<p><img src="/assets/img/20241223/3.png" alt="3" /></p>
+
+<ol>
+  <li>General 탭에 돌아와서 데이터베이스 정보를 입력하면 된다. 여기부터는 일반적인 데이터베이스 접속하는 방법과 일치. Success 표시가 뜨면 연동하는데 성공했단 뜻이고, OK버튼을 누르면 그 다음부터 사용할 수 있다.</li>
+</ol>
+
+<p><img src="/assets/img/20241223/4.png" alt="4" /></p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#database">database</a>
+                    
+                    <a class="tag" href="/tags/#ide">ide</a>
+                    
+                    <a class="tag" href="/tags/#datagrip">datagrip</a>
+                    
                 </div>
             </div>
         </div>
@@ -156,6 +209,5 @@
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
-        <script type="text/javascript" src="https://recoma96.github.io/assets/js/post-list.js"></script>
     </body>
 </html>
