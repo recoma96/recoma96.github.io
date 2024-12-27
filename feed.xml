@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2024-12-27T02:10:01+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T00:00:00+00:00</published><updated>2024-12-27T00:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2024-12-27T02:13:17+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T00:00:00+00:00</published><updated>2024-12-27T00:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>회사에서 개발과 관련된 일을 하다 보면 OpenAPI를 이용한 기능을 구현할 때가 있다. 그런데 간혹 공공기관의 OpenAPI를 이용하다 보면 대부분 인증 관련 데이터를 Base64로 인코딩을 해달라는 요구가 있다. 심지어 운전면허 검증 API중의 하나인 RIMS API의 경우 body 마저도 AES 암호화에 Base64까지 인코딩을 해야 한다. 아니 어차피 HTTPS로 암호화를 따로 할 텐데 왜 도대체 이런 짓들을 하는 걸까? Base64의 의미와 사용하는 이유를 알아보자.</p>
 
@@ -25,10 +25,10 @@
   </tbody>
 </table>
 
-<p>예를 들어 “Man”을 Base64로 인코딩한다고 하자, 문자(char)의 데이터 크기는 1byte, 즉 8bit이다. Man이라는 문자열의 길이는 총 3byte이므로 8bit + 8bit + 8bit = 24bit이다. Base64는 이걸 64진법으로 인코딩한다고 했는데. 64는 $2^6$이다. 즉, 24bit를 6bit 단위로 쪼갠 다음, Base64 색인표에 따라 텍스트를 생성한다.</p>
+<p>예를 들어 “Man”을 Base64로 인코딩한다고 하자, 문자(char)의 데이터 크기는 1byte, 즉 8bit이다. Man이라는 문자열의 길이는 총 3byte이므로 8bit + 8bit + 8bit = 24bit이다. Base64는 이걸 64진법으로 인코딩한다고 했는데. 64는 $2^6$이다. 즉, 24bit를 6bit 단위로 쪼갠 다음, Base64 색인표에 따라 텍스트를 생성한다.<br /></p>
 
-<p><img src="/assets/img/20241227/base64-index.png" alt="base64-index" /><br />
-출처: 위키백과 <br /></p>
+<p>출처: 위키백과
+<img src="/assets/img/20241227/base64-index.png" alt="base64-index" />\</p>
 
 <table>
   <thead>
