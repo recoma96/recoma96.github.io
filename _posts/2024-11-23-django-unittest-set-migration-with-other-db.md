@@ -4,7 +4,7 @@ title:  "DJango에서 마이그레이션을 하지 말아야 할 데이터베이
 date:   2024-11-23 01:04:25 +0900
 categories: "Django"
 summary: "백오피스 같은 툴들을 개발하다 보면, 절때 수정해서는 안될 서비스 데이터베이스에 대해 테스트를 해야 할 때가 있다. 이를 해결하는 방법을 알아보자"
-tags: ["python", "django", "database", "unittest"]
+tags: ["python", "django", "database", "unittest", "testing"]
 image: ""
 ---
 
