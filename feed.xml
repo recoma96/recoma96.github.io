@@ -1,14 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-13T00:38:02+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Pytest Sessionstart Sessionfinish</title><link href="https://recoma96.github.io/2025/01/13/pytest-sessionstart-sessionfinish.html" rel="alternate" type="text/html" title="Pytest Sessionstart Sessionfinish" /><published>2025-01-13T00:00:00+00:00</published><updated>2025-01-13T00:00:00+00:00</updated><id>https://recoma96.github.io/2025/01/13/pytest-sessionstart-sessionfinish</id><content type="html" xml:base="https://recoma96.github.io/2025/01/13/pytest-sessionstart-sessionfinish.html"><![CDATA[<hr />
-<p>layout: post
-title:  “Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법”
-date:   2025-01-13 08:30:00 +0900
-categories: “Testing”
-summary: “Pytest에서 fixture보다 더 넓은 범위, 그러니가 테스트의 맨 처음과 맨 끝부분에서 프로세스를 추가해야 할 때가 있다.”
-tags: [“python”, “testing”, “pytest”]
-image: “”
-—</p>
-
-<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-13T00:51:21+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법</title><link href="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html" rel="alternate" type="text/html" title="Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법" /><published>2025-01-12T23:30:00+00:00</published><updated>2025-01-12T23:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>이전에 <a href="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html">DJango에서 테스트 코드 작성 시 마이그레이션을 하지 말아야 할 데이터베이스 사용법</a> 에서 <code class="language-plaintext highlighter-rouge">DiscoverRunner</code>를 사용하면 맨 처음과 맨 마지막의 로직을 작성함으로써 테스트 시작 전 여러 세팅들을 할 수 있다고 언급했다. 그렇다면, pytest에도 이러한 툴이 있을 까?</p>
 
@@ -73,7 +63,7 @@ image: “”
 <span class="k">def</span> <span class="nf">test_example</span><span class="p">():</span>
     <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Testing</span><span class="sh">"</span><span class="p">)</span>
 
-</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[layout: post title: “Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법” date: 2025-01-13 08:30:00 +0900 categories: “Testing” summary: “Pytest에서 fixture보다 더 넓은 범위, 그러니가 테스트의 맨 처음과 맨 끝부분에서 프로세스를 추가해야 할 때가 있다.” tags: [“python”, “testing”, “pytest”] image: “” —]]></summary></entry><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T00:00:00+00:00</published><updated>2024-12-27T00:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
+</code></pre></div></div>]]></content><author><name></name></author><category term="Testing" /><category term="python" /><category term="testing" /><category term="pytest" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T00:00:00+00:00</published><updated>2024-12-27T00:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>회사에서 개발과 관련된 일을 하다 보면 OpenAPI를 이용한 기능을 구현할 때가 있다. 그런데 간혹 공공기관의 OpenAPI를 이용하다 보면 대부분 인증 관련 데이터를 Base64로 인코딩을 해달라는 요구가 있다. 심지어 운전면허 검증 API중의 하나인 RIMS API의 경우 body 마저도 AES 암호화에 Base64까지 인코딩을 해야 한다. 아니 어차피 HTTPS로 암호화를 따로 할 텐데 왜 도대체 이런 짓들을 하는 걸까? Base64의 의미와 사용하는 이유를 알아보자.</p>
 
