@@ -43,15 +43,16 @@ hello `world!`
 # 이미지
 이미지 불러오기
 기존 마크다운과 일치하나 이미지 루트 의 맨 앞에 site.baseurl 을 붙입니다.
+단 site.baseurl 이 따로 없는 경우, 붙이지 않아도 됩니다.
 * Example
 
 ```c
-![testimage](/assets/img/post/example1.gif)
+![testimage]({{ site.baseurl }}/assets/img/post/example1.gif)
 ```
 
-이 아래에 있는 건 이미지다
+이 아래에 있는 건 이미지 입니다.
 
-![testimage](/assets/img/post/example1.gif)
+![testimage]({{ site.baseurl }}/assets/img/post/example1.gif)
 
 ```bash
 aaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbccccccccccccccccdfdddddddddddddddddd

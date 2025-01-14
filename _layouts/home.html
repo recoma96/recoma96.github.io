@@ -1,20 +1,8 @@
 <!DOCTYPE html>
 <html>
-    {% include head.html %}
+    <head>
+        <meta http-equiv="refresh" content="0; url='{{ site.baseurl }}/posts'" />
+    </head>
     <body>
-        {% include navbar.html %}
-
-        <div class="web-main-container">
-            {% include left-side.html %}
-            <div class="web-main-item">
-                <div class="pt-12">
-                    {{ content }}
-                </div>
-            </div>
-        </div>
-
-        {% include footer.html %}
-        {% include foot.html %}
-        <script type="text/javascript" src="{{ "/assets/js/post-list.js" | absolute_url }}"></script>
     </body>
 </html>
