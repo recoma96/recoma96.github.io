@@ -21,4 +21,8 @@
         from-white via-lime-400 to-white
         dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
     "></div>
+
+    {% if page.image and page.image != "" %}
+        <img src="{{ site.baseurl | append: "/assets/img" | append: page.image }}" alt="main-image"  />
+    {% endif %}
 </div>
