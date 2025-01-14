@@ -1,11 +1,9 @@
-
-
 <!DOCTYPE html>
 <html>
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>About</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,6 +55,7 @@
     <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/categories">Categories</a></li>
     <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/lollineon/about"">About</a></li>
 </ul>
+
         <div class="web-main-container">
             <div id="left-side-bar" class="
     hidden xl:block
@@ -101,58 +100,85 @@
 </div>
 <div class="w-[1px] bg-gray"></div>
             <div class="web-main-item">
-                <h1 class="text-center">categories</h1>
-                <div class="mt-[80px]">
-    
-    
-    
-    
+                <div class="pt-12">
+                    <h1 id="lollineon">LolliNeon</h1>
 
-    <div>
-        <h2 id="코테_뽀개기">코테 뽀개기</h2>
-        <ol class="list-decimal">
-            
-            <li class="hover:text-rose-600 dark:hover:text-rose-200">
-                <div class="flex justify-between">
-                    <a class="text-inherit no-underline" href="/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" class="text-left">[백준, leetcode] 연결리스트로 팰린드롬 확인하기</a>
-                    <span class=text-right>2023.12.07 16:04</span>
+<p><strong>Lollineon</strong> is jekyll engined blog that is LolliPop styled in light-mode and NeonSign styled in dark-mode</p>
+
+<h2 id="️-usage">✔️ Usage</h2>
+
+<h3 id="setting-configuration">Setting Configuration</h3>
+
+<p>Add following to the <code class="language-plaintext highlighter-rouge">_config.yml</code></p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">title</span><span class="pi">:</span> <span class="s">&lt;Your blog name&gt;</span>
+<span class="na">email</span><span class="pi">:</span> <span class="s">&lt;Your email&gt;</span>
+
+<span class="na">nickname</span><span class="pi">:</span> <span class="s">&lt;Your nickname&gt;</span>
+<span class="na">user_description</span><span class="pi">:</span> <span class="s">&lt;Write short description about you&gt;</span>
+<span class="na">profile_image</span><span class="pi">:</span> <span class="s">&lt;url of your profile image&gt;</span> <span class="c1"># width and height of your image must be same!</span>
+
+<span class="na">social</span><span class="pi">:</span>
+  <span class="na">github</span><span class="pi">:</span>
+  <span class="na">email</span><span class="pi">:</span>
+  <span class="na">x</span><span class="pi">:</span> <span class="s">&lt;Your twitter page&gt;</span>
+  <span class="na">instagram</span><span class="pi">:</span>
+  <span class="na">youtube</span><span class="pi">:</span>
+  <span class="na">website</span><span class="pi">:</span> <span class="s">&lt;Your other website&gt;</span>
+</code></pre></div></div>
+
+<h3 id="home-about-page">Home (About) Page</h3>
+
+<p>Modify <code class="language-plaintext highlighter-rouge">index.md</code> file and add the following</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: home
+title: Home
+permalink: /
+---
+
+# This is My Blog
+
+This name is LolliLemon!
+
+</code></pre></div></div>
+
+<h3 id="posting">Posting</h3>
+
+<p>Create markdown file into <code class="language-plaintext highlighter-rouge">_posts</code> file. This filename following this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>YYYY-mm-dd-{this is post title}.md
+</code></pre></div></div>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">YYYY-mm-dd</code> is Date (ex: 2024-09-13)</li>
+  <li><code class="language-plaintext highlighter-rouge">post-title</code> is only english and hipen <code class="language-plaintext highlighter-rouge">-</code></li>
+</ul>
+
+<p>Post header following this</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: post
+title:  &lt;Post title name&gt;
+date:   YYYY-mm-dd HH:MM:SS (+0000)
+categories: &lt;Category-name of this post&gt;
+summary: &lt;short summary of this post&gt;
+tags: ["tag1", "tag2"]
+---
+</code></pre></div></div>
+
+<h3 id="upload-and-import-image-into-markdown-files">Upload And Import Image Into markdown files</h3>
+
+<p>Sometimes, You need to import some images into post and index page. To import this following this</p>
+
+<ol>
+  <li>add image you want into <code class="language-plaintext highlighter-rouge">assets/img/post</code></li>
+  <li>write this into markdown file
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ![testimage](/assets/img/post/{image filename})
+</code></pre></div>    </div>
+  </li>
+</ol>
+
                 </div>
-            </li>
-            
-        </ol>
-    </div>
-
-    <div class="
-        h-[1px] border-0 bg-gradient-to-r
-        from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
-        mt-[40px]
-    "></div>
-    
-    
-    
-    
-
-    <div>
-        <h2 id="kramdown_test">kramdown test</h2>
-        <ol class="list-decimal">
-            
-            <li class="hover:text-rose-600 dark:hover:text-rose-200">
-                <div class="flex justify-between">
-                    <a class="text-inherit no-underline" href="/lollineon/kramdown_test/2024/09/14/markdown-test.html" class="text-left">Markdown Test 마크다운 테스트</a>
-                    <span class=text-right>2024.09.14 16:04</span>
-                </div>
-            </li>
-            
-        </ol>
-    </div>
-
-    <div class="
-        h-[1px] border-0 bg-gradient-to-r
-        from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
-        mt-[40px]
-    "></div>
-    
-</div>
             </div>
         </div>
 
@@ -194,6 +220,6 @@
 <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/util.js"></script>
 <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/layout.js"></script>
 <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/navbar.js"></script>
-        <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/filtered-posts.js"></script>
+        <script type="text/javascript" src="https://sweetcase-production.github.io/lollineon/assets/js/post-list.js"></script>
     </body>
 </html>
