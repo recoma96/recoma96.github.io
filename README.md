@@ -115,8 +115,16 @@ date:   YYYY-mm-dd HH:MM:SS (+0000)
 categories: <Category-name of this post>
 summary: <short summary of this post>
 tags: ["tag1", "tag2"]
+image: "/post/image.jpg"
 ---
 ```
+
+* title: Title of post.
+* date: Release date of this.
+* categories: Subject of this. You can only one category.
+* summary: If you write this. This text is display on post-list page.
+* tags: Array of tags about this post.
+* image: This is the main image. Real root about this is start from `/assets/img/`. For example. if you write image as `/post/example.jpg` the real path is image must be `/assets/img/post/example.jpg`.
 
 
 ### Upload And Import Image Into markdown files

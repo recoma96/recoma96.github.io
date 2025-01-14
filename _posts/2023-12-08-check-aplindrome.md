@@ -5,7 +5,7 @@ date:   2023-12-08 01:04:25 +0900
 categories: "코테_뽀개기"
 summary: "연결리스트로도 팰린드롬인지 확인할 수가 있어요."
 tags: ["algorithm"]
-image: ""
+image: "/post/wolchul-mountain.jpg"
 ---
 
 # 문제
