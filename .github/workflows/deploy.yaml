@@ -3,7 +3,7 @@ name: Deploy LolliNeon
 on:
   push:
     branches:
-      - release
+      - site
 
 jobs:
   build:
