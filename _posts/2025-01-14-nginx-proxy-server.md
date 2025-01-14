@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "EC2와 NginX로 프록시 서버를 구축할 때 알아두면 좋은 것들"
+title:  "EC2와 NginX로 프록시 서버 구축하기"
 date:   2025-01-14 07:00:00 +0900
 categories: "NginX"
 summary: "EC2, NginX 기반의 프록시 서버를 구축하면서 삽질했던 것들과 공부했던 내용을 정리했단다!"
@@ -23,11 +23,18 @@ image: ""
 
 ### 작용 방법
 
-# 도메인 적용하기
+# 도메인 적용하기 <서브도메인 기준>
 
-## Route53 적용
+## Route53에서 도메인 적용
 
-## ACM(AWS Certificate Manager)을 이용한 SSL 인증
+## ACM(AWS Certificate Manager)을 이용한 SSL 인증 (실패)
+
+## Certbot 을 이용한 SSL
+
+### Certbot 설치
+
+### Certbot 인증서 진행
+
+### 자동 인증서 갱신 등록
 
 # EC2 의 Nginx Log와 Cloudwatch 연동하기
-
