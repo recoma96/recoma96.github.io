@@ -21,5 +21,13 @@ image: ""
 
 ### proxy_set_header
 
+### 작용 방법
+
+# 도메인 적용하기
+
+## Route53 적용
+
+## ACM(AWS Certificate Manager)을 이용한 SSL 인증
+
 # EC2 의 Nginx Log와 Cloudwatch 연동하기
 
