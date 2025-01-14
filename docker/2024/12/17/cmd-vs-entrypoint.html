@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMD vs ENTRYPOINT</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            CMD vs ENTRYPOINT
+        </h2>
+        <p class="font-semibold"><a href="/categories/#Docker" class="no-underline text-orange-700 dark:text-blue-200">Docker</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2024.12.17 00:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h1 id="개요">개요</h1>
+
+<p>CMD는 Docker Container가 돌아갈 때 실행하는 명령어이다. 예를 들어 Django 기반의 서버 컨테이너를 띄운다고 한다면 CMD는 아래와 같을 것이다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CMD</span><span class="s"> ["python", "manage.py", "runserver"]</span>
+</code></pre></div></div>
+
+<p>ENTRYPOINT도 마찬가지로 전체적으로 봤을 땐 CMD와 비슷하다. 사용법은 아래와 같고 결과는 일단 CMD와 일치하다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">ENTRYPOINT</span><span class="s"> ["python", "manage.py", "runserver"]</span>
+</code></pre></div></div>
+
+<p>두 개의 기능 차이가 거의 없다 보니, 나 같은 경우에는 아무 생각없이 이 두개를 혼용해서 사용해 왔다. 하지만 이 둘 사이에는 미묘한 차이가 있고 상황에 따라 써야 하는 경우가 다르다.</p>
+
+<h1 id="cmd">CMD</h1>
+
+<p>컨테이너가 실행되는 Default 명령어이다. 즉 필요하면 CMD 내용을 바꿀 수 있다. 아래와 같은 DockerFile이 있다고 가정해 보자.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
+<span class="k">CMD</span><span class="s"> ["echo", "Hello, World!"]</span>
+</code></pre></div></div>
+
+<p>DockerFile을 이미지로 빌드하고 아래와 같이 인자값으로 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 추가하면 <code class="language-plaintext highlighter-rouge">Hello, World</code>가 아니라 현재 위치의 디렉토리가 출력된다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
+total 56
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 <span class="nb">.</span>
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 ..
+<span class="nt">-rwxr-xr-x</span>   1 root root    0 Dec 16 08:26 .dockerenv
+lrwxrwxrwx   1 root root    7 Apr 22  2024 bin -&gt; usr/bin
+drwxr-xr-x   2 root root 4096 Apr 22  2024 boot
+drwxr-xr-x   5 root root  340 Dec 16 08:26 dev
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 etc
+drwxr-xr-x   3 root root 4096 Nov 19 09:50 home
+lrwxrwxrwx   1 root root    7 Apr 22  2024 lib -&gt; usr/lib
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 media
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 mnt
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 opt
+dr-xr-xr-x 231 root root    0 Dec 16 08:26 proc
+drwx------   2 root root 4096 Nov 19 09:50 root
+drwxr-xr-x   4 root root 4096 Nov 19 09:50 run
+lrwxrwxrwx   1 root root    8 Apr 22  2024 sbin -&gt; usr/sbin
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 srv
+dr-xr-xr-x  11 root root    0 Dec 16 08:26 sys
+drwxrwxrwt   2 root root 4096 Nov 19 09:50 tmp
+drwxr-xr-x  11 root root 4096 Nov 19 09:44 usr
+drwxr-xr-x  11 root root 4096 Nov 19 09:50 var
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">docker inspect example</code> 로 Docker 정보를 살펴보면 <code class="language-plaintext highlighter-rouge">Cmd</code> 부분에는 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있고, Path와 Args 역시 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspect example
+... 이하 생략 ...
+        <span class="s2">"Path"</span>: <span class="s2">"ls"</span>,
+        <span class="s2">"Args"</span>: <span class="o">[</span>
+            <span class="s2">"-al"</span>
+        <span class="o">]</span>,
+... 이하 생략 ...
+            <span class="s2">"Cmd"</span>: <span class="o">[</span>
+                <span class="s2">"ls"</span>,
+                <span class="s2">"-al"</span>
+            <span class="o">]</span>,
+            <span class="s2">"Entrypoint"</span>: null,
+</code></pre></div></div>
+
+<p>이렇게 CMD는 명령어를 실행하긴 하지만 언제든지 인자값을 추가함으로써 명령어를 변경할 수 있다. 하지만 ENTRYPOINT는 경우가 다르다.</p>
+
+<h1 id="entrypoint">ENTRYPOINT</h1>
+
+<p>CMD와는 달리 인자가 바뀔 수 없고 무조건 ENTRYPOINT에 기재된 내용대로 컨테이너가 실행된다. 즉, CMD처럼 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 입력했다고 해서 디렉토리 리스트가 나오지 않는다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
+Hello, World! <span class="nb">ls</span> <span class="nt">-al</span>
+</code></pre></div></div>
+
+<p>여전히 <code class="language-plaintext highlighter-rouge">Hello World</code>! 가 나오고, 바로 옆에 <code class="language-plaintext highlighter-rouge">ls -al</code> 가 출력되었다. <code class="language-plaintext highlighter-rouge">docker inspect exmaple</code> 를 입력해서 도커 컨테이너 정보를 알아보자.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspet example
+... 이하 생략 ...
+        <span class="s2">"Path"</span>: <span class="s2">"echo"</span>,
+        <span class="s2">"Args"</span>: <span class="o">[</span>
+            <span class="s2">"Hello, World!"</span>,
+            <span class="s2">"ls"</span>,
+            <span class="s2">"-al"</span>
+        <span class="o">]</span>,
+... 이하 생략 ...
+            <span class="s2">"Cmd"</span>: <span class="o">[</span>
+                <span class="s2">"ls"</span>,
+                <span class="s2">"-al"</span>
+            <span class="o">]</span>,
+            <span class="s2">"Entrypoint"</span>: <span class="o">[</span>
+                <span class="s2">"echo"</span>,
+                <span class="s2">"Hello, World!"</span>
+            <span class="o">]</span>,
+</code></pre></div></div>
+
+<p>밑에 보면 Cmd에는 변경된 명령어 <code class="language-plaintext highlighter-rouge">ls -al</code> 이 적혀있지만, Entrypoint의 명령어가 먼저 나왔다. Path는 <code class="language-plaintext highlighter-rouge">echo</code>로 변함이 없는데, Args에서는 <code class="language-plaintext highlighter-rouge">Hello, World!</code> 뒤로 <code class="language-plaintext highlighter-rouge">ls</code>와 <code class="language-plaintext highlighter-rouge">-al</code>이 추가되었다.</p>
+
+<p>따라서 ENTRYPOINT에서는 인자를 추가하면 명령어 자체가 바뀌는게 아니라 입력한 인자값이 ENTRYPOINT 내용의 뒤로 간다.</p>
+
+<h1 id="두개-혼용하기">두개 혼용하기</h1>
+
+<p>CMD와 ENTRYPOINT 두개를 활용할 수도 있다. ENTRYPOINT는 컨테이너 실행부로 사용하고, CMD는 Default 인자값으로 사용할 수 있다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">docker run</code>으로 컨테이너 실행시, 추가 인자값이 없으면 CMD에 있는 내용이 인자값으로 들어가고, 인자값을 추가하면 그 추가된 인자값이 CMD를 대신한다. 이렇게 해서 컨테이너 실행을 좀더 유연하게 할 수 있다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
+<span class="k">ENTRYPOINT</span><span class="s"> ["echo"]</span>
+<span class="k">CMD</span><span class="s"> ["Hello, World!"]</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example
+Hello, World!
+
+<span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="s1">'Hello, Docker!'</span>
+Hello, Docker!
+</code></pre></div></div>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#docker">docker</a>
+                    
+                    <a class="tag" href="/tags/#dockerfile">dockerfile</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>

@@ -1,4 +1,967 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://sweetcase-production.github.io/lollineon/feed.xml" rel="self" type="application/atom+xml" /><link href="https://sweetcase-production.github.io/lollineon/" rel="alternate" type="text/html" /><updated>2025-01-14T12:49:38+00:00</updated><id>https://sweetcase-production.github.io/lollineon/feed.xml</id><title type="html">LolliNeon</title><entry><title type="html">Markdown Test 마크다운 테스트</title><link href="https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test.html" rel="alternate" type="text/html" title="Markdown Test 마크다운 테스트" /><published>2024-09-14T16:04:25+00:00</published><updated>2024-09-14T16:04:25+00:00</updated><id>https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test</id><content type="html" xml:base="https://sweetcase-production.github.io/lollineon/kramdown_test/2024/09/14/markdown-test.html"><![CDATA[<h1 id="h1">H1</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-14T12:54:34+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법</title><link href="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html" rel="alternate" type="text/html" title="Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법" /><published>2025-01-12T23:30:00+00:00</published><updated>2025-01-12T23:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>이전에 <a href="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html">DJango에서 테스트 코드 작성 시 마이그레이션을 하지 말아야 할 데이터베이스 사용법</a> 에서 <code class="language-plaintext highlighter-rouge">DiscoverRunner</code>를 사용하면 맨 처음과 맨 마지막의 로직을 작성함으로써 테스트 시작 전 여러 세팅들을 할 수 있다고 언급했다. 그렇다면, pytest에도 이러한 툴이 있을 까?</p>
+
+<h1 id="fixture">fixture</h1>
+
+<p>이번에 설명할 툴에 대해서 언급하기 전에 fixture부터 설명해야 할 필요가 있다. pytest에서의 fixture는 테스트 함수 간에 공유할 수 있는 상태나 데이터를 제공하는 기능이다. 예를 들어 테스트를 하면서 유저 정보가 담긴 Dict 형태의 데이터가 사전에 필요하다면 아래와 같이 구현하면 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nd">@fixture</span>
+<span class="k">def</span> <span class="nf">user</span><span class="p">():</span>
+    <span class="n">user_data</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">name</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">recoma</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">birthday</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">19990101</span><span class="sh">"</span><span class="p">}</span>
+    <span class="nf">insert_to_database</span><span class="p">(</span><span class="n">user_data</span><span class="p">)</span>
+    
+    <span class="k">yield</span> <span class="n">user_data</span>
+
+    <span class="nf">remove_from_database</span><span class="p">(</span><span class="n">user_data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_about_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="c1"># Do something
+</span></code></pre></div></div>
+
+<p>해당 테스트 코드의 순서는 아래와 같다.</p>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">test_about_user()</code>가 작동하기 전에 <code class="language-plaintext highlighter-rouge">user()</code>가 작동한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">user()</code>에서 user_data를 리턴한다. 이 리턴된 데이터는 <code class="language-plaintext highlighter-rouge">test_about_user</code>의 <code class="language-plaintext highlighter-rouge">user</code>라는 파라미터에 들어간다.</li>
+  <li><code class="language-plaintext highlighter-rouge">test_about_user()</code>는 <code class="language-plaintext highlighter-rouge">user</code>를 이용해서 특정 테스트를 진행한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">test_about_user()</code>의 프로세스가 끝나면 <code class="language-plaintext highlighter-rouge">user()</code>의 <code class="language-plaintext highlighter-rouge">yield</code>의 아랫부분이 작동한다.</li>
+</ol>
+
+<p><br /></p>
+
+<p>이렇게 fixture는 테스팅을 하기 위해 필요한 데이터들을 미리 세팅하고 테스트 함수들에게 그 데이터를 제공하는데 유용하게 쓰인다. 이런 특성을 이용해 테스트를 세팅할 때도 사용되곤 한다.</p>
+
+<h2 id="한계">한계</h2>
+
+<p>그러나 이 fixture 사용에도 한계가 있다.</p>
+
+<h3 id="scope-범위">scope 범위</h3>
+
+<p>fixture에는 scope라고 해서 작동 범위를 설정하는 파라미터가 있다. 선언 방법은 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="sh">"</span><span class="s">function</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>이는 매 테스트 함수(케이스)가 작동될 때마다 해당 함수가 작동됨을 의미한다. scope를 <code class="language-plaintext highlighter-rouge">module</code>로 설정 할 경우 테스트 파일 내 에서만 작동이 되고 <code class="language-plaintext highlighter-rouge">session</code>으로 설정하면 모든 테스트 파일에서 딱 한번만 작동한다. 일단 <code class="language-plaintext highlighter-rouge">module</code>과, <code class="language-plaintext highlighter-rouge">function</code>은 전체 테스트 에서 딱 한번 실행되는게 아니기 때문에 사용하는데 한계가 있다. <code class="language-plaintext highlighter-rouge">session</code>이 그나마 쓸만해 보이지만 이건 이거대로 문제가 있는데. <code class="language-plaintext highlighter-rouge">session</code>으로 설정된 fixture를 사용하기 위해, <strong>매 함수 또는 일부 함수의 파라미터에다가 해당 fixture를 명시해야 한다.</strong> 단순해 보이지만 이는 일일이 코드가 하나씩 추가됨으로써 클린 코드 상 좋지 못한 결과를 보여줄 수 있다.</p>
+
+<h1 id="pytest_session">pytest_session*</h1>
+
+<p>그렇기 때문에 pytest에서는 아예 테스트 실행과 끝나는 시점에 로직을 작성할 수 있도록 인터페이스를 제공해 주는 데 이게 바로 <code class="language-plaintext highlighter-rouge">pytest_sessionstart</code>와 <code class="language-plaintext highlighter-rouge">pytest_sessionfinish</code>이다. 이 둘을 사용하면 <code class="language-plaintext highlighter-rouge">fixture</code>와 각 테스트 함수에 일일이 설정하지 않아도 알아서 잘 돌아간다. 이 두 함수들은 말 그대로 맨 처음에서 부터 시작하기 때문에 특정 테스트 파일에 들어가기 보다는 <code class="language-plaintext highlighter-rouge">conftest.py</code>에 작성이 되는 경우가 더 많다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># conftest.py
+</span>
+<span class="k">def</span> <span class="nf">pytest_sessionstart</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">_pytest</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">Session</span><span class="p">):</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Start</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pytest_sessionfinish</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">_pytest</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">Session</span><span class="p">):</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Finish!</span><span class="sh">"</span><span class="p">)</span>
+
+
+<span class="c1"># test_example.py
+</span>
+<span class="k">def</span> <span class="nf">test_example</span><span class="p">():</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Testing</span><span class="sh">"</span><span class="p">)</span>
+
+</code></pre></div></div>]]></content><author><name></name></author><category term="Testing" /><category term="python" /><category term="testing" /><category term="pytest" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T00:00:00+00:00</published><updated>2024-12-27T00:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>회사에서 개발과 관련된 일을 하다 보면 OpenAPI를 이용한 기능을 구현할 때가 있다. 그런데 간혹 공공기관의 OpenAPI를 이용하다 보면 대부분 인증 관련 데이터를 Base64로 인코딩을 해달라는 요구가 있다. 심지어 운전면허 검증 API중의 하나인 RIMS API의 경우 body 마저도 AES 암호화에 Base64까지 인코딩을 해야 한다. 아니 어차피 HTTPS로 암호화를 따로 할 텐데 왜 도대체 이런 짓들을 하는 걸까? Base64의 의미와 사용하는 이유를 알아보자.</p>
+
+<h1 id="base64">Base64</h1>
+
+<h2 id="설명">설명</h2>
+
+<p>Base64란 바이너리 데이터를 문자로 64진법 형식으로 인코딩을 하는 방식을 말한다.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>M</th>
+      <th>a</th>
+      <th>n</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>01001101</td>
+      <td>01100001</td>
+      <td>01101110</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>예를 들어 “Man”을 Base64로 인코딩한다고 하자, 문자(char)의 데이터 크기는 1byte, 즉 8bit이다. Man이라는 문자열의 길이는 총 3byte이므로 8bit + 8bit + 8bit = 24bit이다. Base64는 이걸 64진법으로 인코딩한다고 했는데. 64는 2^6이다. 즉, 24bit를 6bit 단위로 쪼갠 다음, Base64 색인표에 따라 텍스트를 생성한다.<br /><br /></p>
+
+<p>출처: 위키백과
+<img src="/assets/img/20241227/base64-index.png" alt="base64-index" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>T</th>
+      <th>W</th>
+      <th>F</th>
+      <th>u</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>010011</td>
+      <td>01<strong>0110</strong></td>
+      <td><strong>0001</strong>01</td>
+      <td>101110</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>이렇게 해서 “Man”에서 “TWFu”로 인코딩이 되었다.</p>
+
+<h3 id="마지막을-로-패딩하는-이유">마지막을 =로 패딩하는 이유</h3>
+
+<p>가끔씩 보면 마지막이 “=”로 끝나는 경우가 있다. 8bit단위에서 6bit단위로 쪼개기 때문에 마지막에 2bit 혹은 4bit가 비게 되는데. 이때는 “=” 기호로 padding을 하게 된다. 예를 들어 <code class="language-plaintext highlighter-rouge">hello world</code>를 base64로 인코딩을 하면 <code class="language-plaintext highlighter-rouge">aGVsbG8gd29ybGQ=</code> 로 나온다. <code class="language-plaintext highlighter-rouge">hello world</code>라는 문자의 길이는 11byte = 88bit이고 이를 6bit로 쪼개면 마지막에 2bit가 비게 되는데, 이 2bit를 대신 <code class="language-plaintext highlighter-rouge">=</code>로 채운 것이다.</p>
+
+<h2 id="단점">단점</h2>
+
+<p>아까 보다시피 “Man”에서 “TWFu”로 인코딩이 되었는데, 3글자에서 4글자로 1글자 더 추가되었다. 비트를 쪼개는 단위가 8bit에서 6bit로 줄면서 그만큼 글자가 늘어났기 때문이다. 즉, Base64 방식은 데이터의 길이가 늘어난다는 단점이 생기게 된다. 데이터가 커질 수록 스토리지에 저장한다던가, 아니면 데이터 통신을 하는데 있어서 상대적으로 부담이 커질 수 밖에 없다. 그럼에도 불구하고 왜 자주 사용을 할까?</p>
+
+<h2 id="사용-이유">사용 이유</h2>
+
+<p><strong>바이너리 데이터를 손실없이 전송할 수 있기 때문이다.</strong> 데이터 중에서는 우리가 알아볼 수 있는 문자 데이터 말고도 바이너리 데이터에 해당되는 그림 파일, 동영상 파일 등이 있다. <strong>이러한 바이너리 데이터들중 일부는 ASCII 코드에 해당하지 않는 경우가 있다.</strong> 그 이유는 문자(char)의 길이는 8bit(1byte)이지만, ASCII의 범위는 0부터 127까지로 7bit이기 때문이다. 즉, 128부터 255 까지는 ASCII 코드에 해당하지 않기 때문에, 수신자는 이 데이터들을 해석하지 못하게 된다. 하지만 <strong>Base64 인코딩을 사용해 바이너리 데이터들을 ASCII형태의 문자열로 변환을 하게 된다면, 수산자는 해당 데이터를 바로 해석을 할 수 있고, 그 이후에 Base64를 포함한 후속 작업을 진행할 수 있게 된다.</strong></p>
+
+<h3 id="예시-이메일-전송시-사용">예시: 이메일 전송시 사용</h3>
+
+<p>이러한 대표적인 예로 메일을 주고받을 때 사용되는 STMP 프로토콜이 있다. 이 프로토콜은 7bit 단위의 데이터만 취급하기 때문에 8bit 이상의 유니코드나, 기타 바이너리 데이터들은 Base64로 6bit 단위로 인코딩을 해서 송수신을 한다.</p>
+
+<h1 id="utf-8-과의-차이점">UTF-8 과의 차이점</h1>
+
+<p>찬혹 UTF-8 인코딩과 헷갈릴 수 있는데 UTF-8은 <em>Unicode Transformation Format - 8bit</em> 의 약자다. 즉, 유니코드를 표현하기 위해 사용되는 인코딩 방식으로, 다양한 언어를 표현할 때 사용된다. 안전성을 목적으로 둔 Base64와는 경우가 다르다.</p>
+
+<h1 id="파이썬에서-base64-사용해-보기-feat-utf-8">파이썬에서 Base64 사용해 보기 (feat. UTF-8)</h1>
+
+<p>파이썬에서는 base64로 인코딩 또는 디코딩을 하는 모듈을 기본으로 제공한다.</p>
+
+<h2 id="인코딩">인코딩</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="sh">'</span><span class="s">안녕 월드</span><span class="sh">'</span>
+<span class="n">utf_text</span> <span class="o">=</span> <span class="n">text</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">utf_text</span><span class="p">)</span>
+<span class="c1"># 바이너리로 변환 -&gt; b'\xec\x95\x88\xeb\x85\x95 \xec\x9b\x94\xeb\x93\x9c'
+</span>
+<span class="n">encoded_text</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64encode</span><span class="p">(</span><span class="n">utf_text</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
+<span class="c1"># b'7JWI64WVIOyblOuTnA=='
+</span></code></pre></div></div>
+
+<h2 id="디코딩">디코딩</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
+
+<span class="n">encoded_text</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">7JWI64WVIOyblOuTnA==</span><span class="sh">'</span>
+<span class="n">decoded_text</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64decode</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
+<span class="c1"># base64 디코딩 -&gt; b'\xec\x95\x88\xeb\x85\x95 \xec\x9b\x94\xeb\x93\x9c'
+</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">decoded_text</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="c1"># utf-8 디코딩 -&gt; 안녕 월드
+</span></code></pre></div></div>]]></content><author><name></name></author><category term="Computer_Science" /><category term="computer-science" /><category term="data" /><category term="encoding" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Datagrip에서 SSH 터널링으로 데이터베이스 접근하기</title><link href="https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling.html" rel="alternate" type="text/html" title="Datagrip에서 SSH 터널링으로 데이터베이스 접근하기" /><published>2024-12-23T04:00:00+00:00</published><updated>2024-12-23T04:00:00+00:00</updated><id>https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling</id><content type="html" xml:base="https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>데이터베이스는 고객의 중요 데이터를 저장하는 매우매우 중요한 시설이다. 그렇기 때문에 어지간한 기업에서는 데이터베이스 보안을 철처히 해놓는다. 내가 다니고 있는 회사도 마찬가지인데,
+일단 데이터베이스를 VPC에 포함시켜 VPC에 포함되는 서비스에서만 사용할 수 있게 했고, Publicy accessible을 False로 세팅함으로써 Security Group에서 0.0.0.0으로 범위를 설정해도 접속하지 못하게 막아놨다. 즉, 사내 IP로는 직접 접속이 불가능하고, 접속할 수 있는 유일한 방법은 오로지 SSH를 통해 운영서버에 접속을 한 다음, 그 운영서버에서 데이터베이스에 접속(mysql-client)해서 SQL문을 타이핑하는 방법이다. 보안상으로는 좋긴 하지만, 데이터베이스 접속을 터미널로 하는 것에 대해 불편함을 가진 적이 많았다. 하지만 데이터베이스 IDE중 하나인 <strong>DataGrip</strong> 에서는 SSH를 통해 데이터베이스를 접속하는 <strong>SSH 터널링</strong>을 지원한다.</p>
+
+<h1 id="사용법">사용법</h1>
+
+<ol>
+  <li>
+    <p>SSH/SSL 탭에 들어간다. 여기서 <strong>Use SSH Tunnel</strong> 을 체크하고 오른쪽에 …을 클릭한다.
+<img src="/assets/img/20241223/1.png" alt="1" /></p>
+  </li>
+  <li>
+    <p>SSH Configuration이라는 창이 뜨는데, 여기서는 데이터베이스에 접속할 서버 정보를 입력하면 된다. 즉 SSH 정보를 입력하면 되는데, 패스워드가 아니니 pem key를 사용할 경우 “Authentication type”에 “Key pair”를 선택하고 Private Key File에 pem키 경로를 입력하면 된다.
+<img src="/assets/img/20241223/2.png" alt="2" /></p>
+  </li>
+  <li>
+    <p>“Test Connection”을 클릭해 접속 여부를 확인한다. 성공했으면 아래와 같은 문구가 뜬다. <strong>데이터베이스에 접속할 서버와의 SSH 연동이 정상적으로 완료되었다는 뜻이다. 절대 데이터베이스 접속에 성공했다는 뜻이 아니다.</strong> 성공했으면 OK를 눌러 다시 뒤로 간다.</p>
+  </li>
+</ol>
+
+<p><img src="/assets/img/20241223/3.png" alt="3" /></p>
+
+<ol>
+  <li>General 탭에 돌아와서 데이터베이스 정보를 입력하면 된다. 여기부터는 일반적인 데이터베이스 접속하는 방법과 일치. Success 표시가 뜨면 연동하는데 성공했단 뜻이고, OK버튼을 누르면 그 다음부터 사용할 수 있다.</li>
+</ol>
+
+<p><img src="/assets/img/20241223/4.png" alt="4" /></p>]]></content><author><name></name></author><category term="개발도구_사용법" /><category term="database" /><category term="ide" /><category term="datagrip" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">CMD vs ENTRYPOINT</title><link href="https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint.html" rel="alternate" type="text/html" title="CMD vs ENTRYPOINT" /><published>2024-12-17T00:00:00+00:00</published><updated>2024-12-17T00:00:00+00:00</updated><id>https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint</id><content type="html" xml:base="https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>CMD는 Docker Container가 돌아갈 때 실행하는 명령어이다. 예를 들어 Django 기반의 서버 컨테이너를 띄운다고 한다면 CMD는 아래와 같을 것이다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CMD</span><span class="s"> ["python", "manage.py", "runserver"]</span>
+</code></pre></div></div>
+
+<p>ENTRYPOINT도 마찬가지로 전체적으로 봤을 땐 CMD와 비슷하다. 사용법은 아래와 같고 결과는 일단 CMD와 일치하다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">ENTRYPOINT</span><span class="s"> ["python", "manage.py", "runserver"]</span>
+</code></pre></div></div>
+
+<p>두 개의 기능 차이가 거의 없다 보니, 나 같은 경우에는 아무 생각없이 이 두개를 혼용해서 사용해 왔다. 하지만 이 둘 사이에는 미묘한 차이가 있고 상황에 따라 써야 하는 경우가 다르다.</p>
+
+<h1 id="cmd">CMD</h1>
+
+<p>컨테이너가 실행되는 Default 명령어이다. 즉 필요하면 CMD 내용을 바꿀 수 있다. 아래와 같은 DockerFile이 있다고 가정해 보자.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
+<span class="k">CMD</span><span class="s"> ["echo", "Hello, World!"]</span>
+</code></pre></div></div>
+
+<p>DockerFile을 이미지로 빌드하고 아래와 같이 인자값으로 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 추가하면 <code class="language-plaintext highlighter-rouge">Hello, World</code>가 아니라 현재 위치의 디렉토리가 출력된다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
+total 56
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 <span class="nb">.</span>
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 ..
+<span class="nt">-rwxr-xr-x</span>   1 root root    0 Dec 16 08:26 .dockerenv
+lrwxrwxrwx   1 root root    7 Apr 22  2024 bin -&gt; usr/bin
+drwxr-xr-x   2 root root 4096 Apr 22  2024 boot
+drwxr-xr-x   5 root root  340 Dec 16 08:26 dev
+drwxr-xr-x   1 root root 4096 Dec 16 08:26 etc
+drwxr-xr-x   3 root root 4096 Nov 19 09:50 home
+lrwxrwxrwx   1 root root    7 Apr 22  2024 lib -&gt; usr/lib
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 media
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 mnt
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 opt
+dr-xr-xr-x 231 root root    0 Dec 16 08:26 proc
+drwx------   2 root root 4096 Nov 19 09:50 root
+drwxr-xr-x   4 root root 4096 Nov 19 09:50 run
+lrwxrwxrwx   1 root root    8 Apr 22  2024 sbin -&gt; usr/sbin
+drwxr-xr-x   2 root root 4096 Nov 19 09:44 srv
+dr-xr-xr-x  11 root root    0 Dec 16 08:26 sys
+drwxrwxrwt   2 root root 4096 Nov 19 09:50 tmp
+drwxr-xr-x  11 root root 4096 Nov 19 09:44 usr
+drwxr-xr-x  11 root root 4096 Nov 19 09:50 var
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">docker inspect example</code> 로 Docker 정보를 살펴보면 <code class="language-plaintext highlighter-rouge">Cmd</code> 부분에는 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있고, Path와 Args 역시 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspect example
+... 이하 생략 ...
+        <span class="s2">"Path"</span>: <span class="s2">"ls"</span>,
+        <span class="s2">"Args"</span>: <span class="o">[</span>
+            <span class="s2">"-al"</span>
+        <span class="o">]</span>,
+... 이하 생략 ...
+            <span class="s2">"Cmd"</span>: <span class="o">[</span>
+                <span class="s2">"ls"</span>,
+                <span class="s2">"-al"</span>
+            <span class="o">]</span>,
+            <span class="s2">"Entrypoint"</span>: null,
+</code></pre></div></div>
+
+<p>이렇게 CMD는 명령어를 실행하긴 하지만 언제든지 인자값을 추가함으로써 명령어를 변경할 수 있다. 하지만 ENTRYPOINT는 경우가 다르다.</p>
+
+<h1 id="entrypoint">ENTRYPOINT</h1>
+
+<p>CMD와는 달리 인자가 바뀔 수 없고 무조건 ENTRYPOINT에 기재된 내용대로 컨테이너가 실행된다. 즉, CMD처럼 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 입력했다고 해서 디렉토리 리스트가 나오지 않는다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
+Hello, World! <span class="nb">ls</span> <span class="nt">-al</span>
+</code></pre></div></div>
+
+<p>여전히 <code class="language-plaintext highlighter-rouge">Hello World</code>! 가 나오고, 바로 옆에 <code class="language-plaintext highlighter-rouge">ls -al</code> 가 출력되었다. <code class="language-plaintext highlighter-rouge">docker inspect exmaple</code> 를 입력해서 도커 컨테이너 정보를 알아보자.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspet example
+... 이하 생략 ...
+        <span class="s2">"Path"</span>: <span class="s2">"echo"</span>,
+        <span class="s2">"Args"</span>: <span class="o">[</span>
+            <span class="s2">"Hello, World!"</span>,
+            <span class="s2">"ls"</span>,
+            <span class="s2">"-al"</span>
+        <span class="o">]</span>,
+... 이하 생략 ...
+            <span class="s2">"Cmd"</span>: <span class="o">[</span>
+                <span class="s2">"ls"</span>,
+                <span class="s2">"-al"</span>
+            <span class="o">]</span>,
+            <span class="s2">"Entrypoint"</span>: <span class="o">[</span>
+                <span class="s2">"echo"</span>,
+                <span class="s2">"Hello, World!"</span>
+            <span class="o">]</span>,
+</code></pre></div></div>
+
+<p>밑에 보면 Cmd에는 변경된 명령어 <code class="language-plaintext highlighter-rouge">ls -al</code> 이 적혀있지만, Entrypoint의 명령어가 먼저 나왔다. Path는 <code class="language-plaintext highlighter-rouge">echo</code>로 변함이 없는데, Args에서는 <code class="language-plaintext highlighter-rouge">Hello, World!</code> 뒤로 <code class="language-plaintext highlighter-rouge">ls</code>와 <code class="language-plaintext highlighter-rouge">-al</code>이 추가되었다.</p>
+
+<p>따라서 ENTRYPOINT에서는 인자를 추가하면 명령어 자체가 바뀌는게 아니라 입력한 인자값이 ENTRYPOINT 내용의 뒤로 간다.</p>
+
+<h1 id="두개-혼용하기">두개 혼용하기</h1>
+
+<p>CMD와 ENTRYPOINT 두개를 활용할 수도 있다. ENTRYPOINT는 컨테이너 실행부로 사용하고, CMD는 Default 인자값으로 사용할 수 있다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">docker run</code>으로 컨테이너 실행시, 추가 인자값이 없으면 CMD에 있는 내용이 인자값으로 들어가고, 인자값을 추가하면 그 추가된 인자값이 CMD를 대신한다. 이렇게 해서 컨테이너 실행을 좀더 유연하게 할 수 있다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
+<span class="k">ENTRYPOINT</span><span class="s"> ["echo"]</span>
+<span class="k">CMD</span><span class="s"> ["Hello, World!"]</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example
+Hello, World!
+
+<span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="s1">'Hello, Docker!'</span>
+Hello, Docker!
+</code></pre></div></div>]]></content><author><name></name></author><category term="Docker" /><category term="docker" /><category term="dockerfile" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">매직 넘버(Magic Number)의 의미와 유의해야 할 점</title><link href="https://recoma96.github.io/software_arhitecture/2024/12/13/magic-number.html" rel="alternate" type="text/html" title="매직 넘버(Magic Number)의 의미와 유의해야 할 점" /><published>2024-12-13T00:30:00+00:00</published><updated>2024-12-13T00:30:00+00:00</updated><id>https://recoma96.github.io/software_arhitecture/2024/12/13/magic-number</id><content type="html" xml:base="https://recoma96.github.io/software_arhitecture/2024/12/13/magic-number.html"><![CDATA[<h1 id="매직-넘버의-의미와-문제점">매직 넘버의 의미와 문제점</h1>
+
+<p>매직 넘버(Magic Number)란 <strong>아무런 설명 없이 임의로 들어가는 상수 또는 기타 데이터</strong>를 의미한다. 즉, 개발자 입장에서는 코드상에 상수가 노출되어 있다는 뜻이 되기도 한다. 처음엔 뭔 소린지 와닿지 않겠지만 우리가 처음 코딩을 공부할 때 쥐도새도 모르게 밥먹듯이 썼던 개념이다. 밑의 예시를 보자.</p>
+
+<h2 id="예시1">예시1</h2>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kt">int</span> <span class="n">score</span><span class="p">;</span>
+<span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">score</span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'A'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">80</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'B'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">70</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'C'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'D'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"미달"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">if</code>문을 처음 공부할 때 국룰로 나오는 <code class="language-plaintext highlighter-rouge">grade</code>관련 분기 예시다. 이렇게 특정 설명 없이 90, 80, 70, 60 상수로 적혀 있는 것을 <strong>매직넘버</strong> 라고 한다. 하지만 이 상수들의 무엇을 의미하는지는 이미 코드에 명확하게 명시되어 있다. 90점 이상이면 A, 80점대면 B, 70점대면 C, 60점대면 D, 그 이하는 미달이다. 그렇기에 겉으로는 문제가 없어 보인다.</p>
+
+<blockquote>
+  <p>경우에 따라서는 ‘A’, ‘B’, ‘C’, ‘D’ 도 매직넘버로 보는 견해가 있다. 얘네들도 특정한 설명이 따로 없기 때문이다.</p>
+</blockquote>
+
+<h2 id="예시2">예시2</h2>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">input</span>
+
+<span class="nf">if</span><span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"남성입니다."</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">input</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"여성입니다."</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>코드를 보아하니 input이 3이면 남성이고 input이 4이면 여성으로 판정을 하고 있는 모양이다. 겉으로는 문제가 없어 보인다. 3이 남자고 4이 여자인게 명확하니까. 하지만 이건 어떨까?</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">send_fcm_to_single_user</code> 함수는 성별이 남성이면서(<code class="language-plaintext highlighter-rouge">user.gender == 3</code>) 동시에 특수유저(<code class="language-plaintext highlighter-rouge">user.is_specialist</code>)일때 중요 푸시알림을 보내고 그렇지 않으면 일반 푸시알림을 보낸다. 하지만 도메인을 모르는 사람 또는 신규 개발자가 이 코드를 보면 어떤 조건으로 중요 푸시알림을 발송하는지 전혀 모른다. <strong><code class="language-plaintext highlighter-rouge">user.gender == 3</code>이 도대체 어떤 것을 의미하는 지 모르기 때문이다.</strong> 당장 이 코드만 봐도 의도를 모르겠는데, 이러한 매직넘버들이 서비스 코드 도처에 깔려있다고 생각해 보자. 아마 담당자한테 일일이 반복적으로 이게 뭔 소린지 물어봐야 할 것이다. 게다가 만약에 남성을 지칭하는 상수가 3에서 5로 바뀐다면, <strong>파일 하나하나씩 뒤져가면서 3을 5로 바꿔야 하는 끔찍한 사태가 벌어질 것이다.</strong> 다 바꿨다 해도 결국 <strong>사람이 코드를 수정했기 때문에 휴먼에러가 일어날 가능성이 생기게 되고 이는 결국 서비스 장애로 이어지게 된다.</strong></p>
+
+<h1 id="제대로-사용하려면">제대로 사용하려면?</h1>
+
+<h2 id="고정-변수-형한정어-const-사용">고정 변수 (형한정어, const) 사용</h2>
+
+<p>매직 넘버를 고정변수로 변경을 해서, 다른 개발자들이 금방 알아볼 수 있게 하면 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// gender.cpp</span>
+<span class="k">const</span> <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">FEMAILE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+<span class="c1">// fcm.cpp</span>
+<span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="n">MALE</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>이제 <code class="language-plaintext highlighter-rouge">user.gender == MALE</code>로 바뀜으로써 누구한테 중요 알림을 보내는지 처음 보는 사람도 정확히 알 수 있게 되었다. 뿐만 아니라 남성 코드가 3에서 5로 바뀔 때, 일일이 3에서 5로 바꾸는 것이 아닌 <code class="language-plaintext highlighter-rouge">gender.cpp</code>의 <code class="language-plaintext highlighter-rouge">MALE</code>의 값만 변경하면 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">FEMAILE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">OTHER_SERVICE_MALE</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="k">const</span> <span class="n">OTHER_SERVICE_FEMAILE</span> <span class="o">=</span> <span class="mi">6</span>
+</code></pre></div></div>
+
+<p>하지만 특정 서비스에서의 성별 코드가 다르다면 동일 변수 이름을 피하기 위해 <code class="language-plaintext highlighter-rouge">OTHER_SERVICE_MALE</code> 처럼 앞에 접두사를 붙여야 한다. 이렇게 되면 변수명은 복잡해지게 되고 코드를 읽기가 힘들어지게 된다. 그래서 나온게 <code class="language-plaintext highlighter-rouge">Enum</code>이라는 구조체(클래스)다.</p>
+
+<h2 id="enum-사용">Enum 사용</h2>
+
+<p>좀더 나아가서 Enum 계열의 자료구조 또는 클래스를 활용할 수도 있다.
+Enum을 사용하게 되면 코드가 좀더 깔끔하게 정리가 된다.</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// gender.cpp</span>
+<span class="k">enum</span> <span class="n">Gender</span> <span class="p">{</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">enum</span> <span class="n">OtherServiceGender</span> <span class="p">{</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// fcm.cpp</span>
+<span class="kt">void</span> <span class="nf">send_fcm_to_single_user</span><span class="p">(</span><span class="n">User</span><span class="o">&amp;</span> <span class="n">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="o">::</span><span class="n">MALE</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="p">.</span><span class="n">is_specialist</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Important Notice"</span><span class="p">,</span> <span class="s">"The Important Notice"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">push_fcm_message</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">"This is Notice"</span><span class="p">,</span> <span class="s">"The Notice"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="python의-경우-dict-vs-enum">Python의 경우 (dict vs Enum)</h3>
+
+<p>Python 에서도 <code class="language-plaintext highlighter-rouge">Enum</code>을 지원하기 하지만 상수 비교하는 과정이 다른 언어보다 약간 복잡하기 때문에 일부 Python 개발자들 사이에서는 <code class="language-plaintext highlighter-rouge">Enum</code>을 쓸지 <code class="language-plaintext highlighter-rouge">dict</code>를 쓸지 논란이 되기도 한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Gender</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MALE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">FEMALE</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">input_gender</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">input_gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="p">.</span><span class="n">MALE</span><span class="p">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">Gender</span><span class="p">.</span><span class="n">MALE</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Gender.MALE == input_gender</code>로 하면 비교 연산이 정상적으로 작동이 되지 않는다. <code class="language-plaintext highlighter-rouge">Gender.MALE</code>을 Enum 클래스로 인식하기 때문이다. <code class="language-plaintext highlighter-rouge">Gender.MALE.value</code> 까지 가야 상수와 비교 연산이 가능하다. <code class="language-plaintext highlighter-rouge">Gender.MALE.name</code>으로 하면 열거형 이름인 ‘MALE’ 이라는 문자열이 나온다. <code class="language-plaintext highlighter-rouge">.value</code>와 <code class="language-plaintext highlighter-rouge">.name</code>에 대해서 유용하게 사용할 수 있다는 긍정적인 시각도 있지만, 한편으로는 코드가 길어진다는 부정적인 시각도 존재한다. 내가 다니는 회사 역시 이러한 이유로 <code class="language-plaintext highlighter-rouge">Enum</code> 사용에 부정적이고 대신에 순수 변수나 <code class="language-plaintext highlighter-rouge">dict</code>를 사용한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Gender</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sh">"</span><span class="s">MALE</span><span class="sh">"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="sh">"</span><span class="s">FEMALE</span><span class="sh">"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">input_gender</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">input_gender</span> <span class="o">==</span> <span class="n">Gender</span><span class="p">[</span><span class="sh">"</span><span class="s">MALE</span><span class="sh">"</span><span class="p">]:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">남성입니다.</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">dict</code>형을 사용하면 <code class="language-plaintext highlighter-rouge">.value</code>를 추가로 사용할 필요가 없어 코드가 짧아진다. 그러나 <code class="language-plaintext highlighter-rouge">Gender.MALE</code>이 아닌 <code class="language-plaintext highlighter-rouge">Gender["MALE"]</code>은 보는 사람에 따라 가독성에 방해가 될 수 있고. <code class="language-plaintext highlighter-rouge">Enum</code>처럼 열거 전용 자료구조가 아닌 범용으로 사용되는 <code class="language-plaintext highlighter-rouge">dict</code>를 사용했기 때문에 이게 열거형인지 아닌지 헷갈리는 경우가 생긴다는 단점이 있다. 따라서 <strong>파이썬의 경우 열거형을 구현할 때 <code class="language-plaintext highlighter-rouge">dict</code>를 쓸건지 <code class="language-plaintext highlighter-rouge">Enum</code>을 쓸건지, 그리고 어떻게 코드네이밍을 정할 지 고민 또는 팀원들 간에 논의를 할 필요가 있다.</strong></p>
+
+<h1 id="마치며">마치며</h1>
+
+<p>그동안 나를 포함한 대부분의 개발자들은 프로그래밍을 처음 공부를 하는 과정에 무의식적으로 매직넘버를 사용해 왔다. 그리고 그게 버릇이 되어 실무에서도 역시 무의식적으로 매직넘버를 사용하는 일도 생긴다. 나 역시 이런 실수를 여러번 해 왔고 이로 인해 일일이 상수를 변경해야 하는 등 여러번 댓가를 치루기도 했다. 매직넘버를 100% 사용하지 않는 것은 매우 힘들긴 하지만 그래도 가능한 사용하지 않는 방향으로 버릇을 고치는 일은 개발에 있어서 매우 중요한 요소이다.</p>]]></content><author><name></name></author><category term="Software_Arhitecture" /><category term="clean-code" /><summary type="html"><![CDATA[매직 넘버의 의미와 문제점]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">DJango에서 N + 1 Problem 해결하는 방법</title><link href="https://recoma96.github.io/django/2024/12/12/django-n1-problem.html" rel="alternate" type="text/html" title="DJango에서 N + 1 Problem 해결하는 방법" /><published>2024-12-12T01:00:00+00:00</published><updated>2024-12-12T01:00:00+00:00</updated><id>https://recoma96.github.io/django/2024/12/12/django-n1-problem</id><content type="html" xml:base="https://recoma96.github.io/django/2024/12/12/django-n1-problem.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>백엔드 프레임워크 또는 다른 라이브러리에서 제공하는 ORM 라이브러리는 데이터베이스와의 상호작용을 편하게 해준다.
+하지만 이걸 아무생각없이 남용을 하게되면 DB트래픽 낭비를 하게 되는 이슈가 발생하게 되는데 대표적인 예가 <strong>N + 1 Problem</strong> 이다. Spring Boot, NodeJS등 많은 백엔드 프레임워크에 사용되는 ORM 라이브러리들이 N + 1 Problem을 해결하기 위해 여러가지 도구들을 제공하는 데, DJango-ORM 역시 이와 같은 도구들을 제공한다.</p>
+
+<h2 id="n--1이-뭐에요">N + 1이 뭐에요?</h2>
+
+<p><strong>N + 1 Problem</strong> 이란, 두 개의 연결된 테이블을 조회할 때, 하위 테이블을 참조해서 조회하기 위해 상위 테이블에서
+조회된 N개의 테이블들을 하나씩 순회하면서 추가로 DB에 요청을 하는 것을 의미한다. 즉, 상위 테이블을 <strong>1번</strong> 조회하고, 조회된 데이터들을 순회하면서 <strong>하위 테이블들을 각각 조회하게 된다.</strong> 결국 DB에 <strong>N + 1</strong> 개의 요청을 하게 된다고 보면 된다. 이렇게 N이 기하급수적으로 커지게 되면 DB 부하가 커지게 됨은 물론, 서버 성능에도 영향을 미치게 된다.</p>
+
+<h2 id="원인">원인</h2>
+
+<p>Django를 포함한 여러 ORM 라이브러리들은 <strong>Lazy Loading</strong>을 지원한다.
+Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 않고 실제 DB 데이터를 사용하려는 시점에서 SQL문이 실행되는 것을 의미한다. 대표적으로 <code class="language-plaintext highlighter-rouge">get()</code>과 <code class="language-plaintext highlighter-rouge">first()</code>가 있다. 평소에는 가만히 있다가 이 함수들이 실행되면 바로 DB로 SQL문 실행을 한다. 그렇기 때문에 유동적으로 쿼리에 쿼리를 추가할 수가 있어 코드를 재활용할 수 있다는 장점이 있다. 하지만, 이는 곧 하위 테이블 데이터의 정보가 필요할 때마다 SQL문을 날리는 N + 1 Problem에 직면하게 된다.</p>
+
+<h3 id="example">Example</h3>
+
+<p>예를 들어 어떤 사용자가 작성한 짧은 게시물들을 조회한다고 할때, 아래와 같이 코드를 작성할 것이다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">diaries</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">).</span><span class="nf">all</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nf">print</span><span class="p">(</span><span class="n">diaries</span><span class="p">)</span>
+<span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="o">=</span> <span class="mi">16</span> <span class="n">LIMIT</span> <span class="mi">21</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="o">&lt;</span><span class="n">QuerySet</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">ShortDiary</span><span class="p">:</span> <span class="n">ShortDiary</span> <span class="nf">object </span><span class="p">(</span><span class="mi">41</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ShortDiary</span><span class="p">:</span> <span class="n">ShortDiary</span> <span class="nf">object </span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ShortDiary</span><span class="p">:</span> <span class="n">ShortDiary</span> <span class="nf">object </span><span class="p">(</span><span class="mi">43</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ShortDiary</span><span class="p">:</span> <span class="n">ShortDiary</span> <span class="nf">object </span><span class="p">(</span><span class="mi">44</span><span class="p">)</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ShortDiary</span><span class="p">:</span> <span class="n">ShortDiary</span> <span class="nf">object </span><span class="p">(</span><span class="mi">45</span><span class="p">)</span><span class="o">&gt;</span><span class="p">]</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<p>위에서 보다시피 <code class="language-plaintext highlighter-rouge">diaries = ShortDiary.objects.filter(user=user).all()</code>를 호출했지만, SQL을 실행한 흔적이 없다, 바로 밑의 <code class="language-plaintext highlighter-rouge">print()</code>를 호출해야 비로소 데이터베이스에 요청이 들어간 것이다. ShortDiary에 있는 데이터를 출력해야 하기 때문이다. 이렇게 꼭 필요한 상황이 되서야 DB에 갔다오기 때문에 <strong>Lazy Loading(게으른 로딩)</strong>이라고 부른다.</p>
+
+<p><br /></p>
+
+<p>하지만 이러한 Lazy Loading 방식은 곧 아래와 같은 문제를 유발하게 된다.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">diaries</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">all</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">diary</span> <span class="ow">in</span> <span class="n">diaries</span><span class="p">:</span>
+<span class="p">...</span>     <span class="nf">print</span><span class="p">(</span><span class="n">diary</span><span class="p">.</span><span class="n">user</span><span class="p">)</span>
+<span class="p">...</span> 
+
+<span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">();</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span> <span class="n">WHERE</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span> <span class="o">=</span> <span class="mi">20</span> <span class="n">LIMIT</span> <span class="mi">21</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="n">mccarthydouglas</span><span class="nd">@example.net</span> <span class="o">-</span> <span class="n">debbiecarr</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span> <span class="n">WHERE</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span> <span class="o">=</span> <span class="mi">20</span> <span class="n">LIMIT</span> <span class="mi">21</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="n">mccarthydouglas</span><span class="nd">@example.net</span> <span class="o">-</span> <span class="n">debbiecarr</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span> <span class="n">WHERE</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span> <span class="o">=</span> <span class="mi">20</span> <span class="n">LIMIT</span> <span class="mi">21</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="n">mccarthydouglas</span><span class="nd">@example.net</span> <span class="o">-</span> <span class="n">debbiecarr</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span> <span class="n">WHERE</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span> <span class="o">=</span> <span class="mi">20</span> <span class="n">LIMIT</span> <span class="mi">21</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+</code></pre></div></div>
+
+<p>ShortDiary(일기장)를 조회하고. 각각의 일기장을 누가 썼는지 출력 하는 코드다. RAW Query라면 JOIN문 한번에 가져올 수 있지만 여기는 ORM이다. Lazy Loading 방식이기 때문에 일기장 주인(User)을 출력하기 전 까지 아무것도 안하다가. 출력하는 순간(<code class="language-plaintext highlighter-rouge">print(diary.user)</code>)이 되서야 SQL문을 날린다. 이걸 일기 갯수(diaries)대로 반복을 하게 되고 결국 N + 1 Problem이 발생하게 된다. 결국 DB에 불필요한 요청을 보내는 꼴이 되고, 이는 서버와 DB 둘다 불필요한 트래픽으로 인해 성능저하가 발생하게 된다.</p>
+
+<p><br /></p>
+
+<p>하지만 ORM은 이러한 이슈가 계속 발생이 되도록 방관하지 않는다. 빠져나갈 방법은 있다.</p>
+
+<h1 id="해결-방법">해결 방법</h1>
+
+<p>사실 해결 방법은 간단하다. JOIN을 사용하면 된다. 이렇게 되면 쿼리문 1번으로 끝내는 것이 가능하다. 하지만 여기는 RAW Query가 아닌 ORM이기 때문에 다른 방법을 사용해야 한다. Django에서는 <strong>select_related</strong>와 <strong>prefetch_related</strong>를 지원한다. <code class="language-plaintext highlighter-rouge">select_related</code>는 JOIN문 1번으로 모든 데이터르들을 한꺼번에 불러오고, <code class="language-plaintext highlighter-rouge">prefetch_related</code>는 상위 테이블 한번, 그 상위 테이블에서 조회된 고유키를 가지고 하위 테이블 조회 함으로써 총 2번 요청을 한다. 이렇게 Lazy Loading이 아닌, 미리미리 데이터를 불러와서 활용하는 방식을 <strong>Eager Loading</strong> 이라고 한다.</p>
+
+<h2 id="모델-구조">모델 구조</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">user</span><span class="sh">"</span>
+
+    <span class="n">GENDER_CODE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">M</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Male</span><span class="sh">"</span><span class="p">),</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">F</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Female</span><span class="sh">"</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">EmailField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">이메일</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">nickname</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">닉네임</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">GENDER_CODE</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">성별</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">BooleanField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">활성화 여부</span><span class="sh">"</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ShortDiary</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">short_diary</span><span class="sh">"</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="p">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+    <span class="n">is_deleted</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">BooleanField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="select_related">select_related</h2>
+
+<p>정참조 또는 1대1에서 주로 사용되는 함수다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">diaries</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">select_related</span><span class="p">(</span><span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">diary</span> <span class="ow">in</span> <span class="n">diaries</span><span class="p">:</span>
+<span class="p">...</span>     <span class="nf">print</span><span class="p">(</span><span class="n">diary</span><span class="p">.</span><span class="n">user</span><span class="p">)</span>
+<span class="p">...</span> 
+
+<span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">INNER</span> <span class="n">JOIN</span> <span class="sb">`user`</span> <span class="nc">ON </span><span class="p">(</span><span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="o">=</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">);</span> <span class="n">args</span><span class="o">=</span><span class="p">();</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">select_related</code>는 <code class="language-plaintext highlighter-rouge">JOIN</code>을 이용해서 문제를 해결한다. 위의 예시에서는 일기를 작성한 사용자(User)의 정보를 가져오는 코드이다. 사용된 쿼리문은 <code class="language-plaintext highlighter-rouge">JOIN</code>문 딱 하나다.</p>
+
+<h3 id="작동이-안되는-경우">작동이 안되는 경우</h3>
+
+<p>반대로 사용자가 어떤 일기를 썼는지 조회하는 경우도 있을 수 있다. 즉 1대다 상황이 되는데, 이때 <code class="language-plaintext highlighter-rouge">select_related</code>를 사용하게 되면 아래와 같은 에러가 발생하게 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">select_related</span><span class="p">(</span><span class="sh">'</span><span class="s">short_diaries</span><span class="sh">'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+<span class="p">...</span>     <span class="nf">print</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">__dict__</span><span class="p">)</span>
+
+<span class="n">django</span><span class="p">.</span><span class="n">core</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">FieldError</span><span class="p">:</span> <span class="n">Invalid</span> <span class="n">field</span> <span class="nf">name</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">given</span> <span class="ow">in</span> <span class="n">select_related</span><span class="p">:</span> <span class="sh">'</span><span class="s">short_diaries</span><span class="sh">'</span><span class="p">.</span> <span class="n">Choices</span> <span class="n">are</span><span class="p">:</span> <span class="p">(</span><span class="n">none</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>short_diaries라는 이름의 field name이 없다는 문구가 뜬다. User Model에 선언된 멤버변수 들 중 short_diaries라는 이름의 변수는 없기 때문이다. 이 경우, prefetch_related를 사용해야 한다.</p>
+
+<h2 id="prefetch_related">prefetch_related</h2>
+
+<p>상위 테이블 조회 1번, 하위 테이블 조회 1번, 총 2번 요청을 한다.
+1대다, 다대다나 역참조에서 주로 사용된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">prefetch_related</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+<span class="p">...</span>     <span class="nf">print</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">short_diaries</span><span class="p">)</span>
+<span class="p">...</span> 
+<span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">();</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="nc">IN </span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">25</span><span class="p">);</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">25</span><span class="p">);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">select_related</code>에서는 되지 않았던 역참조가 <code class="language-plaintext highlighter-rouge">prefetch_related</code> 에서는 정상작동이 되었다.</p>
+
+<h1 id="사용시-주의해야-할-점">사용시 주의해야 할 점</h1>
+
+<h2 id="prefetch_related-와-함께-하위-테이블에-대한-정렬을-하려는-경우">prefetch_related 와 함께 하위 테이블에 대한 정렬을 하려는 경우</h2>
+
+<p>간혹 하위 테이블을 기준으로 정렬을 하려는 경우가 있다. 그런데 위에서 언급했다시피 prefetch_related는 역참조 또는 1..n대다에서 사용되는 함수다. 즉, 하위 테이블의 데이터가 여러개 존재할 수 있다는 얘기가 된다. 결국, 하위 테이블의 모든 데이터들을 참조할 수 밖에 없고, 그 결과 <strong>하위 테이블의 갯수대로 상위 테이블 데이터가 중복이 된다.</strong> 따라서 prefetch_related를 사용할 경우, 하위 테이블을 기준으로 정렬하는 것을 권장하지 않고, 어쩔 수 없이 사용하게 된다면, 쿼리 결과를 그대로 사용하는게 아니라 별도의 로직을 통해 데이터를 가공해야 할 필요가 있다.</p>
+
+<h3 id="예시">예시</h3>
+
+<ul>
+  <li>각 User에는 5개의 ShortDiary가 있음</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">prefetch_related</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">).</span><span class="nf">all</span><span class="p">()</span>
+<span class="n">prefetched_users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">prefetch_related</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">).</span><span class="nf">order_by</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries__id</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Users: </span><span class="si">{</span><span class="nf">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Prefetched Users: </span><span class="si">{</span><span class="nf">len</span><span class="p">(</span><span class="n">prefetched_users</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># 결과
+</span><span class="n">Users</span><span class="p">:</span> <span class="mi">2</span>
+<span class="n">Prefetched</span> <span class="n">Users</span><span class="p">:</span> <span class="mi">10</span> <span class="c1"># 2 x 5 = 10
+</span></code></pre></div></div>
+
+<h3 id="first-get-사용">first(), get() 사용</h3>
+
+<p>참조된 하위 테이블 중 가장 위에 있는 데이터를 사용하기 위해 <code class="language-plaintext highlighter-rouge">first()</code> 또는 <code class="language-plaintext highlighter-rouge">get()</code>을 사용을 하는 경우가 생기는데, 이 두개의 함수를 사용하게 되면 Eager Loading을 했음에도 불구하고 다시 N + 1 Problem 이 발생하는 사고가 생긴다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">prefetch_related</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+    <span class="n">diary</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="n">short_diaries</span><span class="p">.</span><span class="nf">first</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">diary</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
+
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">();</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="nc">IN </span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+
+<span class="c1"># User 갯수대로 추가 SQL문 요청 
+</span><span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="o">=</span> <span class="mi">26</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span> <span class="n">ASC</span> <span class="n">LIMIT</span> <span class="mi">1</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="n">radio</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="o">=</span> <span class="mi">27</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span> <span class="n">ASC</span> <span class="n">LIMIT</span> <span class="mi">1</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">27</span><span class="p">,);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">diary = user.short_diaries.first()</code>에서 short_diary 테이블을 한번 더 조회하고 있다. 즉, 유저 갯수 마다 short_diary를 한번 씩 데이터베이스에 직접 조회하고 있다는 것이다. 그렇기 때문에 <code class="language-plaintext highlighter-rouge">first()</code> 대신 <code class="language-plaintext highlighter-rouge">all()[0]</code> 을 사용해야 한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">prefetch_related</span><span class="p">(</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+    <span class="n">diary</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="n">short_diaries</span><span class="p">.</span><span class="nf">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">diary</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
+
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`password`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`last_login`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_superuser`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`email`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`nickname`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`gender`</span><span class="p">,</span> <span class="sb">`user`</span><span class="p">.</span><span class="sb">`is_active`</span> <span class="n">FROM</span> <span class="sb">`user`</span><span class="p">;</span> <span class="n">args</span><span class="o">=</span><span class="p">();</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="nc">IN </span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
+<span class="n">radio</span>
+<span class="n">man</span>
+</code></pre></div></div>]]></content><author><name></name></author><category term="Django" /><category term="django" /><category term="database" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">EC2 인스턴스 유형 변경하기</title><link href="https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance.html" rel="alternate" type="text/html" title="EC2 인스턴스 유형 변경하기" /><published>2024-11-28T23:00:00+00:00</published><updated>2024-11-28T23:00:00+00:00</updated><id>https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance</id><content type="html" xml:base="https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>사이드 프로젝트나 실무에서 대부분 서버를 돌릴 때 AWS EC2 인스턴스를 사용한다. 그런데, 사용하다 보면 인스턴스의 스펙을 올리거나 내려야 할 상황이 생긴다. 예를 들어 운영하고 있는 서버에 사용자가 증가하면서 트래픽이 많아지게 되고, 트래픽이 많아지게 되면서 CPU, RAM 사용량이 기하급수적으로 증가하게 된다면, 인스턴스 스펙을 올리는 <strong>스케일 업(Scale Up)</strong>을 고려해야 한다. (로드밸런싱을 적극 사용하고 있다면 서버 대수를 늘리는 <strong>스케일 (Scale Out)</strong>을 할 수도 있겠지만. 이번 포스트에서는 이게 주제가 아니므로 패스…). 혹은 사용 대비 비용이 너무 많이 들어가 돈낭비가 지속된다면 반대로 서버 스펙을 줄일 필요가 있다.</p>
+
+<p><br /></p>
+
+<p>순수 자체 구축된 컴퓨터를 사용하고 있다면, CPU또는 RAM을 직접 갈아끼워야 하는 수고가 만만치 않은 데다, 마더보드하고 호환되지 않을 경우 전체를 다 들어내야 하는 등, 많은 인력이 소모될 것이다. 하지만 AWS, Azure 같은 클라우드 서비스를 사용하고 있다면, 마우스 몇번 깔딱으로 스펙을 바꿀 수가 있다. 이번 포스트에서는 EC2의 유형을 변경하는 방법에 대해 설명한다.</p>
+
+<h1 id="ec2-유형-변경하기">EC2 유형 변경하기</h1>
+
+<h2 id="변경-전-점검사항">변경 전 점검사항</h2>
+
+<p>EC2 유형을 변경한다는 것은 마치 본체를 갈아 끼운다는 것과 같다. 그렇기 때문에 유형을 변경하기에 앞서 몇가지 점검해야 할 사항이 있다.</p>
+
+<h3 id="public-ip-변동-여부">Public IP 변동 여부</h3>
+
+<p>EC2를 사용해 봤다면 당연히 알고있겠지만, 유형을 변경하기에 앞서 서버를 내리게 된다. 그리고 다시 올리게 되면 Public IP가 변경된다. Elastic IP를 사용하고 있다면 문제가 없겠지만, 그렇지 않다면 <strong>IP가 바뀜으로서, 영향이 가는 AWS 서비스가 있는지 검토해야 한다.</strong> 대표적으로 여러 인스턴스들을 연동해서 트래픽 분산을 해주는 ALB(어플리케이션 로드밸런싱)가 있고, 해당 서버와 통신하고 있는 다른 서버 및 클라이언트가 이에 해당된다. 단, ALB를 포함한 다른 AWS 서비스들이 EC2를 연동할 때 IP가 아닌 Instance ID를 사용하고 있다면 IP가 어떻게 바뀌든 간에 영향이 가지 않는다.</p>
+
+<h3 id="ec2-내의-스토리지디스크가-ebs인지-확인하기">EC2 내의 스토리지(디스크)가 EBS인지 확인하기</h3>
+
+<p>EC2의 스토리지 유형은 크게 두 가지가 있다. 하나는 <strong>EBS(Elastic Block Store)</strong>이고 다른 하나는 <strong>인스턴스 스토리지(Instance Storage)</strong>이다. EBS는 EC2와 분리되어 있는 하드디스크 개념으로 EC2가 종료되어도 EBS에 있는 내용은 변경사항이 없지만, 인스턴스 스토리지는 말 그대로 EC2내 부착되는 스토리지이기 때문에 EC2를 종료하는 순간 모든 데이터가 사라지게 된다. 따라서 후술하겠지만, <strong>인스턴스 변경에 앞서 데이터에 대한 백업이 반드시 필요하다.</strong></p>
+
+<p><br /></p>
+
+<p>EC2가 사용하고 있는 스토리지의 유형을 확인하는 방법은 아래와 같다.</p>
+
+<ol>
+  <li>EC2 접속</li>
+  <li>명령어 <code class="language-plaintext highlighter-rouge">sudo apt install nvme-list</code> 실행</li>
+  <li>명령어 <code class="language-plaintext highlighter-rouge">nvme list</code> 실행</li>
+</ol>
+
+<p><code class="language-plaintext highlighter-rouge">nvme list</code>를 실행하면 보통 아래와 같이 터미널에 출력이 된다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Node           SN                  Model                                    
+<span class="nt">-------------</span> <span class="nt">--------------------</span> <span class="nt">---------------------------</span>
+/dev/nvme0n1  vol074ab31681a94fc83 Amazon Elastic Block Store              
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>Model 부분에서 <code class="language-plaintext highlighter-rouge">Amazon Elastic Block Store</code>라고 출력되어있다면 EBS가 되고, 그렇지 않다면 인스턴스 스토리지다.</p>
+
+<h3 id="아키텍처-체크">아키텍처 체크</h3>
+
+<p><img src="/assets/img/20241129/arch-list.png" alt="arch-list" /></p>
+
+<p>CPU 아키텍처가 Intel x86인지 AMD인지 아니면 다른 것인지 파악을 해야 한다. 유형에 따라 아키텍처가 달라지는데, 이를 고려하지 않고 변경을 하게 된다면, 서비스 운영에 있어 장애를 경험할 수 있다. 예를 들어 Docker의 경우, ARM 계열의 MacOS에서 DockerFile로 이미지를 만들고 x86 계열의 EC2 인스턴스에서 해당 이미지를 생성해서 사용하려면 DockerFile의 맨 위에 아래와 같이 작성해야 한다. 아키텍처가 서로 다르기 때문이다.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> --platform=linux/amd64 &lt;이미지 유형&gt;</span>
+</code></pre></div></div>
+
+<h2 id="백업본-만들기-ebs-기준">백업본 만들기 (EBS 기준)</h2>
+
+<p>앞서 서술했듯이 인스턴스를 갈아까우면서 스토리지 상에서 혹여 발생하는 문제들에 대해 대비하기 위해 백업본을 미리 만들어야 한다. EBS와 인스턴스 스토리지 둘다 해당이 되지만, 대부분 EBS를 사용하기 때문에 EBS 위주로 설명한다.</p>
+
+<ol>
+  <li>ECS Instances에서 Instance ID를 클릭한다.
+<img src="/assets/img/20241129/backup-1.png" alt="backup-1" /></li>
+  <li>Storage 탭에서 Volume ID를 클릭한다.
+ <img src="/assets/img/20241129/backup-2.png" alt="backup-2" /></li>
+  <li>Action 탭에 Create snapshot을 클릭한다.
+ <img src="/assets/img/20241129/backup-3.png" alt="backup-3" /></li>
+  <li>필요한 설명을 적고 하단의 Create Snapshot을 클릭하면.
+ <img src="/assets/img/20241129/backup-4.png" alt="backup-4" /></li>
+  <li>EBS의 백업본인 Snapshot이 하나 추가가 되고, “Create volume” 버튼을 통해 언제든지 백업본을 생성할 수 있다.
+<img src="/assets/img/20241129/backup-5.png" alt="backup-5" /></li>
+</ol>
+
+<h2 id="ec2-유형-변경하기-1"><strong>EC2 유형 변경하기</strong></h2>
+
+<ol>
+  <li>유형을 변경하기에 앞서 EC2 인스턴스를 Stop(멈춤) 한다. <strong>절대 Terminate(종료)를 해서는 안된다.</strong>
+ <img src="/assets/img/20241129/change-1.png" alt="change-1" /></li>
+  <li>actions -&gt; instance settings -&gt; change instance type 으로 진행한다.
+ <img src="/assets/img/20241129/change-2.png" alt="change-2" /></li>
+  <li>이제 원하는 인스턴스 유형을 고른다. 변경 전과 이후의 인스턴스 스펙 리스트가 있으니 꼭 확인하자. 결정이 됐으면 하단의 Change 버튼을 누른다.
+ <img src="/assets/img/20241129/change-3.png" alt="change-3" /></li>
+  <li>변경 성공, 이제 인스턴스를 켜서 데이터가 그대로 있는지, 서비스가 정상작동이 되는지 확인을 하면 된다.
+ <img src="/assets/img/20241129/change-4.png" alt="change-4" /></li>
+</ol>
+
+<h1 id="마치며">마치며</h1>
+
+<p>서비스를 운영하다 보면 사용자 및 트래픽의 증가에 따라, 혹은 비용 절감을 위해 서버 인스턴스의 스펙을 올리거나 내리는 순간이 꼭 한번쯤은 찾아온다. 현장에서 직접 서버의 스펙을 바꾸려면, 본체내 장비들을 일일이 교체해야 함은 물론, 교체 이후의 세팅을 일일이 해야 한다. 하지만, AWS EC2는 이러한 작업을 고작 마우스 딸깍 몇번으로 해결을 해준다.</p>
+
+<p><br /></p>
+
+<p>그러나, 이런 행위는 사실상 서버 본체를 갈아끼우는 것과 같기 때문에, 내부 스토리지의 데이터가 초기화 되거나, Public IP가 뒤바뀌면서, 서비스 작동에 장애를 안겨줄 수 있다. 그렇기 때문에 <strong>AWS EC2 인스턴스 스펙을 바꾸기 전에, 바뀌게 되면 영향이 가는 요소들을 반드시 확인하고, 변경 이후에도 서비스가 정상작동을 하는지에 대한 모니터링이 정말정말 필요하다.</strong></p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="ec2" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">DJango에서 마이그레이션을 하지 말아야 할 데이터베이스를 테스트 하는 방법</title><link href="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html" rel="alternate" type="text/html" title="DJango에서 마이그레이션을 하지 말아야 할 데이터베이스를 테스트 하는 방법" /><published>2024-11-22T16:04:25+00:00</published><updated>2024-11-22T16:04:25+00:00</updated><id>https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db</id><content type="html" xml:base="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>DJango기반의 서비스를 구현할 때, 보통 해당 서비스에 포함되는 데이터베이스 테이블들은 DJango-ORM으로 관리되는 것이 권장되지만. 공용으로 사용되는 데이터베이스 테이블들의 경우 DJango에서 직접 관리되어선 안된다.(ex: 마이그레이션 같은 테이블의 정보를 바꾸는 작업). 이때 migration 작업시, 직접 관리되어선 안되는 테이블들을 마이그레이션 못하게 하기 위해 해당 테이블의 메타 클래스(<code class="language-plaintext highlighter-rouge">class Model.Meta</code>)에 <code class="language-plaintext highlighter-rouge">managed=False</code>로 설정을 하게 된다.</p>
+
+<p><br /></p>
+
+<p>예를 들어 사내 서비스에 대한 어드민 페이지를 개발할 때, 어드민 페이지 내에서 관리하는 어드민 전용 데이터베이스는 어드민 페이지 서버에서 직접 관리해도 문제가 없지만, 서비스 DB를 상대로 어드민 페이지가 절대로 마이그레이션 같은 DDL에 영향을 주는 행위를 절대절대 해서는 안된다. 그렇기 때문에 어드민 페이지 내 서버 코드에서는 서비스 DB와 관련된 모든 Model들을 전부 <code class="language-plaintext highlighter-rouge">managed=False</code> 처리를 해야 한다.</p>
+
+<p><br /></p>
+
+<p>그러나 이는 또 다른 문제를 발생 시키게 되는데, managed=False로 설정된 모델에서는 유닛테스트가 불가능 하다는 점이다. 유닛테스트 작동 시, DJango는 테스트를 수행하기 전에 테스트용 데이터베이스를 생성하고 그 위에 테이블들을 마이그레이션 한다. 그러나 managed=False로 되어 있는 모델들은 마이그레이션이 불가능하므로, 이 시점에서 에러가 발생하고 더이상 테스트를 진행할 수 없게 된다.</p>
+
+<p>이번 포스트에서는 <code class="language-plaintext highlighter-rouge">managed=False</code>로 되어 있는 모델들을 가지고 어떻게 유닛테스트를 할 수 있는지 설명을 하며, 크게 두 가지 방법이 있다.</p>
+
+<h1 id="솔루션">솔루션</h1>
+
+<h2 id="공통사항">공통사항</h2>
+
+<h3 id="auth-user-model-관련">Auth User Model 관련</h3>
+
+<p>두개 이상의 테이블을 사용할 때, 각 테이블의 모델 구조가 다를 때, 정확히는 로그인을 하기 위한 유저 모델이 한군데만 있고 다른 곳에는 없을 때, 유닛테스트 과정에서 문제가 생긴다.</p>
+
+<p><br /></p>
+
+<p>유닛테스트를 진행하기 전에 DJango는 테스트 전용 데이터베이스들을 생성하고 그 데이터베이스 위에 개발자가 작성한 모델들을 토대로 마이그레이션을 진행하게 된다. 이때 생성되는 모델들 중에, 유저가 정의한 모델들 말고 장고 내장의 모델들도 같이 마이그레이션을 하게 되는데, 이 중 <code class="language-plaintext highlighter-rouge">django_admin_log</code> 라는 테이블이 생성을 하면서 유저가 정의한 로그인 용도의 유저 모델(<code class="language-plaintext highlighter-rouge">AUTH_USER_MODEL</code>) 과 릴레이션 진행을 한다. 그러나 유저 모델이 없는 데이터베이스에서는 <code class="language-plaintext highlighter-rouge">django_admin_log</code> 와 릴레이션을 진행할 수 없기 때문에 유닛 테스트를 실행하기 전 에러가 발생하게 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">django</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">IntegrityError</span><span class="p">:</span> <span class="p">(</span><span class="mi">1215</span><span class="p">,</span> <span class="sh">'</span><span class="s">Cannot add foreign key constraint</span><span class="sh">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>해결 방법은 간단하다. INSTALLED_APPS에 <code class="language-plaintext highlighter-rouge">'django.contrib.admin'</code> 을 주석처리하면 된다.</p>
+
+<p><br /></p>
+
+<p>보통 직접 정의한 모델을  하기 위해 <code class="language-plaintext highlighter-rouge">INSTALLED_APPS</code>에 해당 모델과 관련된 앱 이름을 작성을 하게 된다. <code class="language-plaintext highlighter-rouge">python manage.py migrate</code> 을 수행할 때, 내가 직접 정의한 모델 말고도 장고 내장 테이블도 같이 마이그레이션 되는데, <strong>이는 직접 하드코딩 된 것이 아니라 장고 내장 테이블을 포함하고 있는 모듈이 <code class="language-plaintext highlighter-rouge">INSTALLED_APPS</code>에 선언되어 있기 때문에 저절로 같이 마이그레이션 된 것이다.</strong></p>
+
+<p><br /></p>
+
+<p><code class="language-plaintext highlighter-rouge">django_admin_log</code>도 마찬가지로 <code class="language-plaintext highlighter-rouge">django.contrib.admin</code> 안에 포함되어 있기 때문에 마이그레이션 된 것이다. 따라서 반대로 <code class="language-plaintext highlighter-rouge">django.contrib.admin</code>을 주석처리 및 제외를 하게 되면 <code class="language-plaintext highlighter-rouge">django_admin_log</code>를 더이상 마이그레이션을 하지 않게 될 것이고, 이에 따른 왜래키 문제도 더이상 발생하지 않게 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># 'django.contrib.admin'
+</span>    <span class="sh">'</span><span class="s">django.contrib.auth</span><span class="sh">'</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">django.contrib.contenttypes</span><span class="sh">'</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">django.contrib.sessions</span><span class="sh">'</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">django.contrib.messages</span><span class="sh">'</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">django.contrib.staticfiles</span><span class="sh">'</span><span class="p">,</span>
+<span class="p">]</span>
+</code></pre></div></div>
+
+<h2 id="무식한-방법-djangosettings를-활용해-테스트-할-때만-mangedtrue로-변경하기">(무식한 방법) django.settings를 활용해 테스트 할 때만 manged=True로 변경하기</h2>
+
+<h3 id="적용-방법">적용 방법</h3>
+
+<ol>
+  <li>settings.py에 TEST를 진행중인지에 대한 여부를 나타내는 환경변수를 추가한다.
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">UNDER_TEST</span> <span class="o">=</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">'</span><span class="s">test</span><span class="sh">'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>managed = False상태인 모든 모델의 메타 클래스의 managed를 <strong>전부 다</strong> 아래와 같이 변경한다.
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+     <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">example_table</span><span class="sh">"</span>
+     <span class="n">managed</span> <span class="o">=</span> <span class="nf">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="sh">"</span><span class="s">UNDER_TEST</span><span class="sh">"</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>대상 DB모델을 호출하는 테스트 스크립트를 작성해서 정상적으로 테스트가 돌아가는 지 확인한다.</li>
+</ol>
+
+<h3 id="문제점">문제점</h3>
+
+<p>각 <code class="language-plaintext highlighter-rouge">Model.Meta</code>마다 <code class="language-plaintext highlighter-rouge">getattr</code>함수를 작성해야 하기 때문에 코드 가시성이 떨어지고 유지보수에 문제가 생긴다. 따라서 해당 방안은 비권장하는 부분이다.</p>
+
+<h2 id="test-runner-활용하기">Test Runner 활용하기</h2>
+
+<p>위의 방법과 마찬가지로 <code class="language-plaintext highlighter-rouge">manged = True</code>로 바꿔야 한다는 방향은 일치하지만, 위의 방법에 비해 기술 부채가 일어나지 않게 진행하는 해결방안이다.</p>
+
+<p><br /></p>
+
+<p><code class="language-plaintext highlighter-rouge">DiscoverRunner</code>를 상속받아서 테스트가 맨 처음에 시작했을 때 managed를 True로 바꾸고, 끝나면 다시 원래대로 돌려놓게 함수를 오버라이딩 함으로써, Model 클래스에 위와 같이 똑같은 코드 작성 필요 없이 깔끔하게 해결할 수 있다.</p>
+
+<h3 id="testrunner">TestRunner</h3>
+
+<blockquote>
+  <p>A test runner is a class defining a run_tests() method. Django ships with a DiscoverRunner class that defines the default Django testing behavior. This class defines the run_tests() entry point, plus a selection of other methods that are used by run_tests() to set up, execute and tear down the test suite.</p>
+</blockquote>
+
+<p>TestRunner는 유닛테스트의 작동 방식을 정의를 한다. 각 TestCase 마다 작동 방식을 정의하는 함수들(setUpClass, setUp 등…)과는 다르게 <strong>전체적인 작동 방식을 정의한다.</strong> 예를 들어, 모든 테스트 케이스에서 공통적으로 사용할 수 있는 환경변수를 정의할 수도 있고, 데이터베이스 모델 정보도 변경할 수 있으며, 마이그레이션 없이 테스트를 진행하게 수정할 수 있다. 즉, <strong>TestCase에서는 할 수 없는 정밀한 작업 프로세스를 여기서 구현할 수 있다.</strong></p>
+
+<p>보통 <code class="language-plaintext highlighter-rouge">django.test.runner.DiscoverRunner</code>를 상속받아서 사용한다.</p>
+
+<h3 id="오버라이딩-할-수-있는-함수들">오버라이딩 할 수 있는 함수들</h3>
+
+<p><code class="language-plaintext highlighter-rouge">setup_test_environment()</code></p>
+
+<ul>
+  <li>막 테스트가 시작될 때 작동하는 함수, 모델들을 <code class="language-plaintext highlighter-rouge">managed=True</code>로 변경하는 로직을 여기서 구현한다.</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">teardown_test_environment()</code></p>
+
+<ul>
+  <li>모든 테스트 케이스가 끝나면 작동되는 함수, managed정보가 변경된 모델들을 원상복귀할 때 사용된다.</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">setup_databases()</code></p>
+
+<ul>
+  <li>테스트용 데이터베이스를 생성하고, 마이그레이션을 하는 등, 테스트에 사용되는 데이터베이스들을 세팅하는 데 사용된다.</li>
+  <li>테스트용 데이터베이스를 생성하는 것을 원하지 않는다면 함수내용을 비우는 방향으로 오버라이딩 하면 된다.</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">teardown_databases()</code></p>
+
+<ul>
+  <li>테스트용 데이터베이스를 거두는 등, DB 환경을 원상복귀 시키는데 사용된다.</li>
+</ul>
+
+<h3 id="run_tests"><code class="language-plaintext highlighter-rouge">run_tests()</code></h3>
+
+<p>모든 테스트케이스가 돌아갈 수 있는 이유는 <code class="language-plaintext highlighter-rouge">run_tests</code>함수가 실행되기 때문이다. run_tests의 로직은 아래와 같다.</p>
+
+<ol>
+  <li>테스트가 시작되기 전 전처리 수행 <code class="language-plaintext highlighter-rouge">setup_test_environment()</code></li>
+  <li>테스트 케이스 수집 <code class="language-plaintext highlighter-rouge">build_suite()</code></li>
+  <li>테스트용 데이터베이스 수집 및 세팅 <code class="language-plaintext highlighter-rouge">get_databases()</code>, <code class="language-plaintext highlighter-rouge">setup_databases()</code></li>
+  <li><strong>테스트 수행</strong> <code class="language-plaintext highlighter-rouge">run_suite()</code>
+    <ul>
+      <li>test실패 (assert)시 exception 호출</li>
+    </ul>
+  </li>
+  <li>테스트 종료 후 프로세스 수행 <code class="language-plaintext highlighter-rouge">teardown_databases()</code> <code class="language-plaintext highlighter-rouge">teardown_test_environment()</code>
+    <ul>
+      <li>테스트실패 여부 상관업싱 해당 로직은 수행된다.</li>
+    </ul>
+  </li>
+</ol>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">run_tests()</code> 코드 전문</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_tests</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">extra_tests</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Run the unit tests for all the test labels in the provided list.
+
+    Test labels should be dotted Python paths to test modules, test
+    classes, or test methods.
+
+    Return the number of tests that failed.
+    </span><span class="sh">"""</span>
+    <span class="k">if</span> <span class="n">extra_tests</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="p">.</span><span class="nf">warn</span><span class="p">(</span>
+            <span class="sh">"</span><span class="s">The extra_tests argument is deprecated.</span><span class="sh">"</span><span class="p">,</span>
+            <span class="n">RemovedInDjango50Warning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">self</span><span class="p">.</span><span class="nf">setup_test_environment</span><span class="p">()</span>
+    <span class="n">suite</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">build_suite</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">extra_tests</span><span class="p">)</span>
+    <span class="n">databases</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">get_databases</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
+    <span class="n">suite</span><span class="p">.</span><span class="n">serialized_aliases</span> <span class="o">=</span> <span class="nf">set</span><span class="p">(</span>
+        <span class="n">alias</span> <span class="k">for</span> <span class="n">alias</span><span class="p">,</span> <span class="n">serialize</span> <span class="ow">in</span> <span class="n">databases</span><span class="p">.</span><span class="nf">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">serialize</span>
+    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">timed</span><span class="p">(</span><span class="sh">"</span><span class="s">Total database setup</span><span class="sh">"</span><span class="p">):</span>
+        <span class="n">old_config</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">setup_databases</span><span class="p">(</span>
+            <span class="n">aliases</span><span class="o">=</span><span class="n">databases</span><span class="p">,</span>
+            <span class="n">serialized_aliases</span><span class="o">=</span><span class="n">suite</span><span class="p">.</span><span class="n">serialized_aliases</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">run_failed</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">self</span><span class="p">.</span><span class="nf">run_checks</span><span class="p">(</span><span class="n">databases</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">run_suite</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+        <span class="n">run_failed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">raise</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">timed</span><span class="p">(</span><span class="sh">"</span><span class="s">Total database teardown</span><span class="sh">"</span><span class="p">):</span>
+                <span class="n">self</span><span class="p">.</span><span class="nf">teardown_databases</span><span class="p">(</span><span class="n">old_config</span><span class="p">)</span>
+            <span class="n">self</span><span class="p">.</span><span class="nf">teardown_test_environment</span><span class="p">()</span>
+        <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+            <span class="c1"># Silence teardown exceptions if an exception was raised during
+</span>            <span class="c1"># runs to avoid shadowing it.
+</span>            <span class="k">if</span> <span class="ow">not</span> <span class="n">run_failed</span><span class="p">:</span>
+                <span class="k">raise</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">print_results</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">suite_result</span><span class="p">(</span><span class="n">suite</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="적용-방법-1">적용 방법</h3>
+<ol>
+  <li>DiscoverRunner를 상속받는 모듈을 작성한다.
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">setup_test_environment</code>
+        <ul>
+          <li><strong>테스트가 본격적으로 시작하기 전에 딱 한번 실행되는 함수</strong>로 <code class="language-plaintext highlighter-rouge">TestCase</code>가 처음 실행될 때 작동하는 <code class="language-plaintext highlighter-rouge">setUpClass</code>나 <code class="language-plaintext highlighter-rouge">setUpTestData</code> 와는 결이 다르다</li>
+        </ul>
+      </li>
+      <li><code class="language-plaintext highlighter-rouge">teardown_test_environment</code>
+        <ul>
+          <li><strong>모든 테스트 케이스가 다 끝나는 순간에 작동되는 함수</strong></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kn">from</span> <span class="n">typing</span> <span class="kn">import</span> <span class="n">Set</span>
+
+<span class="kn">from</span> <span class="n">django.test.runner</span> <span class="kn">import</span> <span class="n">DiscoverRunner</span>
+<span class="kn">from</span> <span class="n">django.apps</span> <span class="kn">import</span> <span class="n">apps</span>
+
+
+<span class="k">class</span> <span class="nc">UnManagedModelTestRunner</span><span class="p">(</span><span class="n">DiscoverRunner</span><span class="p">):</span>
+    <span class="n">un_managed_models</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span> <span class="o">=</span> <span class="nf">set</span><span class="p">()</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup_test_environment</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">.</span><span class="nf">get_models</span><span class="p">():</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">model_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span><span class="p">:</span>
+                <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+                <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="nf">super</span><span class="p">(</span><span class="n">UnManagedModelTestRunner</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">setup_test_environment</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">teardown_test_environment</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">.</span><span class="nf">get_models</span><span class="p">():</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">model_name</span>
+            <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span><span class="p">:</span>
+                <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="nf">super</span><span class="p">(</span><span class="n">UnManagedModelTestRunner</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">teardown_test_environment</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">settings.py</code>에 <code class="language-plaintext highlighter-rouge">TEST_RUNNER</code> 변수를 추가한다.</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TEST_RUNNER</span> <span class="o">=</span> <span class="sh">"</span><span class="s">api.tests.runner.UnManagedModelTestRunner</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<ol>
+  <li>유닛테스트를 실행해 제대로 작동되는 지 확인한다.</li>
+</ol>
+
+<h1 id="references">References</h1>
+
+<ul>
+  <li><a href="https://yangtaeyoung.github.io/docs/django/unmanaged-model/#soluton-1-%EB%AA%85%EB%A0%B9%EC%96%B4-%EA%B0%80%EB%A1%9C%EC%B1%84%EA%B8%B0%EC%A0%9C%EA%B0%80-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%B0%A9%EB%B2%95">Unmanaged Model을 사용하면서 Test를 적용하기(feat. Table XXX doesn’t exist)</a></li>
+  <li><a href="https://technote.fyi/programming/django/django-database-testing-unmanaged-tables-with-migrations/">Django Database Testing Unmanaged Tables with Migration</a></li>
+  <li><a href="https://docs.djangoproject.com/en/5.0/topics/testing/advanced/">Django Testing Advanced Document</a></li>
+  <li><a href="https://docs.djangoproject.com/en/5.0/ref/applications/">Django Applications Document</a></li>
+</ul>]]></content><author><name></name></author><category term="Django" /><category term="python" /><category term="django" /><category term="database" /><category term="unittest" /><category term="testing" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Markdown Test 마크다운 테스트</title><link href="https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test.html" rel="alternate" type="text/html" title="Markdown Test 마크다운 테스트" /><published>2024-09-14T16:04:25+00:00</published><updated>2024-09-14T16:04:25+00:00</updated><id>https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test</id><content type="html" xml:base="https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test.html"><![CDATA[<h1 id="h1">H1</h1>
 <p>첫번째 내용</p>
 
 <h2 id="h2">H2</h2>
@@ -37,12 +1000,12 @@
   <li>Example</li>
 </ul>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span><span class="p">[</span><span class="n">testimage</span><span class="p">](</span><span class="o">/</span><span class="n">lollineon</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">img</span><span class="o">/</span><span class="n">post</span><span class="o">/</span><span class="n">example1</span><span class="p">.</span><span class="n">gif</span><span class="p">)</span>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span><span class="p">[</span><span class="n">testimage</span><span class="p">](</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">img</span><span class="o">/</span><span class="n">post</span><span class="o">/</span><span class="n">example1</span><span class="p">.</span><span class="n">gif</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>이 아래에 있는 건 이미지 입니다.</p>
 
-<p><img src="/lollineon/assets/img/post/example1.gif" alt="testimage" /></p>
+<p><img src="/assets/img/post/example1.gif" alt="testimage" /></p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbccccccccccccccccdfdddddddddddddddddd
 </code></pre></div></div>
@@ -236,7 +1199,7 @@ a^2 = b^2 + c^2 - 2bc\cos\alpha\]
       <p><a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
   </ol>
-</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://sweetcase-production.github.io/lollineon" /><media:content medium="image" url="https://sweetcase-production.github.io/lollineon" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[백준, leetcode] 연결리스트로 팰린드롬 확인하기</title><link href="https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" rel="alternate" type="text/html" title="[백준, leetcode] 연결리스트로 팰린드롬 확인하기" /><published>2023-12-07T16:04:25+00:00</published><updated>2023-12-07T16:04:25+00:00</updated><id>https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome</id><content type="html" xml:base="https://sweetcase-production.github.io/lollineon/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html"><![CDATA[<h1 id="문제">문제</h1>
+</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[백준, leetcode] 연결리스트로 팰린드롬 확인하기</title><link href="https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" rel="alternate" type="text/html" title="[백준, leetcode] 연결리스트로 팰린드롬 확인하기" /><published>2023-12-07T16:04:25+00:00</published><updated>2023-12-07T16:04:25+00:00</updated><id>https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome</id><content type="html" xml:base="https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html"><![CDATA[<h1 id="문제">문제</h1>
 <p><a href="https://www.acmicpc.net/problem/1259">백준: 팰린드롬수 [브론즈 1]</a> <br />
 <a href="https://leetcode.com/problems/palindrome-linked-list">leetcode: palindrome linked list [Easy]</a></p>
 
@@ -453,4 +1416,4 @@ a^2 = b^2 + c^2 - 2bc\cos\alpha\]
     <span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
 
 
-</code></pre></div></div>]]></content><author><name></name></author><category term="코테_뽀개기" /><category term="algorithm" /><summary type="html"><![CDATA[문제 백준: 팰린드롬수 [브론즈 1] leetcode: palindrome linked list [Easy]]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://sweetcase-production.github.io/lollineon/post/wolchul-mountain.jpg" /><media:content medium="image" url="https://sweetcase-production.github.io/lollineon/post/wolchul-mountain.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</code></pre></div></div>]]></content><author><name></name></author><category term="코테_뽀개기" /><category term="algorithm" /><summary type="html"><![CDATA[문제 백준: 팰린드롬수 [브론즈 1] leetcode: palindrome linked list [Easy]]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/post/wolchul-mountain.jpg" /><media:content medium="image" url="https://recoma96.github.io/post/wolchul-mountain.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
