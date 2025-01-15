@@ -1,4 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-15T01:00:54+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">IAM Role이란?</title><link href="https://recoma96.github.io/aws/2025/01/14/iam-role.html" rel="alternate" type="text/html" title="IAM Role이란?" /><published>2025-01-14T23:30:00+00:00</published><updated>2025-01-14T23:30:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/14/iam-role</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/14/iam-role.html"><![CDATA[<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-15T05:30:17+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">AWS Configure 여러개로 관리하기</title><link href="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html" rel="alternate" type="text/html" title="AWS Configure 여러개로 관리하기" /><published>2025-01-15T05:00:00+00:00</published><updated>2025-01-15T05:00:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/15/aws-configure-profile</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>내가 다니고 있는 회사에는 두 개의 서비스를 관리하고 있고, 각 서비스 마다 서로 다른 AWS 계정을 가지고 있다.
+나는 두 개의 서비스 중 하나는 전체 관리를 다른 하나는 일부 참여를 하고 있기 때문에 두 개의 AWS 계정을 사용해야 했다.
+개발을 로컬에서 하기 때문에 어쩔 수 없이 AWS Configure를 사용해야 하는데, 매번 다른 서비스를 개발할 때마다 일일이 AWS 정보를 입력해야 하는게 여간 귀찮은게 아니다. 
+그래서 리서치 결과 <code class="language-plaintext highlighter-rouge">aws configure profile</code>이라는 게 있다는 것을 알았다.</p>
+
+<h1 id="aws-configure-profile">aws configure –profile</h1>
+
+<p>프로필을 생성방법은 아래와 같다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws configure <span class="nt">--profile</span> &lt;ProfileName&gt;
+AWS Access Key ID <span class="o">[</span><span class="k">********************</span><span class="o">]</span>:
+AWS Secret Access Key <span class="o">[</span><span class="k">********************</span><span class="o">]</span>:
+Default region name <span class="o">[</span>ap-northeast-2]:
+Default output format <span class="o">[</span>json]:
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>그리고 아래와 같은 명령어로 s3를 불러올 수 있다.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws s3 <span class="nb">ls</span> <span class="nt">--profile</span> &lt;ProfileName&gt;
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>아래의 명령어로 프로파일의 정보를 출력할 수 있다. 아, 물론 엑세스 키와 시크릿 키는 당연히 마스킹 되어 있다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws configure list
+
+      Name                    Value             Type    Location
+      ----                    -----             ----    --------
+   profile                &lt;not set&gt;             None    None
+access_key     ****************xxxx shared-credentials-file    
+secret_key     ****************xxxx shared-credentials-file    
+    region           ap-northeast-2      config-file    ~/.aws/config
+</code></pre></div></div>
+
+<p>그런데 Pycharm 또는 VSCode IDE에서 사용할 경우 어느 Profile을 사용할 건지 고정을 하고 사용해야 한다. 이때는 환경변수로 세팅을 해서 사용한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="o">=</span>&lt;ProfileName&gt;
+</code></pre></div></div>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="iam" /><category term="aws_configure" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">IAM Role이란?</title><link href="https://recoma96.github.io/aws/2025/01/14/iam-role.html" rel="alternate" type="text/html" title="IAM Role이란?" /><published>2025-01-14T23:30:00+00:00</published><updated>2025-01-14T23:30:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/14/iam-role</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/14/iam-role.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <blockquote>
   <p>IAM</p>
@@ -1092,242 +1133,4 @@ Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 
   <li><a href="https://technote.fyi/programming/django/django-database-testing-unmanaged-tables-with-migrations/">Django Database Testing Unmanaged Tables with Migration</a></li>
   <li><a href="https://docs.djangoproject.com/en/5.0/topics/testing/advanced/">Django Testing Advanced Document</a></li>
   <li><a href="https://docs.djangoproject.com/en/5.0/ref/applications/">Django Applications Document</a></li>
-</ul>]]></content><author><name></name></author><category term="Django" /><category term="python" /><category term="django" /><category term="database" /><category term="unittest" /><category term="testing" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Markdown Test 마크다운 테스트</title><link href="https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test.html" rel="alternate" type="text/html" title="Markdown Test 마크다운 테스트" /><published>2024-09-14T16:04:25+00:00</published><updated>2024-09-14T16:04:25+00:00</updated><id>https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test</id><content type="html" xml:base="https://recoma96.github.io/kramdown_test/2024/09/14/markdown-test.html"><![CDATA[<h1 id="h1">H1</h1>
-<p>첫번째 내용</p>
-
-<h2 id="h2">H2</h2>
-<p>두번째 내용</p>
-
-<h3 id="h3">H3</h3>
-<p>세번째 내용</p>
-
-<h1 id="테스트">테스트</h1>
-<p>해당 문법은 kramdown입니다.</p>
-<hr />
-
-<h1 id="로렘-입숨">로렘 입숨</h1>
-<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-<h1 id="코드">코드</h1>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 파이썬이 짱이쥐 ㅋㅋㅋ
-</span><span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello World!</span><span class="sh">"</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_2022</span><span class="p">():</span>
-    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello 2022!</span><span class="sh">"</span><span class="p">)</span>
-
-<span class="nf">hello_world</span><span class="p">()</span>
-<span class="nf">hello_2022</span><span class="p">()</span>
-</code></pre></div></div>
-
-<h1 id="단어속-코드">단어속 코드</h1>
-
-<p>hello <code class="language-plaintext highlighter-rouge">world!</code></p>
-
-<h1 id="이미지">이미지</h1>
-<p>이미지 불러오기
-기존 마크다운과 일치하나 이미지 루트 의 맨 앞에 site.baseurl 을 붙입니다.
-단 site.baseurl 이 따로 없는 경우, 붙이지 않아도 됩니다.</p>
-<ul>
-  <li>Example</li>
-</ul>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span><span class="p">[</span><span class="n">testimage</span><span class="p">](</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">img</span><span class="o">/</span><span class="n">post</span><span class="o">/</span><span class="n">example1</span><span class="p">.</span><span class="n">gif</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>이 아래에 있는 건 이미지 입니다.</p>
-
-<p><img src="/assets/img/post/example1.gif" alt="testimage" /></p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbccccccccccccccccdfdddddddddddddddddd
-</code></pre></div></div>
-
-<h1 id="글씨-">글씨 👌</h1>
-<ul>
-  <li>Normal</li>
-  <li><em>italics</em></li>
-  <li><del>Strikethrough</del></li>
-  <li>– endash –</li>
-  <li>— em-dash —</li>
-  <li>« guilemet »</li>
-  <li>… ellipsis</li>
-  <li>Emoji: 👌</li>
-  <li><strong>bold</strong></li>
-</ul>
-
-<h1 id="paragraph">paragraph</h1>
-
-<blockquote>
-  <p>This is quote
-Quote 2
-Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3 Quote3 Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3Quote3</p>
-</blockquote>
-
-<p>This is a<br />
-line break</p>
-
-<hr />
-
-<h1 id="ordered-list">Ordered List</h1>
-<ul>
-  <li>Numbering
-    <ol>
-      <li>Num1
-        <ul>
-          <li>Pay Attention</li>
-        </ul>
-      </li>
-      <li>Num2</li>
-      <li>Num3</li>
-    </ol>
-  </li>
-</ul>
-
-<h1 id="foot-notes">Foot Notes</h1>
-<p>Here’s a simple footnote,<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup> and here’s a longer one.<sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">2</a></sup></p>
-
-<h1 id="links">Links</h1>
-<p><a href="https://www.google.com">google</a></p>
-
-<p><a href="http://google.com">google</a></p>
-
-<h1 id="table">Table</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Header1</th>
-      <th style="text-align: left">Header2</th>
-      <th style="text-align: right">Header3</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td style="text-align: left">2</td>
-      <td style="text-align: right">3</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td style="text-align: left">5</td>
-      <td style="text-align: right">6</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr>
-      <td>8</td>
-      <td style="text-align: left">95</td>
-      <td style="text-align: right">106</td>
-    </tr>
-    <tr>
-      <td>894</td>
-      <td style="text-align: left">345</td>
-      <td style="text-align: right">866</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td>Foot1</td>
-      <td style="text-align: left">Foot2</td>
-      <td style="text-align: right">Foot3</td>
-    </tr>
-  </tfoot>
-</table>
-
-<h1 id="math">MATH</h1>
-
-\[a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha \\
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha \\
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha
-a^2 = b^2 + c^2 - 2bc\cos\alpha\]
-
-<p><br />
-<br /></p>
-
-\[\begin{aligned}
-\sqrt{37} &amp; = \sqrt{\frac{73^2-1}{12^2}} \\
- &amp; = \sqrt{\frac{73^2}{12^2}\cdot\frac{73^2-1}{73^2}} \\ 
- &amp; = \sqrt{\frac{73^2}{12^2}}\sqrt{\frac{73^2-1}{73^2}} \\
- &amp; = \frac{73}{12}\sqrt{1 - \frac{1}{73^2}} \\ 
- &amp; \approx \frac{73}{12}\left(1 - \frac{1}{2\cdot73^2}\right)
-\end{aligned}\]
-
-<h1 id="코드-1">코드</h1>
-
-<p>아래 있는 건 코드다</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">sys</span>
-<span class="kn">import</span> <span class="n">heapq</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">stdin</span><span class="p">.</span><span class="n">readline</span>
-<span class="n">MAX</span> <span class="o">=</span> <span class="mi">100_001</span>
-
-<span class="n">N</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="nf">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nf">input</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="nf">split</span><span class="p">())</span>
-<span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">)]</span> <span class="o">*</span> <span class="n">MAX</span>
-
-
-<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
-    <span class="n">Q</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">)]</span>
-    <span class="c1"># (횟수, 위치)
-</span>
-
-    <span class="c1"># 예외처리
-</span>    <span class="k">if</span> <span class="n">N</span> <span class="o">==</span> <span class="n">K</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="sh">"</span><span class="s">0</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">1</span><span class="sh">"</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="n">K</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">K</span><span class="p">),</span> <span class="sh">"</span><span class="s">1</span><span class="sh">"</span><span class="p">]</span>
-
-    <span class="n">min_cnt</span> <span class="o">=</span> <span class="mi">0</span>
-
-
-    <span class="k">def</span> <span class="nf">__move</span><span class="p">(</span><span class="n">cnt</span><span class="p">,</span> <span class="n">next_n</span><span class="p">):</span>
-        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">next_n</span> <span class="o">&lt;=</span> <span class="mi">100_000</span> <span class="ow">and</span> <span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">):</span>
-            <span class="n">heapq</span><span class="p">.</span><span class="nf">heappush</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">next_n</span><span class="p">))</span>
-            
-    <span class="k">while</span> <span class="n">Q</span><span class="p">:</span>
-        <span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">=</span> <span class="n">heapq</span><span class="p">.</span><span class="nf">heappop</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
-
-        <span class="c1"># 도착 지점인 지 확인
-</span>        <span class="k">if</span> <span class="n">cur_n</span> <span class="o">==</span> <span class="n">K</span> <span class="ow">and</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="nf">float</span><span class="p">(</span><span class="sh">'</span><span class="s">inf</span><span class="sh">'</span><span class="p">)</span> <span class="ow">or</span> <span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="o">==</span> <span class="n">cur_cnt</span><span class="p">):</span>
-            <span class="n">min_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="k">if</span> <span class="n">times</span><span class="p">[</span><span class="n">cur_n</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">cur_cnt</span><span class="p">:</span>
-            <span class="c1"># 처음 도달하거나 더 빠른 시간으로 도달한 경우
-</span>            <span class="c1"># 근데 어차피 힙을 돌리기 때문에 그럴 일은 없다
-</span>            <span class="c1"># 적립 후 움직이기
-</span>            <span class="n">times</span><span class="p">[</span><span class="n">cur_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur_cnt</span>
-            <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cur_n</span> <span class="o">&lt;</span> <span class="n">K</span><span class="p">:</span>
-                <span class="c1"># 작을 때만 가자
-</span>                <span class="nf">__move</span><span class="p">(</span><span class="n">cur_cnt</span><span class="p">,</span> <span class="n">cur_n</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-            
-
-
-        <span class="c1"># 도달했는 지 확인
-</span>        <span class="c1"># 힙으로 돌렸기 때문에 맨 처음 도착하는 순이 가장 빠른 부분
-</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nf">str</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">K</span><span class="p">]),</span> <span class="nf">str</span><span class="p">(</span><span class="n">min_cnt</span><span class="p">)]</span>
-
-<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="se">\n</span><span class="sh">'</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="nf">process</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">)))</span>
-</code></pre></div></div>
-<div class="footnotes" role="doc-endnotes">
-  <ol>
-    <li id="fn:1" role="doc-endnote">
-      <p>And here is the definition. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
-    </li>
-    <li id="fn:2" role="doc-endnote">
-
-      <p>Second Definition</p>
-      <blockquote>
-        <p>with using quote</p>
-      </blockquote>
-      <p><a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
-    </li>
-  </ol>
-</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</ul>]]></content><author><name></name></author><category term="Django" /><category term="python" /><category term="django" /><category term="database" /><category term="unittest" /><category term="testing" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
