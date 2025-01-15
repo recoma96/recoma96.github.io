@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAM Role이란?</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            IAM Role이란?
+        </h2>
+        <p class="font-semibold"><a href="/categories/#AWS" class="no-underline text-orange-700 dark:text-blue-200">AWS</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2025.01.14 23:30</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h1 id="개요">개요</h1>
+
+<blockquote>
+  <p>IAM</p>
+</blockquote>
+
+<p>AWS 입문을 해 봤다면 <strong>IAM</strong> 이라는 단어는 자주 들어봤을 것이다. IAM은 사용자 또는 AWS 사용 권한에 대한 관리를 하는 웹 서비스로
+보통 사용자를 생성할 때 해당 서비스를 사용하는 것을 볼 수가 있다. IAM 에도 여러가지 세분화가 되어 있는데. 이중에 IAM User는 사용자를 관리하는 항목이다.</p>
+
+<h2 id="iam-user와-aws-configure를-이용한-aws-접근">IAM User와 AWS Configure를 이용한 AWS 접근</h2>
+
+<p>보통 웹 콘솔 말고도 내 컴퓨터나, 서버단에서 AWS 서비스를 사용해야 할 때가 있다. 이 AWS 서비스들을 사용하기 위해 사용자 인증을 하게 되는데 이때 사용되는 툴이 AWS Configure이다.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws configure
+AWS Access Key ID <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
+AWS Secret Access Key <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
+... 이하 생략 ...
+</code></pre></div></div>
+
+<p>IAM에서 유저를 생성하면 그 유저에 대한 엑세스 키 아이디(Access Key ID)와 시크릿 엑세스 키(Secret Access Key)를 발행하게 되는데, 이 두개를 AWS Configure에 입력을 해야 비로소
+로컬 또는 특정 EC2 서버에서 AWS CLI를 통해 웹 콘솔 없이 AWS 리소스에 접근할 수 있다. 백엔드 서버에서 모듈로 사용하는 경우, 해당 모듈을 사용하기 전에 이 두개를 등록을 해 줘야 한다. 그런데, 
+로컬은 그렇다 쳐도 <strong>EC2에서 이렇게 AWS Configure로 유저 정보를 저장하면 발생하는 문제점이 몇가지 있다.</strong></p>
+
+<ol>
+  <li>파일에 저장하는 방식이기 때문에 정보가 유출될 가능성이 있다.</li>
+  <li>엑세스 키에 기한이 설정되어 있는 경우, 만료됬을 때 AWS 서비스를 사용하는 프로덕트가 정상적으로 작동이 안될 수 있다.</li>
+  <li>실무에서 AWS 정보의 주인이 퇴사를 하게 되면, AWS 정보를 바꿔야 하는 번거로움이 발생하게 된다.</li>
+</ol>
+
+<p>이러한 문제점 때문에 EC2에서 AWS Configure를 사용하지 않고도 AWS를 접근할 수 있는 대안이 생기게 되는데 이게 바로 <strong>IAM Role(IAM 역할)</strong> 이다.</p>
+
+<h1 id="iam-role">IAM Role</h1>
+
+<p>IAM User가 사용자의 권한을 의미한다면 <strong>IAM Role은 특정 AWS 서비스에서 다른 AWS 서비스에 접근하기 위한 권한을 관리하는 항목이다.</strong> 그러니까, IAM User가 “사람 대 서비스” 였다면, IAM Role은 “서비스 대 서비스” 라고 보면 된다. 예를 들어 아까 위에서 설명했던 EC2에서 S3를 접근하고 싶다고 할때, S3를 접근하는 IAM Role를 생성한 다음, 그 IAM Role을 EC2에 부착하면 된다.</p>
+
+<h2 id="사용법">사용법</h2>
+
+<p>이번 IAM Role 목표는, EC2에서 aws-cli로 S3에 있는 버킷과 파일들을 접근하기 위해 Role을 생성해서 EC2에 붙이려고 한다. (aws-cli는 설치가 되어 있다고 가정한다. <a href="https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/getting-started-install.html">aws-cli 설치방법</a>)</p>
+
+<h3 id="role-생성">Role 생성</h3>
+
+<p>IAM에 들어가서 IAM resources의 Roles를 클릭한다.
+<img src="/assets/img/20250115/iam-role-use-1.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>새 Role을 만들어야 하니 Create Role을 선택한다.
+<img src="/assets/img/20250115/iam-role-use-2.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>첫번째 스탭으로 누가 이 Role을 사용하는지 선택한다. 우리는 EC2에서 S3에 접근하는 것이 목표이기 때문에 EC2를 고른다.
+<img src="/assets/img/20250115/iam-role-use-3.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>이번엔 어느 서비스를 접근하는지 골라야 한다. 우리는 S3에 있는 데이터들을 읽는게 목표이기 때문에 AmazonS3ReadOnlyAccess 를 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-4.png" alt="" /></p>
+
+<blockquote>
+  <p>S3에 있는 데이터들을 <strong>읽기</strong> 만 하기 때문에 가급적 ReadOnly 권한을 설정해 줘야 한다. <strong>왜냐하면 IAM에서 권한을 줄 때 딱 필요한 권한만 주는게 원칙이기 때문이다.</strong> 사실 특정 버킷을 의미하는 Resource도 모든 리소스를 조회하는 “*“가 아닌 조회하고자 하는 특정 버킷들의 arn만 작성해야 하지만 여기까지 하면 너무 길어지니 생략.</p>
+</blockquote>
+
+<p><br /></p>
+
+<p>이제 Role의 이름만 지어주면 된다. 나는 example-for-ec2로 이름지었다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-5.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>다시 IAM Role로 돌아가 보면 생성이 되어있음을 알 수 있다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-6.png" alt="" /></p>
+
+<p><br /></p>
+
+<h3 id="ec2에-붙여넣기">EC2에 붙여넣기</h3>
+
+<p>EC2 인스턴스 중에 IAM Role이 적용되지 않는 인스턴스를 선택한 다음 Actions &gt; Security &gt; Modify IAM Role을 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-7.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>여기서 아까 만들었던 Role을 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-8.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>다시 돌아가 보면 IAM Role이 부착되었음을 알 수 있다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-9.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>IAM Role이 부착된 EC2를 콘솔로 접근한 다음 아래와 같은 명령어를 입력해 보자 S3 버킷 리스트를 불러올 수 있다면 정상적으로 작동이 된 것이다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
+</span>2024-01-26 09:06:37 bucket1
+2023-11-29 11:01:03 bucket2
+2024-01-26 04:57:58 bucket3
+</code></pre></div></div>
+
+<p>만약 접근이 안된다면 아래와 같은 결과가 나온다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
+
+</span>An error occurred <span class="o">(</span>AccessDenied<span class="o">)</span> when calling the ListBuckets operation: User: arn:aws:sts::00000000000:assumed-role/example-for-ec2/i-000000000000 is not authorized to perform: s3:ListAllMyBuckets because no identity-based policy allows the s3:ListAllMyBuckets action
+</code></pre></div></div>
+
+<p>해석을 하자면 s3 버킷 리스트를 불러오기 위해서는 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code> 라는 권한이 없기 때문에 불러올 수 없다는 뜻이 된다. 이럴 때는 IAM Role이 제대로 부착되어 있는지 확인하고, 부착이 되어 있더라도 <code class="language-plaintext highlighter-rouge">Actions</code>에 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code>가 제대로 명시되어 있는지 다시 한번 확인하자.</p>
+
+<h2 id="이밖의-다른-사용법들">이밖의 다른 사용법들</h2>
+
+<p>위에 서술하다시피, IAM Role은 AWS를 사용하는 백엔드가 구축된 EC2 또는 ECS 컨테이너에서 IAM User 대용으로 사용하기도 하지만 이 외에도 여러 용도가 있다.</p>
+
+<h3 id="cloudwatch-logging">Cloudwatch Logging</h3>
+
+<p>서버를 운영하다 보면 무슨 이슈가 발생했다거나 뭔가를 확인하기 위해 로그를 살펴볼 때가 있다. 그런데 로그는 보통 서버 인스턴스 내부에서 출력이 된다. 그렇다고 해서 일일이 EC2 컨테이너에 들어가기에는 많이 번거롭기 때문에 EC2에 있는 로그들을 Cloudwatch로 내보내서 웹상에서 로그를 볼 수 있게 작업을 하는 경우가 있는데, <strong>이는 EC2에서 Cloudwatch라는 서비스를 사용하는, 즉 “서비스 대 서비스”가 되기 때문에 이때 IAM Role이 사용된다.</strong> 정확히는 EC2의 IAM Role에 Cloudwatch 관련 권한을 부여하는 것이다. 이때 권한명은 CloudWatchLogsFullAccess 이다.</p>
+
+<h3 id="aws-lambda">AWS Lambda</h3>
+
+<p><img src="/assets/img/20250115/iam-role-use-10.png" alt="" /></p>
+
+<p>Serverless API 서비스로 유명한 AWS Lambda는 <strong>일단 만들기만 하면 IAM Role이 자동으로 생성된다.</strong> AWS Lambda는 말 그대로 Serverless 이므로 EC2 처럼 프린팅 해서 콘솔상에서 볼 수 있는 방법이 없기 때문에 바로 자동으로 Cloudwatch와 연동이 되는 것이다. 그래서 AWS Lambda에서 로직을 작성할 때 로그를 출력하는 코드를 작성하고 실행을 하면, 그 출력 정보는 Cloudwatch에 바로 기록이 된다.</p>
+
+<h1 id="마치며">마치며</h1>
+
+<p>IAM User가 각각 사용자들의 권한을 관리하는 서비스라면, IAM Role은 서비스 간의 연동 및 사용에 관한 권한을 관리하는 서비스로, AWS 서비스를 관리함에 있어 상당히 비중이 있는 항목이다. 그렇기 때문에 IAM Role에 대해서 공부해 보고 실제로 적용을 하면, AWS를 관리함에 있어 상당히 유용할 수 있다.</p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#aws">aws</a>
+                    
+                    <a class="tag" href="/tags/#iam">iam</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>

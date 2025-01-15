@@ -1,4 +1,135 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-14T12:56:38+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법</title><link href="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html" rel="alternate" type="text/html" title="Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법" /><published>2025-01-12T23:30:00+00:00</published><updated>2025-01-12T23:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html"><![CDATA[<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-15T01:00:54+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">IAM Role이란?</title><link href="https://recoma96.github.io/aws/2025/01/14/iam-role.html" rel="alternate" type="text/html" title="IAM Role이란?" /><published>2025-01-14T23:30:00+00:00</published><updated>2025-01-14T23:30:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/14/iam-role</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/14/iam-role.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<blockquote>
+  <p>IAM</p>
+</blockquote>
+
+<p>AWS 입문을 해 봤다면 <strong>IAM</strong> 이라는 단어는 자주 들어봤을 것이다. IAM은 사용자 또는 AWS 사용 권한에 대한 관리를 하는 웹 서비스로
+보통 사용자를 생성할 때 해당 서비스를 사용하는 것을 볼 수가 있다. IAM 에도 여러가지 세분화가 되어 있는데. 이중에 IAM User는 사용자를 관리하는 항목이다.</p>
+
+<h2 id="iam-user와-aws-configure를-이용한-aws-접근">IAM User와 AWS Configure를 이용한 AWS 접근</h2>
+
+<p>보통 웹 콘솔 말고도 내 컴퓨터나, 서버단에서 AWS 서비스를 사용해야 할 때가 있다. 이 AWS 서비스들을 사용하기 위해 사용자 인증을 하게 되는데 이때 사용되는 툴이 AWS Configure이다.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws configure
+AWS Access Key ID <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
+AWS Secret Access Key <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
+... 이하 생략 ...
+</code></pre></div></div>
+
+<p>IAM에서 유저를 생성하면 그 유저에 대한 엑세스 키 아이디(Access Key ID)와 시크릿 엑세스 키(Secret Access Key)를 발행하게 되는데, 이 두개를 AWS Configure에 입력을 해야 비로소
+로컬 또는 특정 EC2 서버에서 AWS CLI를 통해 웹 콘솔 없이 AWS 리소스에 접근할 수 있다. 백엔드 서버에서 모듈로 사용하는 경우, 해당 모듈을 사용하기 전에 이 두개를 등록을 해 줘야 한다. 그런데, 
+로컬은 그렇다 쳐도 <strong>EC2에서 이렇게 AWS Configure로 유저 정보를 저장하면 발생하는 문제점이 몇가지 있다.</strong></p>
+
+<ol>
+  <li>파일에 저장하는 방식이기 때문에 정보가 유출될 가능성이 있다.</li>
+  <li>엑세스 키에 기한이 설정되어 있는 경우, 만료됬을 때 AWS 서비스를 사용하는 프로덕트가 정상적으로 작동이 안될 수 있다.</li>
+  <li>실무에서 AWS 정보의 주인이 퇴사를 하게 되면, AWS 정보를 바꿔야 하는 번거로움이 발생하게 된다.</li>
+</ol>
+
+<p>이러한 문제점 때문에 EC2에서 AWS Configure를 사용하지 않고도 AWS를 접근할 수 있는 대안이 생기게 되는데 이게 바로 <strong>IAM Role(IAM 역할)</strong> 이다.</p>
+
+<h1 id="iam-role">IAM Role</h1>
+
+<p>IAM User가 사용자의 권한을 의미한다면 <strong>IAM Role은 특정 AWS 서비스에서 다른 AWS 서비스에 접근하기 위한 권한을 관리하는 항목이다.</strong> 그러니까, IAM User가 “사람 대 서비스” 였다면, IAM Role은 “서비스 대 서비스” 라고 보면 된다. 예를 들어 아까 위에서 설명했던 EC2에서 S3를 접근하고 싶다고 할때, S3를 접근하는 IAM Role를 생성한 다음, 그 IAM Role을 EC2에 부착하면 된다.</p>
+
+<h2 id="사용법">사용법</h2>
+
+<p>이번 IAM Role 목표는, EC2에서 aws-cli로 S3에 있는 버킷과 파일들을 접근하기 위해 Role을 생성해서 EC2에 붙이려고 한다. (aws-cli는 설치가 되어 있다고 가정한다. <a href="https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/getting-started-install.html">aws-cli 설치방법</a>)</p>
+
+<h3 id="role-생성">Role 생성</h3>
+
+<p>IAM에 들어가서 IAM resources의 Roles를 클릭한다.
+<img src="/assets/img/20250115/iam-role-use-1.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>새 Role을 만들어야 하니 Create Role을 선택한다.
+<img src="/assets/img/20250115/iam-role-use-2.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>첫번째 스탭으로 누가 이 Role을 사용하는지 선택한다. 우리는 EC2에서 S3에 접근하는 것이 목표이기 때문에 EC2를 고른다.
+<img src="/assets/img/20250115/iam-role-use-3.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>이번엔 어느 서비스를 접근하는지 골라야 한다. 우리는 S3에 있는 데이터들을 읽는게 목표이기 때문에 AmazonS3ReadOnlyAccess 를 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-4.png" alt="" /></p>
+
+<blockquote>
+  <p>S3에 있는 데이터들을 <strong>읽기</strong> 만 하기 때문에 가급적 ReadOnly 권한을 설정해 줘야 한다. <strong>왜냐하면 IAM에서 권한을 줄 때 딱 필요한 권한만 주는게 원칙이기 때문이다.</strong> 사실 특정 버킷을 의미하는 Resource도 모든 리소스를 조회하는 “*“가 아닌 조회하고자 하는 특정 버킷들의 arn만 작성해야 하지만 여기까지 하면 너무 길어지니 생략.</p>
+</blockquote>
+
+<p><br /></p>
+
+<p>이제 Role의 이름만 지어주면 된다. 나는 example-for-ec2로 이름지었다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-5.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>다시 IAM Role로 돌아가 보면 생성이 되어있음을 알 수 있다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-6.png" alt="" /></p>
+
+<p><br /></p>
+
+<h3 id="ec2에-붙여넣기">EC2에 붙여넣기</h3>
+
+<p>EC2 인스턴스 중에 IAM Role이 적용되지 않는 인스턴스를 선택한 다음 Actions &gt; Security &gt; Modify IAM Role을 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-7.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>여기서 아까 만들었던 Role을 선택한다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-8.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>다시 돌아가 보면 IAM Role이 부착되었음을 알 수 있다.</p>
+
+<p><img src="/assets/img/20250115/iam-role-use-9.png" alt="" /></p>
+
+<p><br /></p>
+
+<p>IAM Role이 부착된 EC2를 콘솔로 접근한 다음 아래와 같은 명령어를 입력해 보자 S3 버킷 리스트를 불러올 수 있다면 정상적으로 작동이 된 것이다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
+</span>2024-01-26 09:06:37 bucket1
+2023-11-29 11:01:03 bucket2
+2024-01-26 04:57:58 bucket3
+</code></pre></div></div>
+
+<p>만약 접근이 안된다면 아래와 같은 결과가 나온다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
+
+</span>An error occurred <span class="o">(</span>AccessDenied<span class="o">)</span> when calling the ListBuckets operation: User: arn:aws:sts::00000000000:assumed-role/example-for-ec2/i-000000000000 is not authorized to perform: s3:ListAllMyBuckets because no identity-based policy allows the s3:ListAllMyBuckets action
+</code></pre></div></div>
+
+<p>해석을 하자면 s3 버킷 리스트를 불러오기 위해서는 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code> 라는 권한이 없기 때문에 불러올 수 없다는 뜻이 된다. 이럴 때는 IAM Role이 제대로 부착되어 있는지 확인하고, 부착이 되어 있더라도 <code class="language-plaintext highlighter-rouge">Actions</code>에 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code>가 제대로 명시되어 있는지 다시 한번 확인하자.</p>
+
+<h2 id="이밖의-다른-사용법들">이밖의 다른 사용법들</h2>
+
+<p>위에 서술하다시피, IAM Role은 AWS를 사용하는 백엔드가 구축된 EC2 또는 ECS 컨테이너에서 IAM User 대용으로 사용하기도 하지만 이 외에도 여러 용도가 있다.</p>
+
+<h3 id="cloudwatch-logging">Cloudwatch Logging</h3>
+
+<p>서버를 운영하다 보면 무슨 이슈가 발생했다거나 뭔가를 확인하기 위해 로그를 살펴볼 때가 있다. 그런데 로그는 보통 서버 인스턴스 내부에서 출력이 된다. 그렇다고 해서 일일이 EC2 컨테이너에 들어가기에는 많이 번거롭기 때문에 EC2에 있는 로그들을 Cloudwatch로 내보내서 웹상에서 로그를 볼 수 있게 작업을 하는 경우가 있는데, <strong>이는 EC2에서 Cloudwatch라는 서비스를 사용하는, 즉 “서비스 대 서비스”가 되기 때문에 이때 IAM Role이 사용된다.</strong> 정확히는 EC2의 IAM Role에 Cloudwatch 관련 권한을 부여하는 것이다. 이때 권한명은 CloudWatchLogsFullAccess 이다.</p>
+
+<h3 id="aws-lambda">AWS Lambda</h3>
+
+<p><img src="/assets/img/20250115/iam-role-use-10.png" alt="" /></p>
+
+<p>Serverless API 서비스로 유명한 AWS Lambda는 <strong>일단 만들기만 하면 IAM Role이 자동으로 생성된다.</strong> AWS Lambda는 말 그대로 Serverless 이므로 EC2 처럼 프린팅 해서 콘솔상에서 볼 수 있는 방법이 없기 때문에 바로 자동으로 Cloudwatch와 연동이 되는 것이다. 그래서 AWS Lambda에서 로직을 작성할 때 로그를 출력하는 코드를 작성하고 실행을 하면, 그 출력 정보는 Cloudwatch에 바로 기록이 된다.</p>
+
+<h1 id="마치며">마치며</h1>
+
+<p>IAM User가 각각 사용자들의 권한을 관리하는 서비스라면, IAM Role은 서비스 간의 연동 및 사용에 관한 권한을 관리하는 서비스로, AWS 서비스를 관리함에 있어 상당히 비중이 있는 항목이다. 그렇기 때문에 IAM Role에 대해서 공부해 보고 실제로 적용을 하면, AWS를 관리함에 있어 상당히 유용할 수 있다.</p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="iam" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법</title><link href="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html" rel="alternate" type="text/html" title="Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법" /><published>2025-01-12T23:30:00+00:00</published><updated>2025-01-12T23:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/12/pytest-sessionstart-sessionfinish.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>이전에 <a href="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html">DJango에서 테스트 코드 작성 시 마이그레이션을 하지 말아야 할 데이터베이스 사용법</a> 에서 <code class="language-plaintext highlighter-rouge">DiscoverRunner</code>를 사용하면 맨 처음과 맨 마지막의 로직을 작성함으로써 테스트 시작 전 여러 세팅들을 할 수 있다고 언급했다. 그렇다면, pytest에도 이러한 툴이 있을 까?</p>
 
@@ -1199,221 +1330,4 @@ a^2 = b^2 + c^2 - 2bc\cos\alpha\]
       <p><a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
   </ol>
-</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">[백준, leetcode] 연결리스트로 팰린드롬 확인하기</title><link href="https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" rel="alternate" type="text/html" title="[백준, leetcode] 연결리스트로 팰린드롬 확인하기" /><published>2023-12-07T16:04:25+00:00</published><updated>2023-12-07T16:04:25+00:00</updated><id>https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome</id><content type="html" xml:base="https://recoma96.github.io/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html"><![CDATA[<h1 id="문제">문제</h1>
-<p><a href="https://www.acmicpc.net/problem/1259">백준: 팰린드롬수 [브론즈 1]</a> <br />
-<a href="https://leetcode.com/problems/palindrome-linked-list">leetcode: palindrome linked list [Easy]</a></p>
-
-<p><br /></p>
-
-<h1 id="팰린드롬이란">팰린드롬이란?</h1>
-<p><img src="https://media.vlpt.us/images/vector7/post/3a8305c6-bc65-4eee-97aa-690c2056f9e6/blog-Page-3.drawio.png" alt="palin" /></p>
-
-<p>“회문”이라고도 하며 문장 또는 단어의 왼쪽 오른쪽이 대칭인 것을 말합니다. 예를들어 단어로는 <strong>12321</strong> 이 있고 문장으로는 <strong>a man, a plan, a canal: panama (amanaplana c analpanama)</strong> 가 있습니다.</p>
-
-<p><br /><br /></p>
-
-<h1 id="문제-1">문제</h1>
-<h2 id="공통">공통</h2>
-<p>입력으로 자연수가 주어집니다. 해당 자연수가 팰린드롬인지 확인하는 문제 입니다.</p>
-<h2 id="백준">백준</h2>
-<p>범위가 1부터 99999 까지 이고, 문자열 형태로 주어집니다.</p>
-<h2 id="leetcode">leetcode</h2>
-<p>1부터 100000 까지가 범위이고 <strong>문자열이 아닌 연결 리스트로 주어집니다.</strong></p>
-<h2 id="접근">접근</h2>
-<p><strong>백준-팰린드롬수</strong>에서는 팰린드롬을 구할 수 있는 방법이 여러가지 있습니다. 문자열을 하나 복사한 다음 뒤집어서 팰린드롬을 확인한다거나, 파이썬에서는 문자열을 collections.deque로 변환한 다음에 양쪽으로 하나 씩 pop 하면서 문자 일치/불일치를 확인할 수 있습니다. 하지만 이번 장에서는 <strong>단일 연결 리스트</strong>로 풀어보려 합니다.</p>
-
-<p><br /><br /></p>
-
-<h1 id="풀이">풀이</h1>
-<p><strong>leetcode 기준으로 설명합니다.</strong></p>
-
-<p><img src="https://media.vlpt.us/images/vector7/post/f1915148-79de-4b7e-99bf-47368daf7a69/blog-Page-3.drawio%20(1).png" alt="" /></p>
-
-<p>위의 문제를 푸는 데 크게 두 가지의 방법이 있습니다.</p>
-
-<h2 id="deque로-변환">Deque로 변환</h2>
-<p>연결리스트로 되어있는 데이터를 순환해서 deque를 형성한 다음 아까 문제-접근에서 설명한 방법데로 deque를 이용해서 풀 수 있습니다. 그러나 이는 연결리스트를 제대로 활용하지 못한 풀이로 문제에서 원하는 풀이법이 아닙니다. 게다가 한번 순회를 해서 deque를 생성한 다음 다시 문자열 길이의 1/2를 또 순회해서 확인을 해야 할 뿐만 아니라, 노드의 값들을 복사해서 deque에 삽입하기 때문에 추가로 시간이 발생하게 됩니다.</p>
-
-<h2 id="러너-기법을-이용한-풀이">러너 기법을 이용한 풀이</h2>
-<p>러너 기법을 이용해서 다른 자료구조를 따로 생성할 필요 없이 문제를 풀 수 있습니다.</p>
-
-<h3 id="러너-기법이란">러너 기법이란?</h3>
-<p><img src="https://media.vlpt.us/images/vector7/post/742bbed0-e78e-4f61-9c05-b4b47128e604/blog-Page-3.drawio%20(2).png" alt="" /></p>
-
-<p>러너 기법이란 출발 노드(head)를 두개 선언하고 하나는 한칸, 다른 하나는 두 칸 씩 이동해서 연결 리스트의 중간 지점을 찾는 기법 입니다.
-이 문제에서는 left가 중간 지점으로 이동하면서 기존 노드를 이용해 역순 리스트를 만든 다음, left 지점과 역순 리스트를 이용해 팰린드롬을 확인합니다.</p>
-
-<p><br /></p>
-
-<h3 id="순서">순서</h3>
-<h4 id="역순-리스트-만들기">역순 리스트 만들기</h4>
-<h5 id="turn-1">[Turn 1]</h5>
-<ol>
-  <li>
-    <p>left, right전부 head에 위치합니다</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/8d9e1a00-3a0c-474f-9c24-0c1a58809342/blog-Page-3.drawio.png" alt="" /></p>
-  </li>
-  <li>
-    <p>right를 2칸 이동하고 left지점에 tmp를 선언한 다음, left를 한 칸 이동합니다.</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/ada623dd-a6bb-42da-b1e2-612b694c31b7/blog-Page-3.drawio%20(1).png" alt="" /></p>
-  </li>
-  <li>
-    <p>tmp에 위치해 있는 노드를 역순 연결 리스트로 이동시킵니다.</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/5b9bcd14-b29a-4328-8981-3d48f36c347b/blog-Page-3.drawio.png" alt="" /></p>
-  </li>
-</ol>
-
-<h5 id="turn-1-1">[Turn 1]</h5>
-<ol>
-  <li>
-    <p>아까와 마찬가지로 right 2칸, left위치에 tmp, left를 1칸 이동합니다.</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/ce780f5c-42c7-4ba7-9e00-0e3069f43dd9/blog-Page-3.drawio.png" alt="" /></p>
-  </li>
-  <li>
-    <p>tmp에 위치해 있는 노드를 reverse head 뒷부분에 추가합니다.</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/2f9ed9ff-a64b-4b7e-bee7-5ee5aed2b017/blog-Page-3.drawio%20(1).png" alt="" /></p>
-  </li>
-</ol>
-
-<h5 id="turn-3">[Turn 3]</h5>
-<ol>
-  <li>
-    <p>right의 next부분이 Null인 상태, 즉 맨 끝에 위치해 있기 때문에 턴을 종료합니다.</p>
-
-    <blockquote>
-      <p>홀수 길이일 경우 right는 있지만 next가 Null이고 짝수 길이일 경우 right가 Null입니다. 따라서 밑에 코드에서도 쓰여져 있지만 while문을 돌릴 때 right and right.next를 조건으로 잡습니다.</p>
-    </blockquote>
-  </li>
-</ol>
-
-<h4 id="팰린드롬-확인하기">팰린드롬 확인하기</h4>
-
-<ol>
-  <li>
-    <p>이제 left와 reverse로 팰린드롬을 확인할 일만 남았습니다. 그전에 right의 상태를 파악해야 합니다. 홀수 길이일 경우, left는 말 그대로 정중앙에 위치해 있기 때문에 한 칸 더 이동합니다.</p>
-
-    <p><img src="https://media.vlpt.us/images/vector7/post/e7084b21-1e60-4b47-9c99-33864a44d27f/blog-Page-3.drawio.png" alt="" /></p>
-  </li>
-  <li>
-    <p>left와 reverse에서의 연결리스트 길이는 일치하기 때문에 맨 끝에 다다를 때 까지 데이터가 일치하는 지만 확인하면 됩니다. 중간에 값이 틀리면 반복문에서 나가기 때문에 reverse가 None이면 False, None이 아니면 True로 출력하면 됩니다.</p>
-  </li>
-</ol>
-
-<p><br /></p>
-
-<h1 id="코드">코드</h1>
-
-<h2 id="leetcode-1">Leetcode</h2>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListNode</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">next</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="nb">next</span>
-<span class="k">class</span> <span class="nc">Solution</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">isPalindrome</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ListNode</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        
-        <span class="n">rev</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
-</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
-        
-        <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
-            <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 2칸씩
-</span>            
-            <span class="c1"># 한 칸 씩, 그리고 역순 리스트에 데이터 추가
-</span>            <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span>
-            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
-            
-            <span class="n">prev_node</span><span class="p">,</span> <span class="n">new_node</span> <span class="o">=</span> <span class="n">rev</span><span class="p">,</span> <span class="n">tmp</span>
-            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_node</span>
-            <span class="n">rev</span> <span class="o">=</span> <span class="n">new_node</span>
-        
-        <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
-            <span class="c1"># 해당 문자열은 홀수, 따라서 left가 한 칸 더 이동해서 맞춘다
-</span>            <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
-            
-        
-        <span class="k">while</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">rev</span><span class="p">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
-            <span class="n">rev</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">rev</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
-        
-        <span class="c1"># rev가 None일 경우 끝까지 확인했기 때문에 True다
-</span>        <span class="c1"># 따라서 not rev -&gt; 팰린드롬 O
-</span>        <span class="k">return</span> <span class="ow">not</span> <span class="n">rev</span>
-</code></pre></div></div>
-
-<p><br /></p>
-
-<h2 id="baekjoon">BaekJoon</h2>
-
-<p>연결 리스트로 들어오지 않기 때문에 연결리스트를 생성하는 작업을 추가해야 합니다.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="n">self</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="bp">None</span>        
-<span class="k">class</span> <span class="nc">LinkedList</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="c1"># 입력 연산을 줄이기 위해 Queue 스타일로 구현
-</span>        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">new_node</span><span class="p">,</span> <span class="n">next_node</span> <span class="o">=</span> <span class="nc">Node</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span>
-            <span class="n">new_node</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">next_node</span><span class="p">,</span> <span class="n">new_node</span>
-
-<span class="k">def</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">LinkedList</span><span class="p">):</span>
-
-    <span class="n">head</span> <span class="o">=</span> <span class="n">L</span><span class="p">.</span><span class="n">head</span>
-    <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">head</span>
-    <span class="n">reverse</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># 역순 리스트
-</span>
-    <span class="k">while</span> <span class="n">right</span> <span class="ow">and</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">:</span>
-        <span class="c1"># 오른쪽 두칸 이동
-</span>        <span class="n">right</span> <span class="o">=</span> <span class="n">right</span><span class="p">.</span><span class="nb">next</span><span class="p">.</span><span class="nb">next</span>
-        
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">left</span> <span class="c1"># 역순 리스트를 만들기 위한 node
-</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span> <span class="c1"># 한 칸 이동
-</span>        
-        <span class="c1"># 역순 리스트 생성
-</span>        <span class="n">prev_reverse</span><span class="p">,</span> <span class="n">new_reverse</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">tmp</span>
-        <span class="n">new_reverse</span><span class="p">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">prev_reverse</span>
-        <span class="n">reverse</span> <span class="o">=</span> <span class="n">new_reverse</span>
-
-        <span class="c1"># 또는 이렇게 표현 가능
-</span>        <span class="c1"># reverse, reverse.next, left = left, reverse, left.next
-</span>
-    <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
-        <span class="c1"># right에 노드가 남아있는 경우 -&gt; 노드 길이가 홀수
-</span>        <span class="c1"># 한칸 이동한다
-</span>        <span class="n">left</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span>
-
-    <span class="k">while</span> <span class="n">reverse</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">left</span><span class="p">.</span><span class="n">val</span> <span class="o">!=</span> <span class="n">reverse</span><span class="p">.</span><span class="n">val</span><span class="p">:</span>
-            <span class="c1"># 다르면 팰린드롬이 아니다
-</span>            <span class="k">return</span> <span class="sh">"</span><span class="s">no</span><span class="sh">"</span>
-        <span class="n">left</span><span class="p">,</span> <span class="n">reverse</span> <span class="o">=</span> <span class="n">left</span><span class="p">.</span><span class="nb">next</span><span class="p">,</span> <span class="n">reverse</span><span class="p">.</span><span class="nb">next</span>
-    <span class="k">return</span> <span class="sh">"</span><span class="s">yes</span><span class="sh">"</span>
-
-<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-
-    <span class="c1"># 연결 리스트 생성
-</span>    <span class="n">l</span> <span class="o">=</span> <span class="nc">LinkedList</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span>
-        <span class="n">l</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nf">use_runner</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
-
-<span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
-<span class="n">R</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">while</span> <span class="n">S</span> <span class="o">!=</span> <span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">:</span>
-
-    <span class="c1"># Check 펠린드롬
-</span>    <span class="n">R</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nf">palindrome</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="nf">input</span><span class="p">()</span>
-
-
-</code></pre></div></div>]]></content><author><name></name></author><category term="코테_뽀개기" /><category term="algorithm" /><summary type="html"><![CDATA[문제 백준: 팰린드롬수 [브론즈 1] leetcode: palindrome linked list [Easy]]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/post/wolchul-mountain.jpg" /><media:content medium="image" url="https://recoma96.github.io/post/wolchul-mountain.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</div>]]></content><author><name></name></author><category term="kramdown_test" /><category term="markdown" /><category term="jekyll" /><summary type="html"><![CDATA[H1 첫번째 내용]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
