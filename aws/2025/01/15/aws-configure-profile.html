@@ -3,7 +3,7 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>AWS Configure 여러개로 관리하기 </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,99 +100,99 @@
 </div>
 <div class="w-[1px] bg-gray"></div>
             <div class="web-main-item">
-                <div class="mt-10 grid grid-cols-1 gap-8">
-    
-    <div class="post-card
-                px-10 py-6
-                shadow-paper-styled dark:shadow-[transparent 0 0 0 0]
-    ">
-        <a href="/kramdown_test/2024/09/14/markdown-test.html" class="
-            post-card-title
-            text-[1.2em] font-semibold dark:font-medium
-            hover:text-light-text-default dark:hover:text-zinc-200
-            cursor-pointer no-underline
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
         ">
-            Markdown Test 마크다운 테스트
-        </a>
-        <div class="flex justify-between">
-            <a href="/categories/#kramdown_test"
-                class="text-[0.9em] text-light-text-default no-underline hover:underline font-bold">
-                kramdown test
-            </a>
-            <p class="text-[0.9em]">2024.09.14 16:04</p>
-        </div>
-        <p class="mt-6 text-light-text-default dark:text-dark-text-default">마크다운 제대로 잘 나오는 지 테스트</p>
-        <div class="
-            h-[1px] mt-4 mb-4
-            border-t-[0.5px] border-zinc-400
-            dark:border-0 dark:bg-gradient-to-r dark:from-transparent dark:via-zinc-200 dark:to-transparent
-        "></div>
-
-        <div class="flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
-            
-            <a class="tag" href="/tags/#markdown">markdown</a>
-            
-            <a class="tag" href="/tags/#jekyll">jekyll</a>
-            
-        </div>
+            AWS Configure 여러개로 관리하기 
+        </h2>
+        <p class="font-semibold"><a href="/categories/#AWS" class="no-underline text-orange-700 dark:text-blue-200">AWS</a></p>
     </div>
     
-    <div class="
-        h-[1px] border-0 bg-gradient-to-r
-        from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
-    "></div>
-    
-    <div class="post-card
-                px-10 py-6
-                shadow-paper-styled dark:shadow-[transparent 0 0 0 0]
-    ">
-        <a href="/%EC%BD%94%ED%85%8C_%EB%BD%80%EA%B0%9C%EA%B8%B0/2023/12/07/check-aplindrome.html" class="
-            post-card-title
-            text-[1.2em] font-semibold dark:font-medium
-            hover:text-light-text-default dark:hover:text-zinc-200
-            cursor-pointer no-underline
-        ">
-            [백준, leetcode] 연결리스트로 팰린드롬 확인하기
-        </a>
-        <div class="flex justify-between">
-            <a href="/categories/#코테_뽀개기"
-                class="text-[0.9em] text-light-text-default no-underline hover:underline font-bold">
-                코테 뽀개기
-            </a>
-            <p class="text-[0.9em]">2023.12.07 16:04</p>
-        </div>
-        <p class="mt-6 text-light-text-default dark:text-dark-text-default">연결리스트로도 팰린드롬인지 확인할 수가 있어요.</p>
-        <div class="
-            h-[1px] mt-4 mb-4
-            border-t-[0.5px] border-zinc-400
-            dark:border-0 dark:bg-gradient-to-r dark:from-transparent dark:via-zinc-200 dark:to-transparent
-        "></div>
-
-        <div class="flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
-            
-            <a class="tag" href="/tags/#algorithm">algorithm</a>
-            
-        </div>
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2025.01.15 05:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
     </div>
-    
+
     <div class="
-        h-[1px] border-0 bg-gradient-to-r
-        from-transparent via-zinc-300 dark:via-yellow-400 to-transparent
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
     "></div>
-    
 
-    <div class="flex justify-center text-[0.8em] gap-x-4">
-    
-    <a href="/posts/" class="no-underline">< previous</a>
-    
-
-    <div>2 of 2</div>
-    
-    
-    <a class="no-underline cursor-not-allowed text-zinc-400 dark:text-zinc-500">next ></a>
     
 </div>
-</div>
+                <h1 id="개요">개요</h1>
+
+<p>내가 다니고 있는 회사에는 두 개의 서비스를 관리하고 있고, 각 서비스 마다 서로 다른 AWS 계정을 가지고 있다.
+나는 두 개의 서비스 중 하나는 전체 관리를 다른 하나는 일부 참여를 하고 있기 때문에 두 개의 AWS 계정을 사용해야 했다.
+개발을 로컬에서 하기 때문에 어쩔 수 없이 AWS Configure를 사용해야 하는데, 매번 다른 서비스를 개발할 때마다 일일이 AWS 정보를 입력해야 하는게 여간 귀찮은게 아니다. 
+그래서 리서치 결과 <code class="language-plaintext highlighter-rouge">aws configure profile</code>이라는 게 있다는 것을 알았다.</p>
+
+<h1 id="aws-configure-profile">aws configure –profile</h1>
+
+<p>프로필을 생성방법은 아래와 같다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws configure <span class="nt">--profile</span> &lt;ProfileName&gt;
+AWS Access Key ID <span class="o">[</span><span class="k">********************</span><span class="o">]</span>:
+AWS Secret Access Key <span class="o">[</span><span class="k">********************</span><span class="o">]</span>:
+Default region name <span class="o">[</span>ap-northeast-2]:
+Default output format <span class="o">[</span>json]:
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>그리고 아래와 같은 명령어로 s3를 불러올 수 있다.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws s3 <span class="nb">ls</span> <span class="nt">--profile</span> &lt;ProfileName&gt;
+</code></pre></div></div>
+
+<p><br /></p>
+
+<p>아래의 명령어로 프로파일의 정보를 출력할 수 있다. 아, 물론 엑세스 키와 시크릿 키는 당연히 마스킹 되어 있다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ aws configure list
+
+      Name                    Value             Type    Location
+      ----                    -----             ----    --------
+   profile                &lt;not set&gt;             None    None
+access_key     ****************xxxx shared-credentials-file    
+secret_key     ****************xxxx shared-credentials-file    
+    region           ap-northeast-2      config-file    ~/.aws/config
+</code></pre></div></div>
+
+<p>그런데 Pycharm 또는 VSCode IDE에서 사용할 경우 어느 Profile을 사용할 건지 고정을 하고 사용해야 한다. 이때는 환경변수로 세팅을 해서 사용한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="o">=</span>&lt;ProfileName&gt;
+</code></pre></div></div>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#aws">aws</a>
+                    
+                    <a class="tag" href="/tags/#iam">iam</a>
+                    
+                    <a class="tag" href="/tags/#aws_configure">aws_configure</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
             </div>
         </div>
 
@@ -234,6 +234,5 @@
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
 <script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
-        <script type="text/javascript" src="https://recoma96.github.io/assets/js/post-list.js"></script>
     </body>
 </html>
