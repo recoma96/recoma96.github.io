@@ -10,7 +10,7 @@ image: ""
 
 # Factory Boy
 
-테스트코드를 작성하다 보면, 테스트를 시작하기 전에 데이터베이스에 테스트용 데이터를 집어넣는 과정을 거친다. 보통은 ORM으로 데이터들을 생성하니까, 가끔 이런 코드를 볼 수가 있다. (Django 기준)
+테스트코드를 작성하다 보면, 테스트를 시작하기 전에 데이터베이스에 테스트용 데이터를 집어넣는 과정을 거친다. 보통은 ORM으로 데이터들을 생성하기 때문에 가끔 이런 코드를 볼 수가 있다. _(Django 기준)_
 
 ```python
 def setUp(self) -> None:
@@ -26,9 +26,9 @@ def setUp(self) -> None:
     )
 ```
 
-`name`이나 `email`같은 테스트 목적이 있는 데이터들을 제외한 나머지 데이터들은 그냥 임의로 적어 놓았음을 알 수 있다. 즉, 테스트에 필요하지 않아 랜덤으로 돌려도 되는 값들을 일일이 리터럴하게 집어넣은 것이다. 이런 식으로 진행하게 되면, 쓸떼없는 코드가 많아서 전체적으로 코드가 더럽게 보일게 뻔하다. 이를 해결하기 위한 라이브러리가 바로 **factory_boy** 이다. 
+`name`이나 `email`같은 테스트 목적이 있는 데이터들을 제외한 나머지 데이터들은 그냥 임의로 적어 놓았음을 알 수 있다. 즉, 테스트에 필요하지 않아 랜덤으로 돌려도 되는 값들을 일일이 리터럴하게 집어넣은 것이다. 이런 식으로 진행하게 되면, 쓸떼없는 코드가 많아져 전체적으로 코드가 더럽게 보일게 뻔하다. 이를 해결하기 위한 라이브러리가 바로 **factory_boy** 이다. 
 
-**factory_boy**는 테스트시 필요한 값들을 랜덤하게 생성하는 역할을 한다. 그런데 그냥 아무 랜덤값을 주는 게 아니라, 테마에 따라 다른 형태의 값을 주는데, 예를 들어 임의의 이름이 필요하다 하면 Mario나 Luigi 같은 랜덤으로 돌린  **이름**을 주고, 주소를 요청하면 주소와 관련되게 임의값을 준다.
+**factory_boy**는 테스트시 필요한 값들을 랜덤하게 생성하는 역할을 한다. 그런데 그냥 아무 랜덤값을 주는 게 아니라, **테마에 따라 다른 형태의 값을 주는데**, 예를 들어 임의의 이름이 필요하다 하면 Mario나 Luigi 같은 랜덤으로 돌린  이름을 주고, 주소를 요청하면 주소와 관련되게 임의값을 준다.
 
 
 # 설치
@@ -55,7 +55,7 @@ from faker import Faker
 fake = Faker()
 
 fake.name() # Shawn Miller
-fake.user_name() #Shawn Miller
+fake.user_name() # Miller
 ```
 
 이름 말고도 다른 테마로도 가능하다.
@@ -91,6 +91,8 @@ def setUp(self) -> None:
 이전에 서술했던 `fake.Faker`가 단순히 랜덤값을 생성시키는 역할을 한 다면, `factory.Factory`는 랜덤값들을 생성함은 물론 **테스트용 데이터베이스에 까지 친절하게 데이터를 저장해 주는 역할을 한다.** 예를 들어 테스트용 `User`데이터를 데이터베이스 저장한다고 할때, `factory.Factory`를 상속한 `UserFactory`를 구현한 다음에 `UserFactory.create()`만 작성해 주면 알아서 데이터베이스를 저장해 주고, ORM 인스턴스를 내뱉는다. 사용법은 아래와 같다.
 
 ```python
+# factory.py
+
 import factory
 
 
@@ -114,13 +116,17 @@ class UserFactory(factory.django.DjangoModelFactory):
     birth_date = "990101"
     is_staff = factory.LazyAttribute(lambda e: e.is_staff)
     profile = factory.SubFactory(ProfileFactory)
+```
 
+
+```python
+# test.py
 
 class UserTestCase(APITestCaese):
     def setUp(self) -> None:
         fake = Faker()
-        self.profile = ProfileFactory().create()
-        self.user = User.objects.create(
+        self.profile = ProfileFactory.create()
+        self.user = UserFactory.create.(
             is_staff=False,
             profile=self.profile,
         )
