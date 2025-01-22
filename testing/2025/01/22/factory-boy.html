@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자
+        </h2>
+        <p class="font-semibold"><a href="/categories/#Testing" class="no-underline text-orange-700 dark:text-blue-200">Testing</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2025.01.22 00:30</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h1 id="factory-boy">Factory Boy</h1>
+
+<p>테스트코드를 작성하다 보면, 테스트를 시작하기 전에 데이터베이스에 테스트용 데이터를 집어넣는 과정을 거친다. 보통은 ORM으로 데이터들을 생성하기 때문에 가끔 이런 코드를 볼 수가 있다. <em>(Django 기준)</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">readable_id</span><span class="o">=</span><span class="sh">"</span><span class="s">G1234512345</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">customer_key</span><span class="o">=</span><span class="sh">"</span><span class="s">6d1fb2d032214636900ec93b94674d74</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">userName</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="sh">"</span><span class="s">email@gmail.com</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">gender</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">phone_number</span><span class="o">=</span><span class="sh">"</span><span class="s">01012341234</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">birth_date</span><span class="o">=</span><span class="sh">"</span><span class="s">19990101</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">user_sns_id</span><span class="o">=</span><span class="sh">"</span><span class="s">user_sns_id</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">name</code>이나 <code class="language-plaintext highlighter-rouge">email</code>같은 테스트 목적이 있는 데이터들을 제외한 나머지 데이터들은 그냥 임의로 적어 놓았음을 알 수 있다. 즉, 테스트에 필요하지 않아 랜덤으로 돌려도 되는 값들을 일일이 리터럴하게 집어넣은 것이다. 이런 식으로 진행하게 되면, 쓸떼없는 코드가 많아져 전체적으로 코드가 더럽게 보일게 뻔하다. 이를 해결하기 위한 라이브러리가 바로 <strong>factory_boy</strong> 이다.</p>
+
+<p><strong>factory_boy</strong>는 테스트시 필요한 값들을 랜덤하게 생성하는 역할을 한다. 그런데 그냥 아무 랜덤값을 주는 게 아니라, <strong>테마에 따라 다른 형태의 값을 주는데</strong>, 예를 들어 임의의 이름이 필요하다 하면 Mario나 Luigi 같은 랜덤으로 돌린  이름을 주고, 주소를 요청하면 주소와 관련되게 임의값을 준다.</p>
+
+<h1 id="설치">설치</h1>
+
+<p>factory_boy 라는 라이브러리를 설치하는 것이기 때문에 방법은 간단하다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>factory_boy
+</code></pre></div></div>
+
+<h1 id="사용법">사용법</h1>
+
+<h2 id="일반-사용법---faker-객체-활용하기">일반 사용법 -&gt; Faker 객체 활용하기</h2>
+
+<p>일반적인 사용법이라 함은 그냥 단순히 랜덤값 하나를 불러오는 것을 의미한다. 이 사용법은 매우 간단하다. 몇줄만 추가하면 되기 때문이다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">faker</code>를 import 하고 <code class="language-plaintext highlighter-rouge">Faker</code> 객체를 하나 만든다. 그 다음에 그 객체에서 내가 원하는 랜덤값 이름의 함수를 사용하면 된다. 예를 들어 내가 이름과 관련된 랜덤값을 원한다면, <code class="language-plaintext highlighter-rouge">.name()</code> 또는  <code class="language-plaintext highlighter-rouge">.user_name()</code>을 사용하면 된다.</p>
+
+<blockquote>
+  <p>단, <code class="language-plaintext highlighter-rouge">name()</code>과 <code class="language-plaintext highlighter-rouge">user_name()</code>의 차이점이라면, <code class="language-plaintext highlighter-rouge">name()</code>은 실제 사람의 이름으로 성과 이름이 분리되서 나오고 <code class="language-plaintext highlighter-rouge">user_name()</code>은 게임에서 나오는 게임유저 이름 정도만 생각하면 된다.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
+
+<span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+
+<span class="n">fake</span><span class="p">.</span><span class="nf">name</span><span class="p">()</span> <span class="c1"># Shawn Miller
+</span><span class="n">fake</span><span class="p">.</span><span class="nf">user_name</span><span class="p">()</span> <span class="c1"># Miller
+</span></code></pre></div></div>
+
+<p>이름 말고도 다른 테마로도 가능하다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fake</span><span class="p">.</span><span class="nf">date_time</span><span class="p">()</span> <span class="c1"># datetime 타입의 랜덤 날짜
+</span><span class="n">fake</span><span class="p">.</span><span class="nf">sentence</span><span class="p">()</span> <span class="c1"># 영어 1문장: General apply international possible old fear.
+</span></code></pre></div></div>
+
+<p>그렇다면 아까 위에 제시했던 유저 생성 코드를 아래와 같이 변경할 수 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
+
+<span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">readable_id</span><span class="o">=</span><span class="sa">f</span><span class="sh">"</span><span class="s">G</span><span class="si">{</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_digit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">customer_key</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">uuid4</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">user_name</span><span class="p">(),</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">email</span><span class="p">(),</span>
+        <span class="n">gender</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">phone_number</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">phone_number</span><span class="p">(),</span>
+        <span class="n">birth_date</span><span class="o">=</span><span class="nf">str</span><span class="p">(</span><span class="n">fake</span><span class="p">.</span><span class="nf">ramdon_digit</span><span class="p">(</span><span class="mi">19900000</span><span class="p">,</span> <span class="mi">20241231</span><span class="p">)),</span>
+        <span class="n">user_sns_id</span><span class="o">=</span><span class="nf">str</span><span class="p">(</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_digit</span><span class="p">(</span><span class="mi">20</span><span class="p">)),</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>일단 <strong>상수값들이 사라졌다.</strong> 이제 임의 데이터 생성은 factory boy에서 알아서 해주기 때문이다. 하지만… 뭔가 코드가 더러운건 똑같아 보인다. 그리고 테스트 유저 생성을 이 한 테스트 파일 뿐만 아니라 여러 테스트 파일에도 사용이 될 텐데 이렇게 되면 또 똑같은 식의 코드를 작성해야 한다. 이때 factory boy는 <strong>factory.Factory를 사용함을 제안한다.</strong></p>
+
+<h2 id="factoryfactory">factory.Factory</h2>
+
+<p>이전에 서술했던 <code class="language-plaintext highlighter-rouge">fake.Faker</code>가 단순히 랜덤값을 생성시키는 역할을 한 다면, <code class="language-plaintext highlighter-rouge">factory.Factory</code>는 랜덤값들을 생성함은 물론 <strong>테스트용 데이터베이스에 까지 친절하게 데이터를 저장해 주는 역할을 한다.</strong> 예를 들어 테스트용 <code class="language-plaintext highlighter-rouge">User</code>데이터를 데이터베이스 저장한다고 할때, <code class="language-plaintext highlighter-rouge">factory.Factory</code>를 상속한 <code class="language-plaintext highlighter-rouge">UserFactory</code>를 구현한 다음에 <code class="language-plaintext highlighter-rouge">UserFactory.create()</code>만 작성해 주면 알아서 데이터베이스를 저장해 주고, ORM 인스턴스를 내뱉는다. 사용법은 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># factory.py
+</span>
+<span class="kn">import</span> <span class="n">factory</span>
+
+
+<span class="k">class</span> <span class="nc">ProfileFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Profile</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+
+
+<span class="k">class</span> <span class="nc">UserFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+
+    <span class="n">readable_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">customer_key</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">uuid4</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">user_sns_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">user_name</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">email</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">random</span><span class="p">.</span><span class="nf">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+    <span class="n">phone_number</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">phone_number</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">birth_date</span> <span class="o">=</span> <span class="sh">"</span><span class="s">990101</span><span class="sh">"</span>
+    <span class="n">is_staff</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyAttribute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">.</span><span class="n">is_staff</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">SubFactory</span><span class="p">(</span><span class="n">ProfileFactory</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test.py
+</span>
+<span class="k">class</span> <span class="nc">UserTestCase</span><span class="p">(</span><span class="n">APITestCaese</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">ProfileFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">UserFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+            <span class="n">is_staff</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">profile</span><span class="o">=</span><span class="n">self</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div></div>
+
+<p>위의 <code class="language-plaintext highlighter-rouge">UserFactory</code>를 정의하는 코드에서 여러 가지의 <code class="language-plaintext highlighter-rouge">factory</code>쪽 함수를 사용하고 있는데 설명하자면 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">user_name</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">factory.Faker</code>는 가장 기본적으로 쓰이는 함수로, 아까 설명했던 <code class="language-plaintext highlighter-rouge">Faker</code>쪽 함수와 기능이 같다고 보면 된다. 다른 점이 있다면 <code class="language-plaintext highlighter-rouge">Faker</code>에서의 함수 이름이, <code class="language-plaintext highlighter-rouge">factory.Faker</code>에서는 문자열 파라미터로 쓰인다는 것이다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">readable_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>하지만 <code class="language-plaintext highlighter-rouge">factory.Faker</code>로는 랜덤 생성이 불가능한 상황이 있다. 예를 들어 UUID를 랜덤으로 돌리는 것은 <code class="language-plaintext highlighter-rouge">factory.Faker("uuid4")</code>로 해결이 가능하지만, 랜덤으로 돌린 다음, 앞의 10자를 제외한 나머지 문자열을 제거하는 것 까지는 할 수가 없다. 이때는 랜덤 함수를 직접 만들어야 하는데, <code class="language-plaintext highlighter-rouge">factory.LazyFunction</code>이 이를 가능하게 해준다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is_staff</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyAttribute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">.</span><span class="n">is_staff</span><span class="p">)</span>
+
+<span class="c1"># test.py
+</span><span class="n">UserFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">is_staff</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+<p>일부 요소들은 반드시 랜덤으로 돌려서는 안되고 개발자가 반드시 값을 지정해 줘야 할 있다. 이때 <code class="language-plaintext highlighter-rouge">LazyAttribute</code>를 사용한다. 파라미터로 익명 함수(<code class="language-plaintext highlighter-rouge">lambda</code>)를 사용함으로써 개발자가 굳이 별도의 로직을 구현할 필요 없이 입력 데이터를 가공해서 저장할 수도 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">birth_date</span> <span class="o">=</span> <span class="sh">"</span><span class="s">990101</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<p>랜덤을 돌리지 않고 그냥 고정시키고 싶다면 이렇게 네이티브 하게 작성하면 된다. 물론, <code class="language-plaintext highlighter-rouge">create</code>에서 필요시 데이터를 변경할 수 도 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ProfileFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Profile</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+
+<span class="k">class</span> <span class="nc">UserFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">SubFactory</span><span class="p">(</span><span class="n">ProfileFactory</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>데이터 저장 시, 관계되어 있는 자식 테이블의 데이터가 필요할 때가 있다. 이때 <code class="language-plaintext highlighter-rouge">factory.SubFactory</code>를 사용한다.</p>
+
+<h2 id="부록-factory_boy에서-사용할-수-있는-필드-리스트">부록) factory_boy에서 사용할 수 있는 필드 리스트</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>필드명</th>
+      <th>설명</th>
+      <th>필드명</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>실제 이름</td>
+      <td>user_name</td>
+      <td>이름(닉네임)</td>
+    </tr>
+    <tr>
+      <td>email</td>
+      <td>이메일 주소</td>
+      <td>phone_number</td>
+      <td>전화번호</td>
+    </tr>
+    <tr>
+      <td>address</td>
+      <td>주소</td>
+      <td>date</td>
+      <td>날짜</td>
+    </tr>
+    <tr>
+      <td>date_time</td>
+      <td>날짜 및 시간(<code class="language-plaintext highlighter-rouge">datetime</code>)</td>
+      <td>time</td>
+      <td>시간</td>
+    </tr>
+    <tr>
+      <td>credit_card_number</td>
+      <td>신용카드 번호</td>
+      <td>credit_card_expire</td>
+      <td>신용카드 만료일</td>
+    </tr>
+    <tr>
+      <td>text</td>
+      <td>랜덤 텍스트</td>
+      <td>sentence</td>
+      <td>1문장</td>
+    </tr>
+    <tr>
+      <td>paragraph</td>
+      <td>1문단(여러문장)</td>
+      <td>url</td>
+      <td>URL</td>
+    </tr>
+    <tr>
+      <td>uuid4</td>
+      <td>UUID</td>
+      <td>color_name</td>
+      <td>색상이름</td>
+    </tr>
+    <tr>
+      <td>random_int(<code class="language-plaintext highlighter-rouge">min: int, max: int</code>)</td>
+      <td>랜덤 정수</td>
+      <td>random_number(<code class="language-plaintext highlighter-rouge">k</code>)</td>
+      <td>K자리 랜덤 숫자</td>
+    </tr>
+    <tr>
+      <td>random_element(<code class="language-plaintext highlighter-rouge">elements: list</code>)</td>
+      <td><code class="language-plaintext highlighter-rouge">elements</code> 중에 하나 랜덤</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#python">python</a>
+                    
+                    <a class="tag" href="/tags/#testing">testing</a>
+                    
+                    <a class="tag" href="/tags/#factory_boy">factory_boy</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>

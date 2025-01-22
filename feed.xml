@@ -1,4 +1,230 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-16T02:02:03+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">AWS Configure 여러개로 관리하기</title><link href="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html" rel="alternate" type="text/html" title="AWS Configure 여러개로 관리하기" /><published>2025-01-15T05:00:00+00:00</published><updated>2025-01-15T05:00:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/15/aws-configure-profile</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html"><![CDATA[<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-01-22T01:27:51+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자</title><link href="https://recoma96.github.io/testing/2025/01/22/factory-boy.html" rel="alternate" type="text/html" title="Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자" /><published>2025-01-22T00:30:00+00:00</published><updated>2025-01-22T00:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/22/factory-boy</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/22/factory-boy.html"><![CDATA[<h1 id="factory-boy">Factory Boy</h1>
+
+<p>테스트코드를 작성하다 보면, 테스트를 시작하기 전에 데이터베이스에 테스트용 데이터를 집어넣는 과정을 거친다. 보통은 ORM으로 데이터들을 생성하기 때문에 가끔 이런 코드를 볼 수가 있다. <em>(Django 기준)</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">readable_id</span><span class="o">=</span><span class="sh">"</span><span class="s">G1234512345</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">customer_key</span><span class="o">=</span><span class="sh">"</span><span class="s">6d1fb2d032214636900ec93b94674d74</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">userName</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="sh">"</span><span class="s">email@gmail.com</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">gender</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">phone_number</span><span class="o">=</span><span class="sh">"</span><span class="s">01012341234</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">birth_date</span><span class="o">=</span><span class="sh">"</span><span class="s">19990101</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">user_sns_id</span><span class="o">=</span><span class="sh">"</span><span class="s">user_sns_id</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">name</code>이나 <code class="language-plaintext highlighter-rouge">email</code>같은 테스트 목적이 있는 데이터들을 제외한 나머지 데이터들은 그냥 임의로 적어 놓았음을 알 수 있다. 즉, 테스트에 필요하지 않아 랜덤으로 돌려도 되는 값들을 일일이 리터럴하게 집어넣은 것이다. 이런 식으로 진행하게 되면, 쓸떼없는 코드가 많아져 전체적으로 코드가 더럽게 보일게 뻔하다. 이를 해결하기 위한 라이브러리가 바로 <strong>factory_boy</strong> 이다.</p>
+
+<p><strong>factory_boy</strong>는 테스트시 필요한 값들을 랜덤하게 생성하는 역할을 한다. 그런데 그냥 아무 랜덤값을 주는 게 아니라, <strong>테마에 따라 다른 형태의 값을 주는데</strong>, 예를 들어 임의의 이름이 필요하다 하면 Mario나 Luigi 같은 랜덤으로 돌린  이름을 주고, 주소를 요청하면 주소와 관련되게 임의값을 준다.</p>
+
+<h1 id="설치">설치</h1>
+
+<p>factory_boy 라는 라이브러리를 설치하는 것이기 때문에 방법은 간단하다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>factory_boy
+</code></pre></div></div>
+
+<h1 id="사용법">사용법</h1>
+
+<h2 id="일반-사용법---faker-객체-활용하기">일반 사용법 -&gt; Faker 객체 활용하기</h2>
+
+<p>일반적인 사용법이라 함은 그냥 단순히 랜덤값 하나를 불러오는 것을 의미한다. 이 사용법은 매우 간단하다. 몇줄만 추가하면 되기 때문이다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">faker</code>를 import 하고 <code class="language-plaintext highlighter-rouge">Faker</code> 객체를 하나 만든다. 그 다음에 그 객체에서 내가 원하는 랜덤값 이름의 함수를 사용하면 된다. 예를 들어 내가 이름과 관련된 랜덤값을 원한다면, <code class="language-plaintext highlighter-rouge">.name()</code> 또는  <code class="language-plaintext highlighter-rouge">.user_name()</code>을 사용하면 된다.</p>
+
+<blockquote>
+  <p>단, <code class="language-plaintext highlighter-rouge">name()</code>과 <code class="language-plaintext highlighter-rouge">user_name()</code>의 차이점이라면, <code class="language-plaintext highlighter-rouge">name()</code>은 실제 사람의 이름으로 성과 이름이 분리되서 나오고 <code class="language-plaintext highlighter-rouge">user_name()</code>은 게임에서 나오는 게임유저 이름 정도만 생각하면 된다.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
+
+<span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+
+<span class="n">fake</span><span class="p">.</span><span class="nf">name</span><span class="p">()</span> <span class="c1"># Shawn Miller
+</span><span class="n">fake</span><span class="p">.</span><span class="nf">user_name</span><span class="p">()</span> <span class="c1"># Miller
+</span></code></pre></div></div>
+
+<p>이름 말고도 다른 테마로도 가능하다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fake</span><span class="p">.</span><span class="nf">date_time</span><span class="p">()</span> <span class="c1"># datetime 타입의 랜덤 날짜
+</span><span class="n">fake</span><span class="p">.</span><span class="nf">sentence</span><span class="p">()</span> <span class="c1"># 영어 1문장: General apply international possible old fear.
+</span></code></pre></div></div>
+
+<p>그렇다면 아까 위에 제시했던 유저 생성 코드를 아래와 같이 변경할 수 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">faker</span> <span class="kn">import</span> <span class="n">Faker</span>
+
+<span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+        <span class="n">readable_id</span><span class="o">=</span><span class="sa">f</span><span class="sh">"</span><span class="s">G</span><span class="si">{</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_digit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">,</span>
+        <span class="n">customer_key</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">uuid4</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">user_name</span><span class="p">(),</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">email</span><span class="p">(),</span>
+        <span class="n">gender</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">phone_number</span><span class="o">=</span><span class="n">fake</span><span class="p">.</span><span class="nf">phone_number</span><span class="p">(),</span>
+        <span class="n">birth_date</span><span class="o">=</span><span class="nf">str</span><span class="p">(</span><span class="n">fake</span><span class="p">.</span><span class="nf">ramdon_digit</span><span class="p">(</span><span class="mi">19900000</span><span class="p">,</span> <span class="mi">20241231</span><span class="p">)),</span>
+        <span class="n">user_sns_id</span><span class="o">=</span><span class="nf">str</span><span class="p">(</span><span class="n">fake</span><span class="p">.</span><span class="nf">random_digit</span><span class="p">(</span><span class="mi">20</span><span class="p">)),</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>일단 <strong>상수값들이 사라졌다.</strong> 이제 임의 데이터 생성은 factory boy에서 알아서 해주기 때문이다. 하지만… 뭔가 코드가 더러운건 똑같아 보인다. 그리고 테스트 유저 생성을 이 한 테스트 파일 뿐만 아니라 여러 테스트 파일에도 사용이 될 텐데 이렇게 되면 또 똑같은 식의 코드를 작성해야 한다. 이때 factory boy는 <strong>factory.Factory를 사용함을 제안한다.</strong></p>
+
+<h2 id="factoryfactory">factory.Factory</h2>
+
+<p>이전에 서술했던 <code class="language-plaintext highlighter-rouge">fake.Faker</code>가 단순히 랜덤값을 생성시키는 역할을 한 다면, <code class="language-plaintext highlighter-rouge">factory.Factory</code>는 랜덤값들을 생성함은 물론 <strong>테스트용 데이터베이스에 까지 친절하게 데이터를 저장해 주는 역할을 한다.</strong> 예를 들어 테스트용 <code class="language-plaintext highlighter-rouge">User</code>데이터를 데이터베이스 저장한다고 할때, <code class="language-plaintext highlighter-rouge">factory.Factory</code>를 상속한 <code class="language-plaintext highlighter-rouge">UserFactory</code>를 구현한 다음에 <code class="language-plaintext highlighter-rouge">UserFactory.create()</code>만 작성해 주면 알아서 데이터베이스를 저장해 주고, ORM 인스턴스를 내뱉는다. 사용법은 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># factory.py
+</span>
+<span class="kn">import</span> <span class="n">factory</span>
+
+
+<span class="k">class</span> <span class="nc">ProfileFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Profile</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+
+
+<span class="k">class</span> <span class="nc">UserFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+
+    <span class="n">readable_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">customer_key</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">uuid4</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">user_sns_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">user_name</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">email</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">random</span><span class="p">.</span><span class="nf">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+    <span class="n">phone_number</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">phone_number</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">birth_date</span> <span class="o">=</span> <span class="sh">"</span><span class="s">990101</span><span class="sh">"</span>
+    <span class="n">is_staff</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyAttribute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">.</span><span class="n">is_staff</span><span class="p">)</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">SubFactory</span><span class="p">(</span><span class="n">ProfileFactory</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test.py
+</span>
+<span class="k">class</span> <span class="nc">UserTestCase</span><span class="p">(</span><span class="n">APITestCaese</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">fake</span> <span class="o">=</span> <span class="nc">Faker</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">ProfileFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">UserFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span>
+            <span class="n">is_staff</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">profile</span><span class="o">=</span><span class="n">self</span><span class="p">.</span><span class="n">profile</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre></div></div>
+
+<p>위의 <code class="language-plaintext highlighter-rouge">UserFactory</code>를 정의하는 코드에서 여러 가지의 <code class="language-plaintext highlighter-rouge">factory</code>쪽 함수를 사용하고 있는데 설명하자면 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">Faker</span><span class="p">(</span><span class="sh">"</span><span class="s">user_name</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">factory.Faker</code>는 가장 기본적으로 쓰이는 함수로, 아까 설명했던 <code class="language-plaintext highlighter-rouge">Faker</code>쪽 함수와 기능이 같다고 보면 된다. 다른 점이 있다면 <code class="language-plaintext highlighter-rouge">Faker</code>에서의 함수 이름이, <code class="language-plaintext highlighter-rouge">factory.Faker</code>에서는 문자열 파라미터로 쓰인다는 것이다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">readable_id</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyFunction</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="nf">uuid4</span><span class="p">())[:</span><span class="mi">10</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>하지만 <code class="language-plaintext highlighter-rouge">factory.Faker</code>로는 랜덤 생성이 불가능한 상황이 있다. 예를 들어 UUID를 랜덤으로 돌리는 것은 <code class="language-plaintext highlighter-rouge">factory.Faker("uuid4")</code>로 해결이 가능하지만, 랜덤으로 돌린 다음, 앞의 10자를 제외한 나머지 문자열을 제거하는 것 까지는 할 수가 없다. 이때는 랜덤 함수를 직접 만들어야 하는데, <code class="language-plaintext highlighter-rouge">factory.LazyFunction</code>이 이를 가능하게 해준다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is_staff</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">LazyAttribute</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">.</span><span class="n">is_staff</span><span class="p">)</span>
+
+<span class="c1"># test.py
+</span><span class="n">UserFactory</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">is_staff</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+<p>일부 요소들은 반드시 랜덤으로 돌려서는 안되고 개발자가 반드시 값을 지정해 줘야 할 있다. 이때 <code class="language-plaintext highlighter-rouge">LazyAttribute</code>를 사용한다. 파라미터로 익명 함수(<code class="language-plaintext highlighter-rouge">lambda</code>)를 사용함으로써 개발자가 굳이 별도의 로직을 구현할 필요 없이 입력 데이터를 가공해서 저장할 수도 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">birth_date</span> <span class="o">=</span> <span class="sh">"</span><span class="s">990101</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<p>랜덤을 돌리지 않고 그냥 고정시키고 싶다면 이렇게 네이티브 하게 작성하면 된다. 물론, <code class="language-plaintext highlighter-rouge">create</code>에서 필요시 데이터를 변경할 수 도 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ProfileFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Profile</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+
+<span class="k">class</span> <span class="nc">UserFactory</span><span class="p">(</span><span class="n">factory</span><span class="p">.</span><span class="n">django</span><span class="p">.</span><span class="n">DjangoModelFactory</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">factory</span><span class="p">.</span><span class="nc">SubFactory</span><span class="p">(</span><span class="n">ProfileFactory</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>데이터 저장 시, 관계되어 있는 자식 테이블의 데이터가 필요할 때가 있다. 이때 <code class="language-plaintext highlighter-rouge">factory.SubFactory</code>를 사용한다.</p>
+
+<h2 id="부록-factory_boy에서-사용할-수-있는-필드-리스트">부록) factory_boy에서 사용할 수 있는 필드 리스트</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>필드명</th>
+      <th>설명</th>
+      <th>필드명</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>name</td>
+      <td>실제 이름</td>
+      <td>user_name</td>
+      <td>이름(닉네임)</td>
+    </tr>
+    <tr>
+      <td>email</td>
+      <td>이메일 주소</td>
+      <td>phone_number</td>
+      <td>전화번호</td>
+    </tr>
+    <tr>
+      <td>address</td>
+      <td>주소</td>
+      <td>date</td>
+      <td>날짜</td>
+    </tr>
+    <tr>
+      <td>date_time</td>
+      <td>날짜 및 시간(<code class="language-plaintext highlighter-rouge">datetime</code>)</td>
+      <td>time</td>
+      <td>시간</td>
+    </tr>
+    <tr>
+      <td>credit_card_number</td>
+      <td>신용카드 번호</td>
+      <td>credit_card_expire</td>
+      <td>신용카드 만료일</td>
+    </tr>
+    <tr>
+      <td>text</td>
+      <td>랜덤 텍스트</td>
+      <td>sentence</td>
+      <td>1문장</td>
+    </tr>
+    <tr>
+      <td>paragraph</td>
+      <td>1문단(여러문장)</td>
+      <td>url</td>
+      <td>URL</td>
+    </tr>
+    <tr>
+      <td>uuid4</td>
+      <td>UUID</td>
+      <td>color_name</td>
+      <td>색상이름</td>
+    </tr>
+    <tr>
+      <td>random_int(<code class="language-plaintext highlighter-rouge">min: int, max: int</code>)</td>
+      <td>랜덤 정수</td>
+      <td>random_number(<code class="language-plaintext highlighter-rouge">k</code>)</td>
+      <td>K자리 랜덤 숫자</td>
+    </tr>
+    <tr>
+      <td>random_element(<code class="language-plaintext highlighter-rouge">elements: list</code>)</td>
+      <td><code class="language-plaintext highlighter-rouge">elements</code> 중에 하나 랜덤</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>]]></content><author><name></name></author><category term="Testing" /><category term="python" /><category term="testing" /><category term="factory_boy" /><summary type="html"><![CDATA[Factory Boy]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">AWS Configure 여러개로 관리하기</title><link href="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html" rel="alternate" type="text/html" title="AWS Configure 여러개로 관리하기" /><published>2025-01-15T05:00:00+00:00</published><updated>2025-01-15T05:00:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/15/aws-configure-profile</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/15/aws-configure-profile.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>내가 다니고 있는 회사에는 두 개의 서비스를 관리하고 있고, 각 서비스 마다 서로 다른 AWS 계정을 가지고 있다.
 나는 두 개의 서비스 중 하나는 전체 관리를 다른 하나는 일부 참여를 하고 있기 때문에 두 개의 AWS 계정을 사용해야 했다.
@@ -879,258 +1105,4 @@ Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 
 
 <p><br /></p>
 
-<p>그러나, 이런 행위는 사실상 서버 본체를 갈아끼우는 것과 같기 때문에, 내부 스토리지의 데이터가 초기화 되거나, Public IP가 뒤바뀌면서, 서비스 작동에 장애를 안겨줄 수 있다. 그렇기 때문에 <strong>AWS EC2 인스턴스 스펙을 바꾸기 전에, 바뀌게 되면 영향이 가는 요소들을 반드시 확인하고, 변경 이후에도 서비스가 정상작동을 하는지에 대한 모니터링이 정말정말 필요하다.</strong></p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="ec2" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">DJango에서 마이그레이션을 하지 말아야 할 데이터베이스를 테스트 하는 방법</title><link href="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html" rel="alternate" type="text/html" title="DJango에서 마이그레이션을 하지 말아야 할 데이터베이스를 테스트 하는 방법" /><published>2024-11-22T16:04:25+00:00</published><updated>2024-11-22T16:04:25+00:00</updated><id>https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db</id><content type="html" xml:base="https://recoma96.github.io/django/2024/11/22/django-unittest-set-migration-with-other-db.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<p>DJango기반의 서비스를 구현할 때, 보통 해당 서비스에 포함되는 데이터베이스 테이블들은 DJango-ORM으로 관리되는 것이 권장되지만. 공용으로 사용되는 데이터베이스 테이블들의 경우 DJango에서 직접 관리되어선 안된다.(ex: 마이그레이션 같은 테이블의 정보를 바꾸는 작업). 이때 migration 작업시, 직접 관리되어선 안되는 테이블들을 마이그레이션 못하게 하기 위해 해당 테이블의 메타 클래스(<code class="language-plaintext highlighter-rouge">class Model.Meta</code>)에 <code class="language-plaintext highlighter-rouge">managed=False</code>로 설정을 하게 된다.</p>
-
-<p><br /></p>
-
-<p>예를 들어 사내 서비스에 대한 어드민 페이지를 개발할 때, 어드민 페이지 내에서 관리하는 어드민 전용 데이터베이스는 어드민 페이지 서버에서 직접 관리해도 문제가 없지만, 서비스 DB를 상대로 어드민 페이지가 절대로 마이그레이션 같은 DDL에 영향을 주는 행위를 절대절대 해서는 안된다. 그렇기 때문에 어드민 페이지 내 서버 코드에서는 서비스 DB와 관련된 모든 Model들을 전부 <code class="language-plaintext highlighter-rouge">managed=False</code> 처리를 해야 한다.</p>
-
-<p><br /></p>
-
-<p>그러나 이는 또 다른 문제를 발생 시키게 되는데, managed=False로 설정된 모델에서는 유닛테스트가 불가능 하다는 점이다. 유닛테스트 작동 시, DJango는 테스트를 수행하기 전에 테스트용 데이터베이스를 생성하고 그 위에 테이블들을 마이그레이션 한다. 그러나 managed=False로 되어 있는 모델들은 마이그레이션이 불가능하므로, 이 시점에서 에러가 발생하고 더이상 테스트를 진행할 수 없게 된다.</p>
-
-<p>이번 포스트에서는 <code class="language-plaintext highlighter-rouge">managed=False</code>로 되어 있는 모델들을 가지고 어떻게 유닛테스트를 할 수 있는지 설명을 하며, 크게 두 가지 방법이 있다.</p>
-
-<h1 id="솔루션">솔루션</h1>
-
-<h2 id="공통사항">공통사항</h2>
-
-<h3 id="auth-user-model-관련">Auth User Model 관련</h3>
-
-<p>두개 이상의 테이블을 사용할 때, 각 테이블의 모델 구조가 다를 때, 정확히는 로그인을 하기 위한 유저 모델이 한군데만 있고 다른 곳에는 없을 때, 유닛테스트 과정에서 문제가 생긴다.</p>
-
-<p><br /></p>
-
-<p>유닛테스트를 진행하기 전에 DJango는 테스트 전용 데이터베이스들을 생성하고 그 데이터베이스 위에 개발자가 작성한 모델들을 토대로 마이그레이션을 진행하게 된다. 이때 생성되는 모델들 중에, 유저가 정의한 모델들 말고 장고 내장의 모델들도 같이 마이그레이션을 하게 되는데, 이 중 <code class="language-plaintext highlighter-rouge">django_admin_log</code> 라는 테이블이 생성을 하면서 유저가 정의한 로그인 용도의 유저 모델(<code class="language-plaintext highlighter-rouge">AUTH_USER_MODEL</code>) 과 릴레이션 진행을 한다. 그러나 유저 모델이 없는 데이터베이스에서는 <code class="language-plaintext highlighter-rouge">django_admin_log</code> 와 릴레이션을 진행할 수 없기 때문에 유닛 테스트를 실행하기 전 에러가 발생하게 된다.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">django</span><span class="p">.</span><span class="n">db</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">IntegrityError</span><span class="p">:</span> <span class="p">(</span><span class="mi">1215</span><span class="p">,</span> <span class="sh">'</span><span class="s">Cannot add foreign key constraint</span><span class="sh">'</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>해결 방법은 간단하다. INSTALLED_APPS에 <code class="language-plaintext highlighter-rouge">'django.contrib.admin'</code> 을 주석처리하면 된다.</p>
-
-<p><br /></p>
-
-<p>보통 직접 정의한 모델을  하기 위해 <code class="language-plaintext highlighter-rouge">INSTALLED_APPS</code>에 해당 모델과 관련된 앱 이름을 작성을 하게 된다. <code class="language-plaintext highlighter-rouge">python manage.py migrate</code> 을 수행할 때, 내가 직접 정의한 모델 말고도 장고 내장 테이블도 같이 마이그레이션 되는데, <strong>이는 직접 하드코딩 된 것이 아니라 장고 내장 테이블을 포함하고 있는 모듈이 <code class="language-plaintext highlighter-rouge">INSTALLED_APPS</code>에 선언되어 있기 때문에 저절로 같이 마이그레이션 된 것이다.</strong></p>
-
-<p><br /></p>
-
-<p><code class="language-plaintext highlighter-rouge">django_admin_log</code>도 마찬가지로 <code class="language-plaintext highlighter-rouge">django.contrib.admin</code> 안에 포함되어 있기 때문에 마이그레이션 된 것이다. 따라서 반대로 <code class="language-plaintext highlighter-rouge">django.contrib.admin</code>을 주석처리 및 제외를 하게 되면 <code class="language-plaintext highlighter-rouge">django_admin_log</code>를 더이상 마이그레이션을 하지 않게 될 것이고, 이에 따른 왜래키 문제도 더이상 발생하지 않게 된다.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="c1"># 'django.contrib.admin'
-</span>    <span class="sh">'</span><span class="s">django.contrib.auth</span><span class="sh">'</span><span class="p">,</span>
-    <span class="sh">'</span><span class="s">django.contrib.contenttypes</span><span class="sh">'</span><span class="p">,</span>
-    <span class="sh">'</span><span class="s">django.contrib.sessions</span><span class="sh">'</span><span class="p">,</span>
-    <span class="sh">'</span><span class="s">django.contrib.messages</span><span class="sh">'</span><span class="p">,</span>
-    <span class="sh">'</span><span class="s">django.contrib.staticfiles</span><span class="sh">'</span><span class="p">,</span>
-<span class="p">]</span>
-</code></pre></div></div>
-
-<h2 id="무식한-방법-djangosettings를-활용해-테스트-할-때만-mangedtrue로-변경하기">(무식한 방법) django.settings를 활용해 테스트 할 때만 manged=True로 변경하기</h2>
-
-<h3 id="적용-방법">적용 방법</h3>
-
-<ol>
-  <li>settings.py에 TEST를 진행중인지에 대한 여부를 나타내는 환경변수를 추가한다.
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">UNDER_TEST</span> <span class="o">=</span> <span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">'</span><span class="s">test</span><span class="sh">'</span><span class="p">)</span>
-</code></pre></div>    </div>
-  </li>
-  <li>managed = False상태인 모든 모델의 메타 클래스의 managed를 <strong>전부 다</strong> 아래와 같이 변경한다.
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
-     <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">example_table</span><span class="sh">"</span>
-     <span class="n">managed</span> <span class="o">=</span> <span class="nf">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="sh">"</span><span class="s">UNDER_TEST</span><span class="sh">"</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
-</code></pre></div>    </div>
-  </li>
-  <li>대상 DB모델을 호출하는 테스트 스크립트를 작성해서 정상적으로 테스트가 돌아가는 지 확인한다.</li>
-</ol>
-
-<h3 id="문제점">문제점</h3>
-
-<p>각 <code class="language-plaintext highlighter-rouge">Model.Meta</code>마다 <code class="language-plaintext highlighter-rouge">getattr</code>함수를 작성해야 하기 때문에 코드 가시성이 떨어지고 유지보수에 문제가 생긴다. 따라서 해당 방안은 비권장하는 부분이다.</p>
-
-<h2 id="test-runner-활용하기">Test Runner 활용하기</h2>
-
-<p>위의 방법과 마찬가지로 <code class="language-plaintext highlighter-rouge">manged = True</code>로 바꿔야 한다는 방향은 일치하지만, 위의 방법에 비해 기술 부채가 일어나지 않게 진행하는 해결방안이다.</p>
-
-<p><br /></p>
-
-<p><code class="language-plaintext highlighter-rouge">DiscoverRunner</code>를 상속받아서 테스트가 맨 처음에 시작했을 때 managed를 True로 바꾸고, 끝나면 다시 원래대로 돌려놓게 함수를 오버라이딩 함으로써, Model 클래스에 위와 같이 똑같은 코드 작성 필요 없이 깔끔하게 해결할 수 있다.</p>
-
-<h3 id="testrunner">TestRunner</h3>
-
-<blockquote>
-  <p>A test runner is a class defining a run_tests() method. Django ships with a DiscoverRunner class that defines the default Django testing behavior. This class defines the run_tests() entry point, plus a selection of other methods that are used by run_tests() to set up, execute and tear down the test suite.</p>
-</blockquote>
-
-<p>TestRunner는 유닛테스트의 작동 방식을 정의를 한다. 각 TestCase 마다 작동 방식을 정의하는 함수들(setUpClass, setUp 등…)과는 다르게 <strong>전체적인 작동 방식을 정의한다.</strong> 예를 들어, 모든 테스트 케이스에서 공통적으로 사용할 수 있는 환경변수를 정의할 수도 있고, 데이터베이스 모델 정보도 변경할 수 있으며, 마이그레이션 없이 테스트를 진행하게 수정할 수 있다. 즉, <strong>TestCase에서는 할 수 없는 정밀한 작업 프로세스를 여기서 구현할 수 있다.</strong></p>
-
-<p>보통 <code class="language-plaintext highlighter-rouge">django.test.runner.DiscoverRunner</code>를 상속받아서 사용한다.</p>
-
-<h3 id="오버라이딩-할-수-있는-함수들">오버라이딩 할 수 있는 함수들</h3>
-
-<p><code class="language-plaintext highlighter-rouge">setup_test_environment()</code></p>
-
-<ul>
-  <li>막 테스트가 시작될 때 작동하는 함수, 모델들을 <code class="language-plaintext highlighter-rouge">managed=True</code>로 변경하는 로직을 여기서 구현한다.</li>
-</ul>
-
-<p><code class="language-plaintext highlighter-rouge">teardown_test_environment()</code></p>
-
-<ul>
-  <li>모든 테스트 케이스가 끝나면 작동되는 함수, managed정보가 변경된 모델들을 원상복귀할 때 사용된다.</li>
-</ul>
-
-<p><code class="language-plaintext highlighter-rouge">setup_databases()</code></p>
-
-<ul>
-  <li>테스트용 데이터베이스를 생성하고, 마이그레이션을 하는 등, 테스트에 사용되는 데이터베이스들을 세팅하는 데 사용된다.</li>
-  <li>테스트용 데이터베이스를 생성하는 것을 원하지 않는다면 함수내용을 비우는 방향으로 오버라이딩 하면 된다.</li>
-</ul>
-
-<p><code class="language-plaintext highlighter-rouge">teardown_databases()</code></p>
-
-<ul>
-  <li>테스트용 데이터베이스를 거두는 등, DB 환경을 원상복귀 시키는데 사용된다.</li>
-</ul>
-
-<h3 id="run_tests"><code class="language-plaintext highlighter-rouge">run_tests()</code></h3>
-
-<p>모든 테스트케이스가 돌아갈 수 있는 이유는 <code class="language-plaintext highlighter-rouge">run_tests</code>함수가 실행되기 때문이다. run_tests의 로직은 아래와 같다.</p>
-
-<ol>
-  <li>테스트가 시작되기 전 전처리 수행 <code class="language-plaintext highlighter-rouge">setup_test_environment()</code></li>
-  <li>테스트 케이스 수집 <code class="language-plaintext highlighter-rouge">build_suite()</code></li>
-  <li>테스트용 데이터베이스 수집 및 세팅 <code class="language-plaintext highlighter-rouge">get_databases()</code>, <code class="language-plaintext highlighter-rouge">setup_databases()</code></li>
-  <li><strong>테스트 수행</strong> <code class="language-plaintext highlighter-rouge">run_suite()</code>
-    <ul>
-      <li>test실패 (assert)시 exception 호출</li>
-    </ul>
-  </li>
-  <li>테스트 종료 후 프로세스 수행 <code class="language-plaintext highlighter-rouge">teardown_databases()</code> <code class="language-plaintext highlighter-rouge">teardown_test_environment()</code>
-    <ul>
-      <li>테스트실패 여부 상관업싱 해당 로직은 수행된다.</li>
-    </ul>
-  </li>
-</ol>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">run_tests()</code> 코드 전문</li>
-</ul>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_tests</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">extra_tests</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sh">"""</span><span class="s">
-    Run the unit tests for all the test labels in the provided list.
-
-    Test labels should be dotted Python paths to test modules, test
-    classes, or test methods.
-
-    Return the number of tests that failed.
-    </span><span class="sh">"""</span>
-    <span class="k">if</span> <span class="n">extra_tests</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="p">.</span><span class="nf">warn</span><span class="p">(</span>
-            <span class="sh">"</span><span class="s">The extra_tests argument is deprecated.</span><span class="sh">"</span><span class="p">,</span>
-            <span class="n">RemovedInDjango50Warning</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">self</span><span class="p">.</span><span class="nf">setup_test_environment</span><span class="p">()</span>
-    <span class="n">suite</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">build_suite</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">extra_tests</span><span class="p">)</span>
-    <span class="n">databases</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">get_databases</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
-    <span class="n">suite</span><span class="p">.</span><span class="n">serialized_aliases</span> <span class="o">=</span> <span class="nf">set</span><span class="p">(</span>
-        <span class="n">alias</span> <span class="k">for</span> <span class="n">alias</span><span class="p">,</span> <span class="n">serialize</span> <span class="ow">in</span> <span class="n">databases</span><span class="p">.</span><span class="nf">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">serialize</span>
-    <span class="p">)</span>
-    <span class="k">with</span> <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">timed</span><span class="p">(</span><span class="sh">"</span><span class="s">Total database setup</span><span class="sh">"</span><span class="p">):</span>
-        <span class="n">old_config</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">setup_databases</span><span class="p">(</span>
-            <span class="n">aliases</span><span class="o">=</span><span class="n">databases</span><span class="p">,</span>
-            <span class="n">serialized_aliases</span><span class="o">=</span><span class="n">suite</span><span class="p">.</span><span class="n">serialized_aliases</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">run_failed</span> <span class="o">=</span> <span class="bp">False</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">self</span><span class="p">.</span><span class="nf">run_checks</span><span class="p">(</span><span class="n">databases</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">run_suite</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
-    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
-        <span class="n">run_failed</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">raise</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">timed</span><span class="p">(</span><span class="sh">"</span><span class="s">Total database teardown</span><span class="sh">"</span><span class="p">):</span>
-                <span class="n">self</span><span class="p">.</span><span class="nf">teardown_databases</span><span class="p">(</span><span class="n">old_config</span><span class="p">)</span>
-            <span class="n">self</span><span class="p">.</span><span class="nf">teardown_test_environment</span><span class="p">()</span>
-        <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
-            <span class="c1"># Silence teardown exceptions if an exception was raised during
-</span>            <span class="c1"># runs to avoid shadowing it.
-</span>            <span class="k">if</span> <span class="ow">not</span> <span class="n">run_failed</span><span class="p">:</span>
-                <span class="k">raise</span>
-    <span class="n">self</span><span class="p">.</span><span class="n">time_keeper</span><span class="p">.</span><span class="nf">print_results</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">suite_result</span><span class="p">(</span><span class="n">suite</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
-</code></pre></div></div>
-
-<h3 id="적용-방법-1">적용 방법</h3>
-<ol>
-  <li>DiscoverRunner를 상속받는 모듈을 작성한다.
-    <ul>
-      <li><code class="language-plaintext highlighter-rouge">setup_test_environment</code>
-        <ul>
-          <li><strong>테스트가 본격적으로 시작하기 전에 딱 한번 실행되는 함수</strong>로 <code class="language-plaintext highlighter-rouge">TestCase</code>가 처음 실행될 때 작동하는 <code class="language-plaintext highlighter-rouge">setUpClass</code>나 <code class="language-plaintext highlighter-rouge">setUpTestData</code> 와는 결이 다르다</li>
-        </ul>
-      </li>
-      <li><code class="language-plaintext highlighter-rouge">teardown_test_environment</code>
-        <ul>
-          <li><strong>모든 테스트 케이스가 다 끝나는 순간에 작동되는 함수</strong></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-</ol>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kn">from</span> <span class="n">typing</span> <span class="kn">import</span> <span class="n">Set</span>
-
-<span class="kn">from</span> <span class="n">django.test.runner</span> <span class="kn">import</span> <span class="n">DiscoverRunner</span>
-<span class="kn">from</span> <span class="n">django.apps</span> <span class="kn">import</span> <span class="n">apps</span>
-
-
-<span class="k">class</span> <span class="nc">UnManagedModelTestRunner</span><span class="p">(</span><span class="n">DiscoverRunner</span><span class="p">):</span>
-    <span class="n">un_managed_models</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span> <span class="o">=</span> <span class="nf">set</span><span class="p">()</span>
-        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">setup_test_environment</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">.</span><span class="nf">get_models</span><span class="p">():</span>
-            <span class="n">model_name</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">model_name</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span><span class="p">:</span>
-                <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-                <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span> <span class="o">=</span> <span class="bp">True</span>
-
-        <span class="nf">super</span><span class="p">(</span><span class="n">UnManagedModelTestRunner</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">setup_test_environment</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">teardown_test_environment</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">apps</span><span class="p">.</span><span class="nf">get_models</span><span class="p">():</span>
-            <span class="n">model_name</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">model_name</span>
-            <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">self</span><span class="p">.</span><span class="n">un_managed_models</span><span class="p">:</span>
-                <span class="n">model</span><span class="p">.</span><span class="n">_meta</span><span class="p">.</span><span class="n">managed</span> <span class="o">=</span> <span class="bp">False</span>
-
-        <span class="nf">super</span><span class="p">(</span><span class="n">UnManagedModelTestRunner</span><span class="p">,</span> <span class="n">self</span><span class="p">).</span><span class="nf">teardown_test_environment</span><span class="p">()</span>
-</code></pre></div></div>
-
-<ol>
-  <li><code class="language-plaintext highlighter-rouge">settings.py</code>에 <code class="language-plaintext highlighter-rouge">TEST_RUNNER</code> 변수를 추가한다.</li>
-</ol>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TEST_RUNNER</span> <span class="o">=</span> <span class="sh">"</span><span class="s">api.tests.runner.UnManagedModelTestRunner</span><span class="sh">"</span>
-</code></pre></div></div>
-
-<ol>
-  <li>유닛테스트를 실행해 제대로 작동되는 지 확인한다.</li>
-</ol>
-
-<h1 id="references">References</h1>
-
-<ul>
-  <li><a href="https://yangtaeyoung.github.io/docs/django/unmanaged-model/#soluton-1-%EB%AA%85%EB%A0%B9%EC%96%B4-%EA%B0%80%EB%A1%9C%EC%B1%84%EA%B8%B0%EC%A0%9C%EA%B0%80-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%B0%A9%EB%B2%95">Unmanaged Model을 사용하면서 Test를 적용하기(feat. Table XXX doesn’t exist)</a></li>
-  <li><a href="https://technote.fyi/programming/django/django-database-testing-unmanaged-tables-with-migrations/">Django Database Testing Unmanaged Tables with Migration</a></li>
-  <li><a href="https://docs.djangoproject.com/en/5.0/topics/testing/advanced/">Django Testing Advanced Document</a></li>
-  <li><a href="https://docs.djangoproject.com/en/5.0/ref/applications/">Django Applications Document</a></li>
-</ul>]]></content><author><name></name></author><category term="Django" /><category term="python" /><category term="django" /><category term="database" /><category term="unittest" /><category term="testing" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+<p>그러나, 이런 행위는 사실상 서버 본체를 갈아끼우는 것과 같기 때문에, 내부 스토리지의 데이터가 초기화 되거나, Public IP가 뒤바뀌면서, 서비스 작동에 장애를 안겨줄 수 있다. 그렇기 때문에 <strong>AWS EC2 인스턴스 스펙을 바꾸기 전에, 바뀌게 되면 영향이 가는 요소들을 반드시 확인하고, 변경 이후에도 서비스가 정상작동을 하는지에 대한 모니터링이 정말정말 필요하다.</strong></p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="ec2" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
