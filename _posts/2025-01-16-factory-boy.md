@@ -107,7 +107,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
     readable_id = factory.LazyFunction(lambda: str(uuid4())[:10])
-    customer_key = factory.LazyFunction(uuid4)
+    customer_key = factory.Faker("uuid4")
     user_sns_id = factory.LazyFunction(lambda: str(uuid4())[:10])
     name = factory.Faker("user_name")
     email = factory.Faker("email")
@@ -118,7 +118,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     profile = factory.SubFactory(ProfileFactory)
 ```
 
-
 ```python
 # test.py
 
@@ -126,12 +125,53 @@ class UserTestCase(APITestCaese):
     def setUp(self) -> None:
         fake = Faker()
         self.profile = ProfileFactory.create()
-        self.user = UserFactory.create.(
+        self.user = UserFactory.create(
             is_staff=False,
             profile=self.profile,
         )
 ```
 
+위의 `UserFactory`를 정의하는 코드에서 여러 가지의 `factory`쪽 함수를 사용하고 있는데 설명하자면 아래와 같다.
+
+```python
+name = factory.Faker("user_name")
+```
+
+`factory.Faker`는 가장 기본적으로 쓰이는 함수로, 아까 설명했던 `Faker`쪽 함수와 기능이 같다고 보면 된다. 다른 점이 있다면 `Faker`에서의 함수 이름이, `factory.Faker`에서는 문자열 파라미터로 쓰인다는 것이다.
+
+```python
+readable_id = factory.LazyFunction(lambda: str(uuid4())[:10])
+```
+
+하지만 `factory.Faker`로는 랜덤 생성이 불가능한 상황이 있다. 예를 들어 UUID를 랜덤으로 돌리는 것은 `factory.Faker("uuid4")`로 해결이 가능하지만, 랜덤으로 돌린 다음, 앞의 10자를 제외한 나머지 문자열을 제거하는 것 까지는 할 수가 없다. 이때는 랜덤 함수를 직접 만들어야 하는데, `factory.LazyFunction`이 이를 가능하게 해준다.
+
+```python
+is_staff = factory.LazyAttribute(lambda e: e.is_staff)
+
+# test.py
+UserFactory.create(is_staff=False)
+```
+일부 요소들은 반드시 랜덤으로 돌려서는 안되고 개발자가 반드시 값을 지정해 줘야 할 있다. 이때 `LazyAttribute`를 사용한다. 파라미터로 익명 함수(`lambda`)를 사용함으로써 개발자가 굳이 별도의 로직을 구현할 필요 없이 입력 데이터를 가공해서 저장할 수도 있다.
+
+```python
+birth_date = "990101"
+```
+
+랜덤을 돌리지 않고 그냥 고정시키고 싶다면 이렇게 네이티브 하게 작성하면 된다. 물론, `create`에서 필요시 데이터를 변경할 수 도 있다.
+
+```python
+class ProfileFactory(factory.django.DjangoModelFactory)
+    class Meta:
+        model = Profile
+    ... 이하 생략 ...
+
+class UserFactory(factory.django.DjangoModelFactory)
+    class Meta:
+        model = User
+    profile = factory.SubFactory(ProfileFactory)
+```
+
+데이터 저장 시, 관계되어 있는 자식 테이블의 데이터가 필요할 때가 있다. 이때 `factory.SubFactory`를 사용한다.
 
 
 
