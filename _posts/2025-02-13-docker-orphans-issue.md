@@ -3,7 +3,7 @@ layout: post
 title:  "WARNING: Found orphan containers (***) for this project."
 date:   2025-02-13 11:30:00 +0900
 categories: "Docker"
-summary: "도커 컨테이너가 고아(orphans) 되었다구요..? 말이 너무 심한거 아니에요??"
+summary: "도커 컨테이너가 고아(orphans)가 되었다구요..? 말이 너무 심한거 아니에요??"
 tags: ["docker", "issue"]
 image: ""
 ---
@@ -11,7 +11,7 @@ image: ""
 내가 사내에서 운영하고 있는 서버의 Docker Container구조는 크게 "backend server", "celery", "celerybeat"가 있다.
 그리고 이 동일한 서버가 두대가 있고 그 위에 ALB가 배치되어 있다. 그렇다면, 결국 celerybeat가 두개 돌아간다는 뜻이 되는데, 
 이렇게 되면 완전 동일한 batch process가 두번 중복되어 작동한다는 뜻이 된다. 이는 즉 리소스 낭비 부터 시작해서 서비스 이슈 까지 
-발생할 가능성이 있기 때문에 서버 두개 중 하나만 "celerybeat"를 빌드를 해야 했다. (_가장 확실한 방법은 기존 서버 두대에서 Celerybeat와 Celery를 제외시키고 
+발생할 가능성이 있기 때문에 서버 두개 중 하나만 "celerybeat"를 빌드를 해야 한다. (_가장 확실한 방법은 기존 서버 두대에서 Celerybeat와 Celery를 제외시키고 
 서버를 하나 더 대여해서 그곳에 빌드를 하는 것인데. 비용 이슈도 있고, 오늘 포스팅은 그게 주제가 아니라서 패스_)
 
 <br>
