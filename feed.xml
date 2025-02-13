@@ -1,4 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-02-13T03:33:34+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자</title><link href="https://recoma96.github.io/testing/2025/01/22/factory-boy.html" rel="alternate" type="text/html" title="Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자" /><published>2025-01-22T00:30:00+00:00</published><updated>2025-01-22T00:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/22/factory-boy</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/22/factory-boy.html"><![CDATA[<h1 id="factory-boy">Factory Boy</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-02-13T07:34:39+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">WARNING: Found orphan containers (***) for this project.</title><link href="https://recoma96.github.io/docker/2025/02/13/docker-orphans-issue.html" rel="alternate" type="text/html" title="WARNING: Found orphan containers (***) for this project." /><published>2025-02-13T02:30:00+00:00</published><updated>2025-02-13T02:30:00+00:00</updated><id>https://recoma96.github.io/docker/2025/02/13/docker-orphans-issue</id><content type="html" xml:base="https://recoma96.github.io/docker/2025/02/13/docker-orphans-issue.html"><![CDATA[<p>내가 사내에서 운영하고 있는 서버의 Docker Container구조는 크게 “backend server”, “celery”, “celerybeat”가 있다.
+그리고 이 동일한 서버가 두대가 있고 그 위에 ALB가 배치되어 있다. 그렇다면, 결국 celerybeat가 두개 돌아간다는 뜻이 되는데, 
+이렇게 되면 완전 동일한 batch process가 두번 중복되어 작동한다는 뜻이 된다. 이는 즉 리소스 낭비 부터 시작해서 서비스 이슈 까지 
+발생할 가능성이 있기 때문에 서버 두개 중 하나만 “celerybeat”를 빌드를 해야 했다. (<em>가장 확실한 방법은 기존 서버 두대에서 Celerybeat와 Celery를 제외시키고 
+서버를 하나 더 대여해서 그곳에 빌드를 하는 것인데. 비용 이슈도 있고, 오늘 포스팅은 그게 주제가 아니라서 패스</em>)</p>
+
+<p><br /></p>
+
+<p>그래서 서버에 직접 접속을 해서 <code class="language-plaintext highlighter-rouge">docker-compose</code> 파일에서 container 목록 중에 celerybeat를 제거했다.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">app</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">backend</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+  <span class="na">worker</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">worker</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">always</span>
+  <span class="na">beat</span><span class="pi">:</span> <span class="s">&lt;- 얘 삭제</span>
+    <span class="s">container_name</span><span class="err">:</span> <span class="s">beat</span>
+    <span class="s">command</span><span class="err">:</span> <span class="s">sh run_celerybeat.sh</span>
+    <span class="s">restart</span><span class="err">:</span> <span class="s">always</span>
+</code></pre></div></div>
+
+<p>그리고 빌드를 하기 위해 아래와 같은 명령어를 입력했다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nt">-f</span> docker-compose.yml up <span class="nt">-d</span>
+</code></pre></div></div>
+
+<p>그랬더니 아래와 같은 경고문과 함께 <strong>celery beat 컨테이너가 소멸되지 않았다.</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WARNING: Found orphan containers <span class="o">(</span>beat<span class="o">)</span> <span class="k">for </span>this project. If you removed or renamed this service <span class="k">in </span>your compose file, you can run this <span class="nb">command </span>with the <span class="nt">--remove-orphans</span> flag to clean it up.
+</code></pre></div></div>
+
+<p>“orphans”는 한국어로 번역하면 “고아” 라는 뜻이다. 즉, 고아 상태의 컨테이너를 발견했다는 것인데. <strong>docker compose 파일에는 없는 컨테이너가 OS상에서 발견되었다는 뜻이 된다.</strong></p>
+
+<p><br /></p>
+
+<p>당연히 다음 빌드시 대상 컨테이너를 지워야 하는데 방법은 간단하다. 아까 빌드 명령어에 <code class="language-plaintext highlighter-rouge">--remove-orphans</code> 플래그를 추가하면 된다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose <span class="nt">-f</span> docker-compose.yml up <span class="nt">-d</span> <span class="nt">--remove-orphans</span>
+</code></pre></div></div>]]></content><author><name></name></author><category term="Docker" /><category term="docker" /><category term="issue" /><summary type="html"><![CDATA[내가 사내에서 운영하고 있는 서버의 Docker Container구조는 크게 “backend server”, “celery”, “celerybeat”가 있다. 그리고 이 동일한 서버가 두대가 있고 그 위에 ALB가 배치되어 있다. 그렇다면, 결국 celerybeat가 두개 돌아간다는 뜻이 되는데, 이렇게 되면 완전 동일한 batch process가 두번 중복되어 작동한다는 뜻이 된다. 이는 즉 리소스 낭비 부터 시작해서 서비스 이슈 까지 발생할 가능성이 있기 때문에 서버 두개 중 하나만 “celerybeat”를 빌드를 해야 했다. (가장 확실한 방법은 기존 서버 두대에서 Celerybeat와 Celery를 제외시키고 서버를 하나 더 대여해서 그곳에 빌드를 하는 것인데. 비용 이슈도 있고, 오늘 포스팅은 그게 주제가 아니라서 패스)]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자</title><link href="https://recoma96.github.io/testing/2025/01/22/factory-boy.html" rel="alternate" type="text/html" title="Factory Boy를 이용해 테스트 데이터를 깔끔하게 만들어 보자" /><published>2025-01-22T00:30:00+00:00</published><updated>2025-01-22T00:30:00+00:00</updated><id>https://recoma96.github.io/testing/2025/01/22/factory-boy</id><content type="html" xml:base="https://recoma96.github.io/testing/2025/01/22/factory-boy.html"><![CDATA[<h1 id="factory-boy">Factory Boy</h1>
 
 <p>테스트코드를 작성하다 보면, 테스트를 시작하기 전에 데이터베이스에 테스트용 데이터를 집어넣는 과정을 거친다. 보통은 ORM으로 데이터들을 생성하기 때문에 가끔 이런 코드를 볼 수가 있다. <em>(Django 기준)</em></p>
 
@@ -1017,92 +1058,4 @@ Lazy Loading이란, ORM 함수를 사용한다고 해서 바로 사용하지는 
 <span class="p">(</span><span class="mf">0.000</span><span class="p">)</span> <span class="n">SELECT</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`title`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`context`</span><span class="p">,</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`is_deleted`</span> <span class="n">FROM</span> <span class="sb">`short_diary`</span> <span class="n">WHERE</span> <span class="sb">`short_diary`</span><span class="p">.</span><span class="sb">`user_id`</span> <span class="nc">IN </span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">);</span> <span class="n">alias</span><span class="o">=</span><span class="n">default</span>
 <span class="n">radio</span>
 <span class="n">man</span>
-</code></pre></div></div>]]></content><author><name></name></author><category term="Django" /><category term="django" /><category term="database" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">EC2 인스턴스 유형 변경하기</title><link href="https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance.html" rel="alternate" type="text/html" title="EC2 인스턴스 유형 변경하기" /><published>2024-11-28T23:00:00+00:00</published><updated>2024-11-28T23:00:00+00:00</updated><id>https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance</id><content type="html" xml:base="https://recoma96.github.io/aws/2024/11/28/change-type-of-ec2-instance.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<p>사이드 프로젝트나 실무에서 대부분 서버를 돌릴 때 AWS EC2 인스턴스를 사용한다. 그런데, 사용하다 보면 인스턴스의 스펙을 올리거나 내려야 할 상황이 생긴다. 예를 들어 운영하고 있는 서버에 사용자가 증가하면서 트래픽이 많아지게 되고, 트래픽이 많아지게 되면서 CPU, RAM 사용량이 기하급수적으로 증가하게 된다면, 인스턴스 스펙을 올리는 <strong>스케일 업(Scale Up)</strong>을 고려해야 한다. (로드밸런싱을 적극 사용하고 있다면 서버 대수를 늘리는 <strong>스케일 (Scale Out)</strong>을 할 수도 있겠지만. 이번 포스트에서는 이게 주제가 아니므로 패스…). 혹은 사용 대비 비용이 너무 많이 들어가 돈낭비가 지속된다면 반대로 서버 스펙을 줄일 필요가 있다.</p>
-
-<p><br /></p>
-
-<p>순수 자체 구축된 컴퓨터를 사용하고 있다면, CPU또는 RAM을 직접 갈아끼워야 하는 수고가 만만치 않은 데다, 마더보드하고 호환되지 않을 경우 전체를 다 들어내야 하는 등, 많은 인력이 소모될 것이다. 하지만 AWS, Azure 같은 클라우드 서비스를 사용하고 있다면, 마우스 몇번 깔딱으로 스펙을 바꿀 수가 있다. 이번 포스트에서는 EC2의 유형을 변경하는 방법에 대해 설명한다.</p>
-
-<h1 id="ec2-유형-변경하기">EC2 유형 변경하기</h1>
-
-<h2 id="변경-전-점검사항">변경 전 점검사항</h2>
-
-<p>EC2 유형을 변경한다는 것은 마치 본체를 갈아 끼운다는 것과 같다. 그렇기 때문에 유형을 변경하기에 앞서 몇가지 점검해야 할 사항이 있다.</p>
-
-<h3 id="public-ip-변동-여부">Public IP 변동 여부</h3>
-
-<p>EC2를 사용해 봤다면 당연히 알고있겠지만, 유형을 변경하기에 앞서 서버를 내리게 된다. 그리고 다시 올리게 되면 Public IP가 변경된다. Elastic IP를 사용하고 있다면 문제가 없겠지만, 그렇지 않다면 <strong>IP가 바뀜으로서, 영향이 가는 AWS 서비스가 있는지 검토해야 한다.</strong> 대표적으로 여러 인스턴스들을 연동해서 트래픽 분산을 해주는 ALB(어플리케이션 로드밸런싱)가 있고, 해당 서버와 통신하고 있는 다른 서버 및 클라이언트가 이에 해당된다. 단, ALB를 포함한 다른 AWS 서비스들이 EC2를 연동할 때 IP가 아닌 Instance ID를 사용하고 있다면 IP가 어떻게 바뀌든 간에 영향이 가지 않는다.</p>
-
-<h3 id="ec2-내의-스토리지디스크가-ebs인지-확인하기">EC2 내의 스토리지(디스크)가 EBS인지 확인하기</h3>
-
-<p>EC2의 스토리지 유형은 크게 두 가지가 있다. 하나는 <strong>EBS(Elastic Block Store)</strong>이고 다른 하나는 <strong>인스턴스 스토리지(Instance Storage)</strong>이다. EBS는 EC2와 분리되어 있는 하드디스크 개념으로 EC2가 종료되어도 EBS에 있는 내용은 변경사항이 없지만, 인스턴스 스토리지는 말 그대로 EC2내 부착되는 스토리지이기 때문에 EC2를 종료하는 순간 모든 데이터가 사라지게 된다. 따라서 후술하겠지만, <strong>인스턴스 변경에 앞서 데이터에 대한 백업이 반드시 필요하다.</strong></p>
-
-<p><br /></p>
-
-<p>EC2가 사용하고 있는 스토리지의 유형을 확인하는 방법은 아래와 같다.</p>
-
-<ol>
-  <li>EC2 접속</li>
-  <li>명령어 <code class="language-plaintext highlighter-rouge">sudo apt install nvme-list</code> 실행</li>
-  <li>명령어 <code class="language-plaintext highlighter-rouge">nvme list</code> 실행</li>
-</ol>
-
-<p><code class="language-plaintext highlighter-rouge">nvme list</code>를 실행하면 보통 아래와 같이 터미널에 출력이 된다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Node           SN                  Model                                    
-<span class="nt">-------------</span> <span class="nt">--------------------</span> <span class="nt">---------------------------</span>
-/dev/nvme0n1  vol074ab31681a94fc83 Amazon Elastic Block Store              
-</code></pre></div></div>
-
-<p><br /></p>
-
-<p>Model 부분에서 <code class="language-plaintext highlighter-rouge">Amazon Elastic Block Store</code>라고 출력되어있다면 EBS가 되고, 그렇지 않다면 인스턴스 스토리지다.</p>
-
-<h3 id="아키텍처-체크">아키텍처 체크</h3>
-
-<p><img src="/assets/img/20241129/arch-list.png" alt="arch-list" /></p>
-
-<p>CPU 아키텍처가 Intel x86인지 AMD인지 아니면 다른 것인지 파악을 해야 한다. 유형에 따라 아키텍처가 달라지는데, 이를 고려하지 않고 변경을 하게 된다면, 서비스 운영에 있어 장애를 경험할 수 있다. 예를 들어 Docker의 경우, ARM 계열의 MacOS에서 DockerFile로 이미지를 만들고 x86 계열의 EC2 인스턴스에서 해당 이미지를 생성해서 사용하려면 DockerFile의 맨 위에 아래와 같이 작성해야 한다. 아키텍처가 서로 다르기 때문이다.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> --platform=linux/amd64 &lt;이미지 유형&gt;</span>
-</code></pre></div></div>
-
-<h2 id="백업본-만들기-ebs-기준">백업본 만들기 (EBS 기준)</h2>
-
-<p>앞서 서술했듯이 인스턴스를 갈아까우면서 스토리지 상에서 혹여 발생하는 문제들에 대해 대비하기 위해 백업본을 미리 만들어야 한다. EBS와 인스턴스 스토리지 둘다 해당이 되지만, 대부분 EBS를 사용하기 때문에 EBS 위주로 설명한다.</p>
-
-<ol>
-  <li>ECS Instances에서 Instance ID를 클릭한다.
-<img src="/assets/img/20241129/backup-1.png" alt="backup-1" /></li>
-  <li>Storage 탭에서 Volume ID를 클릭한다.
- <img src="/assets/img/20241129/backup-2.png" alt="backup-2" /></li>
-  <li>Action 탭에 Create snapshot을 클릭한다.
- <img src="/assets/img/20241129/backup-3.png" alt="backup-3" /></li>
-  <li>필요한 설명을 적고 하단의 Create Snapshot을 클릭하면.
- <img src="/assets/img/20241129/backup-4.png" alt="backup-4" /></li>
-  <li>EBS의 백업본인 Snapshot이 하나 추가가 되고, “Create volume” 버튼을 통해 언제든지 백업본을 생성할 수 있다.
-<img src="/assets/img/20241129/backup-5.png" alt="backup-5" /></li>
-</ol>
-
-<h2 id="ec2-유형-변경하기-1"><strong>EC2 유형 변경하기</strong></h2>
-
-<ol>
-  <li>유형을 변경하기에 앞서 EC2 인스턴스를 Stop(멈춤) 한다. <strong>절대 Terminate(종료)를 해서는 안된다.</strong>
- <img src="/assets/img/20241129/change-1.png" alt="change-1" /></li>
-  <li>actions -&gt; instance settings -&gt; change instance type 으로 진행한다.
- <img src="/assets/img/20241129/change-2.png" alt="change-2" /></li>
-  <li>이제 원하는 인스턴스 유형을 고른다. 변경 전과 이후의 인스턴스 스펙 리스트가 있으니 꼭 확인하자. 결정이 됐으면 하단의 Change 버튼을 누른다.
- <img src="/assets/img/20241129/change-3.png" alt="change-3" /></li>
-  <li>변경 성공, 이제 인스턴스를 켜서 데이터가 그대로 있는지, 서비스가 정상작동이 되는지 확인을 하면 된다.
- <img src="/assets/img/20241129/change-4.png" alt="change-4" /></li>
-</ol>
-
-<h1 id="마치며">마치며</h1>
-
-<p>서비스를 운영하다 보면 사용자 및 트래픽의 증가에 따라, 혹은 비용 절감을 위해 서버 인스턴스의 스펙을 올리거나 내리는 순간이 꼭 한번쯤은 찾아온다. 현장에서 직접 서버의 스펙을 바꾸려면, 본체내 장비들을 일일이 교체해야 함은 물론, 교체 이후의 세팅을 일일이 해야 한다. 하지만, AWS EC2는 이러한 작업을 고작 마우스 딸깍 몇번으로 해결을 해준다.</p>
-
-<p><br /></p>
-
-<p>그러나, 이런 행위는 사실상 서버 본체를 갈아끼우는 것과 같기 때문에, 내부 스토리지의 데이터가 초기화 되거나, Public IP가 뒤바뀌면서, 서비스 작동에 장애를 안겨줄 수 있다. 그렇기 때문에 <strong>AWS EC2 인스턴스 스펙을 바꾸기 전에, 바뀌게 되면 영향이 가는 요소들을 반드시 확인하고, 변경 이후에도 서비스가 정상작동을 하는지에 대한 모니터링이 정말정말 필요하다.</strong></p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="ec2" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</code></pre></div></div>]]></content><author><name></name></author><category term="Django" /><category term="django" /><category term="database" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
