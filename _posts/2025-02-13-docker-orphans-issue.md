@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "WARNING: Found orphan containers (***) for this project."
-date:   2025-02-13 11:30:00
+date:   2025-02-13 11:30:00 +0900
 categories: "Docker"
 summary: "도커 컨테이너가 고아(orphans) 되었다구요..? 말이 너무 심한거 아니에요??"
 tags: ["docker", "issue"]
