@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "AWS Lambda Layer 활용해 보기 (Python 기준)"
-date:   2025-03-05 11:30:00 +0900
+date:   2025-03-05 11:30:00 
 categories: "AWS"
 summary: "람다에 코드 복붙은 이제 그만 ㅠ"
 tags: ["aws", "lambda"]

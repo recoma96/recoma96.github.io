@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Pytest에서 테스트 처음과 끝부분에 프로세스를 작성하는 법"
-date:   2025-01-13 08:30:00 +0900
+date:   2025-01-13 08:30:00 
 categories: "Testing"
 summary: "Pytest에서 fixture보다 더 넓은 범위, 그러니가 테스트의 맨 처음과 맨 끝부분에서 프로세스를 추가해야 할 때가 있다."
 tags: ["python", "testing", "pytest"]

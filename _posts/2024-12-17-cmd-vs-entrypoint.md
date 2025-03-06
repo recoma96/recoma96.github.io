@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "CMD vs ENTRYPOINT"
-date:   2024-12-17 09:00:00 +0900
+date:   2024-12-17 09:00:00 
 categories: "Docker"
 summary: "CMD와 ENTRYPOINT 사이의 미묘한 차이"
 tags: ["docker", "dockerfile"]

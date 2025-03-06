@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "AWS Configure 여러개로 관리하기 "
-date:   2025-01-15 14:00:00 +0900
+date:   2025-01-15 14:00:00 
 categories: "AWS"
 summary: "AWS 계정이 여러개 있다면 AWS Configure 에서는 어떻게 관리를 하지?"
 tags: ["aws", "iam", "aws_configure"]

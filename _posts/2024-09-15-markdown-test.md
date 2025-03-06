@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Markdown Test 마크다운 테스트"
-date:   2024-09-15 01:04:25 +0900
+date:   2024-09-15 01:04:25 
 categories: "kramdown_test"
 summary: "마크다운 제대로 잘 나오는 지 테스트"
 tags: ["markdown", "jekyll"]
