@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기"
-date:   2025-04-10 07:00:00 
+date:   2025-04-09 07:00:00 
 categories: "Python"
 summary: "이중 리스트 컴프리헨션... 꼭 필요한가..?"
 tags: ["python"]
