@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기
+        </h2>
+        <p class="font-semibold"><a href="/categories/#Python" class="no-underline text-orange-700 dark:text-blue-200">Python</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2025.04.09 07:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h1 id="list-comprehension">List Comprehension</h1>
+
+<p>Python의 List Comprehension은 어떤 배열을 다른 배열로 매핑할 때 사용되는 트릭으로 일반적인 <code class="language-plaintext highlighter-rouge">for</code> 문 보다 더 코드를 깔끔하게 작성할 수 있다. 예를 들어 
+<code class="language-plaintext highlighter-rouge">[1,2,3,4]</code> 배열의 요소에 2를 곱한 <code class="language-plaintext highlighter-rouge">[2,4,6,8]</code> 로 표현하고자 할때</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">src</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="n">dst</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>
+    <span class="n">dst</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">element</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>이렇게 작성할 코드를 List Comprehension을 사용하면</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">src</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="n">dst</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">src</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>이렇게 보기좋게 작성할 수 있다. 그렇다 보니 복잡한 로직이 아닌 이상 어지간하면 리스트 컴프리헨션을 쓰는 경우가 많으며. <code class="language-plaintext highlighter-rouge">map</code>함수가 버젓이 있음에도 불구하고 이쪽을 더 많이 쓴다.</p>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">map</code>함수를 사용할 경우 아래와 같다. 일반 for문 보다는 코드가 줄긴 했지만, 리스트 컴프리헨션보다는 코드 가시성이 조금 아쉽다.</p>
+  <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">src</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">dst</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="nf">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">src</span><span class="p">))</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<h1 id="이중-list-comprehension">이중 List Comprehension</h1>
+
+<p>그런데 최근 문득 궁금증이 생긴다. <em>“이중 리스트 컴프리헨션도 작성할 수 있을까?”</em></p>
+
+<p>예를 들어 2차원 배열 <code class="language-plaintext highlighter-rouge">[[1,2,3], [4,5,6]]</code>를 <code class="language-plaintext highlighter-rouge">[1,2,3,4,5,6]</code> 1차원 배열로 바꾼다고 가정해 보자. 리스트 컴프리헨션을 쓰지 않았다면 코드는 아래와 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">dst</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="n">dst</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">element</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>이걸 이중 List Comprehension으로 표현하면 다음과 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">dst</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">arr</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>저 코드가 뭔지 모를 수 있는데 이중 for 문과 비교하면 아래와 같다.</p>
+
+<p><img src="/assets/img/20250410/1.jpg" alt="" /></p>
+
+<p>for문 depth는 List Comprehension에서 <strong>왼쪽부터 오른쪽으로 이동한다.</strong> 단 최후에 출력될 데이터 <code class="language-plaintext highlighter-rouge">element</code> 는 depth에 상관없이 <strong>무조건 왼쪽으로</strong> 간다. element가 왼쪽에 배치되기 때문에 for문도 오른쪽부터 왼쪽으로 진행할 거라 생각하는데 절대 아니다. 그래서 이 부분은 처음 접할 때 헷갈리는 경우가 많다.</p>
+
+<h2 id="대안-itertoolschainfrom_iterable-사용하기">대안: itertools.chain.from_iterable 사용하기</h2>
+
+<p>개인적인 생각으로는 솔직히 이중 컴프리헨션은 코드 순서부터 헷갈리기 때문에 <strong>혼란만 야기할 거라고 생각한다.</strong> 그렇다 보니 이중 리스트 컴프리헨션의 대안이 따로 있는데 그게 바로 <code class="language-plaintext highlighter-rouge">itertools.chain.from_iterable</code> 이다. Python 내장 패키지 중 하나인 <code class="language-plaintext highlighter-rouge">itertools</code>는 순혈, 조합 등 프로그래밍을 하는 데 있어 여러 알고리즘을 제공하는데 <code class="language-plaintext highlighter-rouge">itertools.chain.from_iterable</code>는 2차원 배열을 1차원 배열로 펴는데 사용된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">dst</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">chain</span><span class="p">.</span><span class="nf">from_iterable</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h2 id="용도">용도</h2>
+
+<p>뭔가 이딴건 사용하지 않을 것 같지만. 간혹 있는 모양이다. 나의 경우 django 기반의 관리자 페이지 API 서버를 개발할 때. 복합키 이슈로 조회 <code class="language-plaintext highlighter-rouge">select</code>를를 Raw Query를 사용하는 경우가 있었다. 정확히는 복합키 여러개를 가지고 조회하는 쿼리였다.s <em>(django model은 복합키를 지원하지 않는다.)</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>select ... 생략 ... from table where (pk1, pk2) in ((%s, %s), (%s, %s), ...)
+</code></pre></div></div>
+
+<p>그리고 내가 가지고 있는 배열은 복합키로 이루어진 2중 배열이었다</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="p">]</span>
+</code></pre></div></div>
+
+<p>즉 저 복합키 2중 배열을 쿼리문에 바인딩을 해야 하는데 바인딩을 하려면 1차원 배열이 필요했으므로 2차원 배열을 1차원 배열로 변형해야 하는 일이 생겼다. 그래서 이중 List Comprehension을 사용하여 해당 문제를 해결했다. <em>(나중가서는 <code class="language-plaintext highlighter-rouge">itertools.chain.from_iterable</code>을 사용했다.)</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">placeholders</span> <span class="o">=</span> <span class="sh">"</span><span class="s">, </span><span class="sh">"</span><span class="p">.</span><span class="nf">join</span><span class="p">([</span><span class="sh">"</span><span class="s">(%s, %s)</span><span class="sh">"</span><span class="p">]</span> <span class="o">*</span> <span class="nf">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="n">flat_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+
+<span class="n">sql</span> <span class="o">=</span> <span class="sa">f</span><span class="sh">"</span><span class="s">select * from table where (pk1, pk2) in (</span><span class="si">{</span><span class="n">placeholders</span><span class="si">}</span><span class="s">)</span><span class="sh">"</span>
+
+<span class="k">with</span> <span class="n">connections</span><span class="p">[</span><span class="sh">"</span><span class="s">main-database</span><span class="sh">"</span><span class="p">].</span><span class="nf">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+    <span class="n">cursor</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">flat_values</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="p">.</span><span class="nf">fetchall</span><span class="p">()</span>
+</code></pre></div></div>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#python">python</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>
