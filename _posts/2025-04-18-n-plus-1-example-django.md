@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "N + 1 Problem 해결 사례 1 - Django의 queryset과 Serizlier"
+title:  "N + 1 Problem 해결 사례 (1) - Django의 queryset과 Serizlier"
 date:   2025-04-18 17:00:00 
 categories: "Database"
 summary: "서로 참조하는 두 테이블 상대로 Serizlier를 쓰는 순간 쥐도 새도 모르게 N + 1 Problem을 일으킬 수 있다."
@@ -10,19 +10,30 @@ image: ""
 
 # 개요
 
-한참 전에, [Django에서의 N + 1 Problem을 해결하는 방법](/django/2024/12/12/django-n1-problem.html)을 포스팅 한 적이 있었다. 요약하자면, **우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져옴으로써, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈** 정도가 된다. 해결 방법은 Join이나 아니면 참조 테이블을 한번더 Select를 하면 되고, Django에서는 `select_related`와 `prefetch_related`라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.
+한참 전에, [Django에서의 N + 1 Problem을 해결하는 방법](/django/2024/12/12/django-n1-problem.html)을 포스팅 한 적이 있었다. 요약하자면, **우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈** 정도가 된다. 해결 방법은 `join`이나 아니면 참조 테이블을 한번더 `select`를 하면 되고, Django에서는 `select_related`와 `prefetch_related`라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.
 
-## 솔직히 고백하자면
+## 솔직히 고백하자면 난 N + 1 Problem를 경험한 적이 없다
 
-지금까지 N + 1 Problem을 직접 겪어본 적이 없다.
+사실 N + 1 포스팅을 했던 것은, 이직면접을 봤을 때, N + 1 Problem 관련 문제가 나왔는데 제대로 말을 하지 못해서 면접복기겸 포스팅 했던 것이고... 나는 지금까지 이 이슈를 겪어본 적이 없었다. **아니,
+정확히는 분명히 있었을 텐테 내가 둔해서 몸으로 느끼지 못한 것이 분명하다**. 심지어 1년동안 Django 기반의 신사업 프로젝트를 개발 내치 운영을 하면서도 
+이 N + 1 Problem 이란 녀셕을 한번도 만나 본 적이 없었다. 그런데...
+
+## 결국 발견했다
+
+최근 `flask-admin` 기반으로 개발된 사내 관리자 페이지를 `django`, `react`로 리빌딩하는 프로젝트에서 
+차량 구독 신청 내역 조회 API를 개발하는 과정에서 N + 1 Problem 문제를 발견했다. ViewSet과 Serlizer를 이용해 API를 개발하고 있는 와중에 뭔가 의심이 들어 쿼리 로그를 봤더니
+**조회된 레코드 갯수 대로 참조 테이블을 향해 쿼리를 또 날리는 것이다!** 어떤 이슈였는지 밑의 본론을 통해 알아보자.
 
 
-# Problem
+# 본론
+
+> 사내 기발 정보가 유출될 수 있기 때문에 실제 사내 DB모델이 아닌 직접 구상한 DB모델로 재현했습니다.
 
 
-# Solution
 
+## Situation
 
+## Solution
 
 
 # 끝 (feat.회고)
