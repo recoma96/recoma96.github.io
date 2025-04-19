@@ -1,4 +1,248 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-04-10T03:26:15+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기</title><link href="https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension.html" rel="alternate" type="text/html" title="Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기" /><published>2025-04-09T07:00:00+00:00</published><updated>2025-04-09T07:00:00+00:00</updated><id>https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension</id><content type="html" xml:base="https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension.html"><![CDATA[<h1 id="list-comprehension">List Comprehension</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-04-19T17:24:08+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">N + 1 Problem 해결 사례 (1) - DRF ModelSerializer in List API</title><link href="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html" rel="alternate" type="text/html" title="N + 1 Problem 해결 사례 (1) - DRF ModelSerializer in List API" /><published>2025-04-18T17:00:00+00:00</published><updated>2025-04-18T17:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django</id><content type="html" xml:base="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<p>한참 전에, <a href="/django/2024/12/12/django-n1-problem.html">Django에서의 N + 1 Problem을 해결하는 방법</a>을 포스팅 한 적이 있었다. 요약하자면, <strong>우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈</strong> 정도가 된다. 해결 방법은 <code class="language-plaintext highlighter-rouge">join</code>이나 아니면 참조 테이블을 한번더 <code class="language-plaintext highlighter-rouge">select</code>를 하면 되고, Django에서는 <code class="language-plaintext highlighter-rouge">select_related</code>와 <code class="language-plaintext highlighter-rouge">prefetch_related</code>라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.</p>
+
+<h2 id="솔직히-고백하자면-난-n--1-problem를-경험한-적이-없었다">솔직히 고백하자면 난 N + 1 Problem를 경험한 적이 없었다.</h2>
+
+<p>사실 N + 1 포스팅을 했던 것은, 예전에 관련 질문을 받았을 때, N + 1 Problem 관련 문제가 나왔는데 제대로 말을 하지 못해서 복기겸 포스팅 했던 것이고… 나는 지금까지 이 이슈를 겪어본 적이 없었다. <strong>아니,
+정확히는 분명히 있었을 텐테 내가 둔해서 몸으로 느끼지 못한 것이 분명하다</strong>. 심지어 1년동안 Django 기반의 신사업 프로젝트를 개발 내지 운영을 하면서도 
+이 N + 1 Problem 이란 녀셕을 한번도 만나 본 적이 없었다. 그런데…</p>
+
+<h2 id="그러나-결국-발견했다">그러나 결국 발견했다</h2>
+
+<p>최근 <code class="language-plaintext highlighter-rouge">flask-admin</code> 기반으로 개발된 사내 관리자 페이지를 <code class="language-plaintext highlighter-rouge">django</code>, <code class="language-plaintext highlighter-rouge">react</code>로 리빌딩하는 프로젝트를 진행하면서, 
+차량 구독 신청 내역 조회 API를 개발하는 과정에서 N + 1 Problem 문제를 발견했다. ViewSet과 Serlizer를 이용해 API를 개발하고 있는 와중에 뭔가 의심이 들어 쿼리 로그를 봤더니
+<strong>조회된 레코드 갯수 대로 참조 테이블을 향해 쿼리를 또 날리는 것이다!</strong> 어떤 이슈였는지 밑의 본론을 통해 알아보자.</p>
+
+<h1 id="본론">본론</h1>
+
+<blockquote>
+  <p>사내 기밀 정보가 유출될 수 있기 때문에 실제 사내 DB모델이 아닌 직접 구상한 DB모델로 재현했습니다.</p>
+</blockquote>
+
+<h2 id="situation">Situation</h2>
+
+<p>관리자 입장에서 모든 사람들의 일기 리스트를 조회하는 API를 개발해야 한다. 이때 각 일기 데이터 마다, 그 일기를 작성한 유저의 필수정보도 같이 조회해야 한다. 즉 <code class="language-plaintext highlighter-rouge">user</code>와 <code class="language-plaintext highlighter-rouge">short_diary</code>두 개를 한꺼번에 참조해서 리스트를 뽑아야 한다.</p>
+
+<h3 id="모델db-table">모델(DB Table)</h3>
+
+<p>DB 모델 구조는 아래와 같다. 유저 <code class="language-plaintext highlighter-rouge">User</code> 테이블이 있고. 각 유저는 자신만의 여러 개의 짧은 일기 <code class="language-plaintext highlighter-rouge">ShortDiary</code>를 가진다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">AbstractBaseUser</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">user</span><span class="sh">"</span>
+
+    <span class="n">GENDER_CODE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">M</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Male</span><span class="sh">"</span><span class="p">),</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">F</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Female</span><span class="sh">"</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">EmailField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">이메일</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">nickname</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">닉네임</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">GENDER_CODE</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">성별</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">BooleanField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="sh">"</span><span class="s">활성화 여부</span><span class="sh">"</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ShortDiary</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">,</span> <span class="n">ModelTimeStampMixin</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="sh">"</span><span class="s">short_diary</span><span class="sh">"</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="sh">"</span><span class="s">short_diaries</span><span class="sh">"</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="p">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+    <span class="n">is_deleted</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">BooleanField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="serializer">Serializer</h3>
+
+<p>DB 로부터 받은 유저와 일기 데이터를 API를 호출한 클라이언트에게 직렬화 해서 전달하기 위해 <code class="language-plaintext highlighter-rouge">Serializer</code>를 구현해야 한다. <code class="language-plaintext highlighter-rouge">serializers.ModelSerializer</code>를 사용하면 Model과 연동이 
+가능하지만, <code class="language-plaintext highlighter-rouge">user_id</code> 같은 왜래키를 통해 참조 테이블까지 직렬화를 하려면 따로 field를 선언해야 한다. 그렇기 때문에 여기서는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>의 필드에 <code class="language-plaintext highlighter-rouge">UserSerializer</code>를 추가했다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">UserSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="sh">"</span><span class="s">id</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">email</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">nickname</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">gender</span><span class="sh">"</span><span class="p">)</span>
+
+
+
+<span class="k">class</span> <span class="nc">DiarySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="nc">UserSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ShortDiary</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__all__</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<h3 id="viewset">ViewSet</h3>
+
+<p>딱히 특히 요구사항은 없기 때문에 기본 <code class="language-plaintext highlighter-rouge">ViewSet</code>을 이용해 API를 구현한다. 조회 대상이 <code class="language-plaintext highlighter-rouge">ShortDiary</code>이기 때문에 <code class="language-plaintext highlighter-rouge">queryset</code>을 <code class="language-plaintext highlighter-rouge">ShortDiary.objects.all()</code> 로 잡는다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiaryViewSet</span><span class="p">(</span>
+    <span class="n">viewsets</span><span class="p">.</span><span class="n">ModelViewSet</span><span class="p">,</span>
+    <span class="n">mixins</span><span class="p">.</span><span class="n">ListModelMixin</span>
+<span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">UserSerializer</span>
+</code></pre></div></div>
+
+<h3 id="db-query-logging">DB Query Logging</h3>
+
+<p>여기까지 세팅을 했다면, 이제 일기 리스트 조회 API는 완성이 되었고, 실제로 정상적으로 잘 돌아간다. 특정한 Warning 조차도 없이 정상적으로 돌아갈 것이다. 그러나 과연 정상적으로 돌아가는 것이 맞을까? Django를 사용하다 보면, ORM코드에 따라 DB Query가 어떻게 생성되는지 궁금할 때가 있을 것이다. 그래서 Django에서는 <code class="language-plaintext highlighter-rouge">settings.py</code>에 아래 코드를 추가하면, ORM으로 인한 데이터를 가져올 때마다 DB Query까지 로깅할 수 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sh">'</span><span class="s">version</span><span class="sh">'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">disable_existing_loggers</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="sh">'</span><span class="s">handlers</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span>
+        <span class="sh">'</span><span class="s">console</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">'</span><span class="s">class</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">logging.StreamHandler</span><span class="sh">'</span><span class="p">,</span>
+            <span class="sh">'</span><span class="s">level</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">DEBUG</span><span class="sh">'</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="sh">'</span><span class="s">loggers</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span>
+        <span class="sh">'</span><span class="s">django.db.backends</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">'</span><span class="s">handlers</span><span class="sh">'</span><span class="p">:</span> <span class="p">[</span><span class="sh">'</span><span class="s">console</span><span class="sh">'</span><span class="p">],</span>
+            <span class="sh">'</span><span class="s">level</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">DEBUG</span><span class="sh">'</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span><span class="sh">"</span><span class="s">
+</span></code></pre></div></div>
+
+<p>저렿게 하고 API를 호출하면 쿼리 로그는 아래와 같이 출력된다.</p>
+
+<h3 id="n--1-problem">N + 1 Problem</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(0.001) SELECT `short_diary`.`id`, `short_diary`.`user_id`, `short_diary`.`title`, `short_diary`.`context`, `short_diary`.`is_deleted` FROM `short_diary`; args=(); alias=default
+
+(0.001) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user` WHERE `user`.`id` = 23 LIMIT 21; args=(23,); alias=default
+(0.001) SELECT `user`.`id`, `user`.`password`, `user`.`last_login`, `user`.`is_superuser`, `user`.`email`, `user`.`nickname`, `user`.`gender`, `user`.`is_active` FROM `user` WHERE `user`.`id` = 23 LIMIT 21; args=(23,); alias=default
+</code></pre></div></div>
+
+<p>일단 DB 안에는 1명의 유저가 있고, 이 유저는 2개의 일기를 가지고 있다. 그런데 맨 처음에 일기 <strong>만</strong> 조회 한 다음, 일기 리스트를 순회하면서 <code class="language-plaintext highlighter-rouge">user_id</code>를 추출해서 해당 <code class="language-plaintext highlighter-rouge">id</code>에 해당하는 유저를 조회하기 위해 추가로 Query문을 날리고 있다. 즉, 전체 리스트를 1번 조회하고, 추가로 그 개수(N개) 만큼 조회를 함으로써 <strong>N + 1 Problem</strong> 이 발생한 것이다. 지금이야 데이터가 딱 두개 밖에 없으니 우리 눈에는 문제가 없는 것 처럼 보이겠지만, 데이터 개수가 100개가 넘어간다고 생각해 보자. <em>왜 사용하는 사람이 별로 없는데 API 응답 시간이 오래 걸리지?</em> 하는 생각이 들 것이다.</p>
+
+<h2 id="drf-내부-코드-분석">DRF 내부 코드 분석</h2>
+
+<blockquote>
+  <p>왜 ModelSerializer에서 Lazy Loading이 발생하지?</p>
+</blockquote>
+
+<p>이전 <a href="/django/2024/12/12/django-n1-problem.html">N + 1 Problem 포스트</a> 에서 설명했듯. <strong>Lazy Loading 기법에 의해 꼭 필요할 때만 데이터를 추출한다.</strong> 가 원인이다. 그러면 꼬리질문이 들어갈 것이다. <strong>왜 Lazy Loading이 발생하는 거지?</strong> 엔지니어라면 왜 이 문제가 언제 어디에서 발생했는지 정도는 정확히 파악할 필요가 있다.</p>
+
+<h3 id="diaryviewset">DiaryViewSet</h3>
+
+<p>일단 아래의 ViewSet을 다시 보자</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiaryViewSet</span><span class="p">(</span>
+    <span class="n">viewsets</span><span class="p">.</span><span class="n">ModelViewSet</span><span class="p">,</span>
+    <span class="n">mixins</span><span class="p">.</span><span class="n">ListModelMixin</span>
+<span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">UserSerializer</span>
+
+
+    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># mixins.ListModelMixin 의 list 함수를 그대로 가져온 것
+</span>        <span class="n">queryset</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">filter_queryset</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">get_queryset</span><span class="p">())</span>
+
+        <span class="n">page</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">paginate_queryset</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">serializer</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">get_serializer</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">get_paginated_response</span><span class="p">(</span><span class="n">serializer</span><span class="p">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">get_serializer</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nc">Response</span><span class="p">(</span><span class="n">serializer</span><span class="p">.</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">list()</code> 함수에서 마지막에 응답값을 리턴할 때 <code class="language-plaintext highlighter-rouge">Serializer</code>의 <code class="language-plaintext highlighter-rouge">data</code> 프로퍼티를 호출하는 것을 볼 수 있다.</p>
+
+<h3 id="property-def-data">@property def data</h3>
+
+<p>다음은 <code class="language-plaintext highlighter-rouge">Serializer</code>의 <code class="language-plaintext highlighter-rouge">data</code> 프로퍼티 코드의 일부이다. “조회 API”이기 때문에 <code class="language-plaintext highlighter-rouge">Serializer</code>는 DB Instance를 받아 <code class="language-plaintext highlighter-rouge">self.instance</code>에 저장했을 것이다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@property</span>
+<span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nf">hasattr</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="sh">'</span><span class="s">_data</span><span class="sh">'</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nf">getattr</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="sh">'</span><span class="s">_errors</span><span class="sh">'</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">to_representation</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">instance</span><span class="p">)</span>
+    <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
+</code></pre></div></div>
+
+<p>위에 <code class="language-plaintext highlighter-rouge">self.to_representation</code> 함수를 사용하는 것을 볼 수가 있다. 다음은 <code class="language-plaintext highlighter-rouge">ListSerializer.to_representation</code> 함수의 일부다. <code class="language-plaintext highlighter-rouge">to_representation</code>은 DB 인스턴스를 파라미터로 받고 <code class="language-plaintext highlighter-rouge">dict</code> 형태로 직렬화를 하는 함수로, 보통 Serializer에서 직렬화 해주는 데이터 말고도 다른 추가적인 데이터도 같이 직렬화 해야 할때 해당 함수를 오버라이딩을 하는 경우가 종종 있다.</p>
+
+<h3 id="listserializerto_representation">ListSerializer.to_representation</h3>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">ModelSerializer</code>가 아닌 <code class="language-plaintext highlighter-rouge">ListSerializer</code>를 보는 이유는, <code class="language-plaintext highlighter-rouge">list()</code>에서 <code class="language-plaintext highlighter-rouge">serializer</code>를 가져올 때 <code class="language-plaintext highlighter-rouge">self.get_serializer(page, many=True)</code> 처럼 파라미터에 <code class="language-plaintext highlighter-rouge">many=True</code>로 설정하면. <code class="language-plaintext highlighter-rouge">ListSerializer</code>로 매핑이 되기 때문이다. 결국 최상단에 사용되는 Serializer는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>가 아닌 <code class="language-plaintext highlighter-rouge">ListSerializer</code>이고 <code class="language-plaintext highlighter-rouge">ListSerializer</code>의 <code class="language-plaintext highlighter-rouge">child</code>는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>가 된다. 이 점을 꼭 기억해야 한다.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ListSerializer</span><span class="p">(</span><span class="n">BaseSerializer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_representation</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sh">"""</span><span class="s">
+        List of object instances -&gt; List of dicts of primitive datatypes.
+        </span><span class="sh">"""</span>
+        <span class="c1"># Dealing with nested relationships, data can be a Manager,
+</span>        <span class="c1"># so, first get a queryset from the Manager if needed
+</span>        <span class="n">iterable</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="nf">all</span><span class="p">()</span> <span class="k">if</span> <span class="nf">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">models</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">BaseManager</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">child</span><span class="p">.</span><span class="nf">to_representation</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iterable</span>
+        <span class="p">]</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">return</code> 부에 <code class="language-plaintext highlighter-rouge">iterable</code>, 즉 일기 리스트 DB 쿼리에 대해 순회를 하면서 각 리스트 요소 마다 <code class="language-plaintext highlighter-rouge">self.child.to_representation</code>을 호출하는 것을 볼 수가 있다. <code class="language-plaintext highlighter-rouge">self.child</code>는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>이고 <code class="language-plaintext highlighter-rouge">item</code>은 <code class="language-plaintext highlighter-rouge">diary</code> 인스턴스가 될 것이다. 그리고 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>는 <code class="language-plaintext highlighter-rouge">UserSerializer</code>를 필드로 가지고 있을 것이고, <code class="language-plaintext highlighter-rouge">DiarySeiralizer.to_representation</code>이 실행될 때마다 <code class="language-plaintext highlighter-rouge">diary.user</code>가 <code class="language-plaintext highlighter-rouge">UserSerializer</code>안에 들어가서 유저 정보를 직렬화 할 것이다. 대강 로직을 구상해 보면 아래와 같다고 보면 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">diary</span> <span class="ow">in</span> <span class="n">diaries</span><span class="p">:</span>
+    <span class="n">user_indstance</span><span class="p">:</span> <span class="n">User</span> <span class="o">=</span> <span class="n">diary</span><span class="p">.</span><span class="n">user</span>
+    <span class="n">arr</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nc">Serializer</span><span class="p">(</span><span class="n">diary</span><span class="p">,</span> <span class="n">diary</span><span class="p">.</span><span class="n">user</span><span class="p">).</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>일기 리스트를 순회할 때마다 <code class="language-plaintext highlighter-rouge">diary.user</code>를 사용한다. 그런데 이 <code class="language-plaintext highlighter-rouge">diary.user</code>에 대해서 의구심이 가기 시작한다. 아까 설명했듯. Django ORM은 <code class="language-plaintext highlighter-rouge">Lazy Loading</code> 기법으로 인해 꼭 필요할 대만 DB에 쿼리를 던진다고 했다. 그렇기 때문에 <code class="language-plaintext highlighter-rouge">Diary</code>에 대한 실제 DB 쿼리를 날리는 시점은 <code class="language-plaintext highlighter-rouge">to_representation</code>의 <code class="language-plaintext highlighter-rouge">return</code>부분이다. 순회를 하면서 실질적으로 <code class="language-plaintext highlighter-rouge">diary</code>를 꺼내오기 때문이다. <strong>그렇다면 DB 쿼리를 날릴 때 <code class="language-plaintext highlighter-rouge">diary</code> 뿐만 아니라 <code class="language-plaintext highlighter-rouge">user</code> 테이블인 <code class="language-plaintext highlighter-rouge">diary.user</code>도 같이 딸려서 들어왔을까?</strong> 아까 <code class="language-plaintext highlighter-rouge">ViewSet</code>에서 <code class="language-plaintext highlighter-rouge">queryset</code>을 어떻게 정의했더라… 다시 한번 살펴보자.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>queryset = ShortDiary.objects.all()
+</code></pre></div></div>
+
+<p>그냥 <code class="language-plaintext highlighter-rouge">ShortDiary</code>만 조회한다. 이 코드 어디에도 <code class="language-plaintext highlighter-rouge">user</code>와 관련된 흔적은 없다. 설령 <code class="language-plaintext highlighter-rouge">ShortDiary</code> Model에 <code class="language-plaintext highlighter-rouge">user</code>과 관련된 <code class="language-plaintext highlighter-rouge">relationship</code>이 선언되었더라도 일단 이 코드에서는 
+<code class="language-plaintext highlighter-rouge">user</code> 관련된 코드는 보이지 않는다. <strong>눈씻고 찾아봐도 <code class="language-plaintext highlighter-rouge">user</code> 를 사용하려는 코드가 보이지 않기 때문에 Django는 굳이 불필요하게 user까지 데이터를 가져오는 비효율적인 행위를 하지 않는 것이다.</strong> 왜? 개발자가 그렇게 코드를 짰으니까.</p>
+
+<h2 id="요약">요약</h2>
+
+<p>결국 ORM을 사용, 혹은 <code class="language-plaintext highlighter-rouge">ModelSerializer</code>같은 ORM기능이 포함된 모듈을 사용할 때, <strong><code class="language-plaintext highlighter-rouge">user</code>를 사용한다는 표시를 하지 않았기 때문에</strong> 처음에 <code class="language-plaintext highlighter-rouge">diary</code>를 조회할 때 <code class="language-plaintext highlighter-rouge">user</code>를 같이 조회하지 않았고. 
+이는 결국 리스트를 순회하면서 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>에서 각 DB 인스턴스에 대해 직렬화를 수행할 때, <code class="language-plaintext highlighter-rouge">user</code> 관련 정보를 로드하지 않았기 때문에, 반복문이 돌아가는 동안 <code class="language-plaintext highlighter-rouge">user</code> 조회를 반복해서 실행하는 N + 1 Problem이 터진 것이다. 이 문제를 해결하는 근본적인 방법은 <strong><code class="language-plaintext highlighter-rouge">user</code>를 사용한다는 표시를 해주면 된다.</strong></p>
+
+<h2 id="solution">Solution</h2>
+
+<p>해결방법은 간단하고 명료하다. 코드로 Django에게 “나 <code class="language-plaintext highlighter-rouge">user</code>도 같이 쓸거야” 라고 말해주면 된다. 그러니까, <code class="language-plaintext highlighter-rouge">ViewSet</code>에 <strong><code class="language-plaintext highlighter-rouge">queryset</code>에 <code class="language-plaintext highlighter-rouge">user</code>를 미리 로딩 <code class="language-plaintext highlighter-rouge">eager loading</code> 하게 하면 된다. 즉, <code class="language-plaintext highlighter-rouge">select_related</code>를 사용하면 된다.</strong>
+이렇게 되면 처음부터 <code class="language-plaintext highlighter-rouge">join</code>을 이용해 <code class="language-plaintext highlighter-rouge">user</code> 정보도 미리 쿼리에 포함되어 있기 때문에 더이상 N + 1 Problem이 발생하지 않게 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiaryViewSet</span><span class="p">(</span>
+    <span class="n">viewsets</span><span class="p">.</span><span class="n">ModelViewSet</span><span class="p">,</span>
+    <span class="n">mixins</span><span class="p">.</span><span class="n">ListModelMixin</span>
+<span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">select_related</span><span class="p">(</span><span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">).</span><span class="nf">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">DiarySerializer</span>
+</code></pre></div></div>
+
+<h1 id="끝-회고">끝 (회고)</h1>
+
+<p>이번 문제해결을 통해 깨달은 점이 참 많았다. Django가 항상 만능이 아니라는 점 부터, 그동안 대충 개발해 왔다는 반성 까지…</p>
+
+<h2 id="django-restframework는-만능이-아니다">Django Restframework는 만능이 아니다</h2>
+
+<p>Django는 대표적인 Python Backend Framework으로 각종 템플릿 부터 부속 모듈 까지 생산성을 향상시키기 위한 도구들이 여럿 있고 실제로 생산성이 좋다고 알려져 있다. 
+하지만 <strong>Trade Off</strong> 라는 말이 있다. 어느족이 강점이라면 분명 다른 곳에서는 약점일 경우도 있다는 것이다. Django가 딱 그런게 두드러진 것 같다. 
+당장은 사용하기가 편하지만, 아무생각없이 너무 편하게만 쓴다면, 이 편함에 익숙한 나머지 N + 1 Problem 같은 성능이슈를 못알아 볼 수 도 있다.</p>
+
+<h2 id="한번-짠-코드-다시한번-보자">한번 짠 코드 다시한번 보자</h2>
+
+<p>그렇기 때문에 최근들어 코드 하나하나 작성할 때마다 “내가 왜 이렇게 작성을 하려고 했을 까” 하는 생각을 하려고 노력하고 있고, 가능하면 검증까지 하려고 노력하고 있다. 다시는 위와 같은 일이 일어나지 않게 말이다. 그동안 내가 너무 생각없이 코딩을 해 왔다는 생각이 자주 들고 있다. 그리고 그게 천천히 업보로도 쌓이고 있다. 내가 짠 코드를 스스로 설명하지
+못하는 지경에 올라와 버린 것이다. 지금부터라도 이런 사태가 벌어지는 것을 한시라도 막아야 한다.</p>
+
+<h2 id="db-최적화도-한번-해볼까">DB 최적화도 한번 해볼까?</h2>
+
+<p>이번 문제해겨을 통해서 DB 최적화 혹은 튜링이 관심이 생겼다. 잘못된 DB 쿼리로 인해 API 장애가 일어날 수 있다는 것으 간접적으로 경험하고 있다. 그래서 최근들어 DB 쿼리 로깅을 적극적으로 활용하고 있고. 유데미에서 데이터베이스 관련 강의를 듣고 있다.</p>]]></content><author><name></name></author><category term="Database" /><category term="django" /><category term="database" /><category term="orm" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기</title><link href="https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension.html" rel="alternate" type="text/html" title="Python Double List Comprehension으로 2차원 배열을 1차원으로 만들기" /><published>2025-04-09T07:00:00+00:00</published><updated>2025-04-09T07:00:00+00:00</updated><id>https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension</id><content type="html" xml:base="https://recoma96.github.io/python/2025/04/09/python-double-list-comprehension.html"><![CDATA[<h1 id="list-comprehension">List Comprehension</h1>
 
 <p>Python의 List Comprehension은 어떤 배열을 다른 배열로 매핑할 때 사용되는 트릭으로 일반적인 <code class="language-plaintext highlighter-rouge">for</code> 문 보다 더 코드를 깔끔하게 작성할 수 있다. 예를 들어 
 <code class="language-plaintext highlighter-rouge">[1,2,3,4]</code> 배열의 요소에 2를 곱한 <code class="language-plaintext highlighter-rouge">[2,4,6,8]</code> 로 표현하고자 할때</p>
@@ -832,117 +1076,4 @@ AWS Secret Access Key <span class="o">[</span><span class="k">****************</
   <li>General 탭에 돌아와서 데이터베이스 정보를 입력하면 된다. 여기부터는 일반적인 데이터베이스 접속하는 방법과 일치. Success 표시가 뜨면 연동하는데 성공했단 뜻이고, OK버튼을 누르면 그 다음부터 사용할 수 있다.</li>
 </ol>
 
-<p><img src="/assets/img/20241223/4.png" alt="4" /></p>]]></content><author><name></name></author><category term="개발도구_사용법" /><category term="database" /><category term="ide" /><category term="datagrip" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">CMD vs ENTRYPOINT</title><link href="https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint.html" rel="alternate" type="text/html" title="CMD vs ENTRYPOINT" /><published>2024-12-17T09:00:00+00:00</published><updated>2024-12-17T09:00:00+00:00</updated><id>https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint</id><content type="html" xml:base="https://recoma96.github.io/docker/2024/12/17/cmd-vs-entrypoint.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<p>CMD는 Docker Container가 돌아갈 때 실행하는 명령어이다. 예를 들어 Django 기반의 서버 컨테이너를 띄운다고 한다면 CMD는 아래와 같을 것이다.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CMD</span><span class="s"> ["python", "manage.py", "runserver"]</span>
-</code></pre></div></div>
-
-<p>ENTRYPOINT도 마찬가지로 전체적으로 봤을 땐 CMD와 비슷하다. 사용법은 아래와 같고 결과는 일단 CMD와 일치하다.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">ENTRYPOINT</span><span class="s"> ["python", "manage.py", "runserver"]</span>
-</code></pre></div></div>
-
-<p>두 개의 기능 차이가 거의 없다 보니, 나 같은 경우에는 아무 생각없이 이 두개를 혼용해서 사용해 왔다. 하지만 이 둘 사이에는 미묘한 차이가 있고 상황에 따라 써야 하는 경우가 다르다.</p>
-
-<h1 id="cmd">CMD</h1>
-
-<p>컨테이너가 실행되는 Default 명령어이다. 즉 필요하면 CMD 내용을 바꿀 수 있다. 아래와 같은 DockerFile이 있다고 가정해 보자.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
-<span class="k">CMD</span><span class="s"> ["echo", "Hello, World!"]</span>
-</code></pre></div></div>
-
-<p>DockerFile을 이미지로 빌드하고 아래와 같이 인자값으로 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 추가하면 <code class="language-plaintext highlighter-rouge">Hello, World</code>가 아니라 현재 위치의 디렉토리가 출력된다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
-total 56
-drwxr-xr-x   1 root root 4096 Dec 16 08:26 <span class="nb">.</span>
-drwxr-xr-x   1 root root 4096 Dec 16 08:26 ..
-<span class="nt">-rwxr-xr-x</span>   1 root root    0 Dec 16 08:26 .dockerenv
-lrwxrwxrwx   1 root root    7 Apr 22  2024 bin -&gt; usr/bin
-drwxr-xr-x   2 root root 4096 Apr 22  2024 boot
-drwxr-xr-x   5 root root  340 Dec 16 08:26 dev
-drwxr-xr-x   1 root root 4096 Dec 16 08:26 etc
-drwxr-xr-x   3 root root 4096 Nov 19 09:50 home
-lrwxrwxrwx   1 root root    7 Apr 22  2024 lib -&gt; usr/lib
-drwxr-xr-x   2 root root 4096 Nov 19 09:44 media
-drwxr-xr-x   2 root root 4096 Nov 19 09:44 mnt
-drwxr-xr-x   2 root root 4096 Nov 19 09:44 opt
-dr-xr-xr-x 231 root root    0 Dec 16 08:26 proc
-drwx------   2 root root 4096 Nov 19 09:50 root
-drwxr-xr-x   4 root root 4096 Nov 19 09:50 run
-lrwxrwxrwx   1 root root    8 Apr 22  2024 sbin -&gt; usr/sbin
-drwxr-xr-x   2 root root 4096 Nov 19 09:44 srv
-dr-xr-xr-x  11 root root    0 Dec 16 08:26 sys
-drwxrwxrwt   2 root root 4096 Nov 19 09:50 tmp
-drwxr-xr-x  11 root root 4096 Nov 19 09:44 usr
-drwxr-xr-x  11 root root 4096 Nov 19 09:50 var
-</code></pre></div></div>
-
-<p><code class="language-plaintext highlighter-rouge">docker inspect example</code> 로 Docker 정보를 살펴보면 <code class="language-plaintext highlighter-rouge">Cmd</code> 부분에는 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있고, Path와 Args 역시 <code class="language-plaintext highlighter-rouge">ls -al</code>로 바뀌어 있다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspect example
-... 이하 생략 ...
-        <span class="s2">"Path"</span>: <span class="s2">"ls"</span>,
-        <span class="s2">"Args"</span>: <span class="o">[</span>
-            <span class="s2">"-al"</span>
-        <span class="o">]</span>,
-... 이하 생략 ...
-            <span class="s2">"Cmd"</span>: <span class="o">[</span>
-                <span class="s2">"ls"</span>,
-                <span class="s2">"-al"</span>
-            <span class="o">]</span>,
-            <span class="s2">"Entrypoint"</span>: null,
-</code></pre></div></div>
-
-<p>이렇게 CMD는 명령어를 실행하긴 하지만 언제든지 인자값을 추가함으로써 명령어를 변경할 수 있다. 하지만 ENTRYPOINT는 경우가 다르다.</p>
-
-<h1 id="entrypoint">ENTRYPOINT</h1>
-
-<p>CMD와는 달리 인자가 바뀔 수 없고 무조건 ENTRYPOINT에 기재된 내용대로 컨테이너가 실행된다. 즉, CMD처럼 <code class="language-plaintext highlighter-rouge">ls -al</code> 를 입력했다고 해서 디렉토리 리스트가 나오지 않는다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="nb">ls</span> <span class="nt">-al</span>
-Hello, World! <span class="nb">ls</span> <span class="nt">-al</span>
-</code></pre></div></div>
-
-<p>여전히 <code class="language-plaintext highlighter-rouge">Hello World</code>! 가 나오고, 바로 옆에 <code class="language-plaintext highlighter-rouge">ls -al</code> 가 출력되었다. <code class="language-plaintext highlighter-rouge">docker inspect exmaple</code> 를 입력해서 도커 컨테이너 정보를 알아보자.</p>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker inspet example
-... 이하 생략 ...
-        <span class="s2">"Path"</span>: <span class="s2">"echo"</span>,
-        <span class="s2">"Args"</span>: <span class="o">[</span>
-            <span class="s2">"Hello, World!"</span>,
-            <span class="s2">"ls"</span>,
-            <span class="s2">"-al"</span>
-        <span class="o">]</span>,
-... 이하 생략 ...
-            <span class="s2">"Cmd"</span>: <span class="o">[</span>
-                <span class="s2">"ls"</span>,
-                <span class="s2">"-al"</span>
-            <span class="o">]</span>,
-            <span class="s2">"Entrypoint"</span>: <span class="o">[</span>
-                <span class="s2">"echo"</span>,
-                <span class="s2">"Hello, World!"</span>
-            <span class="o">]</span>,
-</code></pre></div></div>
-
-<p>밑에 보면 Cmd에는 변경된 명령어 <code class="language-plaintext highlighter-rouge">ls -al</code> 이 적혀있지만, Entrypoint의 명령어가 먼저 나왔다. Path는 <code class="language-plaintext highlighter-rouge">echo</code>로 변함이 없는데, Args에서는 <code class="language-plaintext highlighter-rouge">Hello, World!</code> 뒤로 <code class="language-plaintext highlighter-rouge">ls</code>와 <code class="language-plaintext highlighter-rouge">-al</code>이 추가되었다.</p>
-
-<p>따라서 ENTRYPOINT에서는 인자를 추가하면 명령어 자체가 바뀌는게 아니라 입력한 인자값이 ENTRYPOINT 내용의 뒤로 간다.</p>
-
-<h1 id="두개-혼용하기">두개 혼용하기</h1>
-
-<p>CMD와 ENTRYPOINT 두개를 활용할 수도 있다. ENTRYPOINT는 컨테이너 실행부로 사용하고, CMD는 Default 인자값으로 사용할 수 있다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">docker run</code>으로 컨테이너 실행시, 추가 인자값이 없으면 CMD에 있는 내용이 인자값으로 들어가고, 인자값을 추가하면 그 추가된 인자값이 CMD를 대신한다. 이렇게 해서 컨테이너 실행을 좀더 유연하게 할 수 있다.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> ubuntu</span>
-<span class="k">ENTRYPOINT</span><span class="s"> ["echo"]</span>
-<span class="k">CMD</span><span class="s"> ["Hello, World!"]</span>
-</code></pre></div></div>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> example example
-Hello, World!
-
-<span class="nv">$ </span>docker run <span class="nt">--name</span> example example <span class="s1">'Hello, Docker!'</span>
-Hello, Docker!
-</code></pre></div></div>]]></content><author><name></name></author><category term="Docker" /><category term="docker" /><category term="dockerfile" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+<p><img src="/assets/img/20241223/4.png" alt="4" /></p>]]></content><author><name></name></author><category term="개발도구_사용법" /><category term="database" /><category term="ide" /><category term="datagrip" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
