@@ -3,7 +3,7 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N + 1 Problem 해결 사례 (1) - DRF ModelSerializer in List API</title>
+    <title>N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -108,7 +108,7 @@
             dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
             shadow-paper-styled
         ">
-            N + 1 Problem 해결 사례 (1) - DRF ModelSerializer in List API
+            N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화
         </h2>
         <p class="font-semibold"><a href="/categories/#Database" class="no-underline text-orange-700 dark:text-blue-200">Database</a></p>
     </div>
@@ -130,15 +130,7 @@
 
 <p>한참 전에, <a href="/django/2024/12/12/django-n1-problem.html">Django에서의 N + 1 Problem을 해결하는 방법</a>을 포스팅 한 적이 있었다. 요약하자면, <strong>우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈</strong> 정도가 된다. 해결 방법은 <code class="language-plaintext highlighter-rouge">join</code>이나 아니면 참조 테이블을 한번더 <code class="language-plaintext highlighter-rouge">select</code>를 하면 되고, Django에서는 <code class="language-plaintext highlighter-rouge">select_related</code>와 <code class="language-plaintext highlighter-rouge">prefetch_related</code>라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.</p>
 
-<h2 id="솔직히-고백하자면-난-n--1-problem를-경험한-적이-없었다">솔직히 고백하자면 난 N + 1 Problem를 경험한 적이 없었다.</h2>
-
-<p>사실 N + 1 포스팅을 했던 것은, 예전에 관련 질문을 받았을 때, N + 1 Problem 관련 문제가 나왔는데 제대로 말을 하지 못해서 복기겸 포스팅 했던 것이고… 나는 지금까지 이 이슈를 겪어본 적이 없었다. <strong>아니,
-정확히는 분명히 있었을 텐테 내가 둔해서 몸으로 느끼지 못한 것이 분명하다</strong>. 심지어 1년동안 Django 기반의 신사업 프로젝트를 개발 내지 운영을 하면서도 
-이 N + 1 Problem 이란 녀셕을 한번도 만나 본 적이 없었다. 그런데…</p>
-
-<h2 id="그러나-결국-발견했다">그러나 결국 발견했다</h2>
-
-<p>최근 <code class="language-plaintext highlighter-rouge">flask-admin</code> 기반으로 개발된 사내 관리자 페이지를 <code class="language-plaintext highlighter-rouge">django</code>, <code class="language-plaintext highlighter-rouge">react</code>로 리빌딩하는 프로젝트를 진행하면서, 
+<p>지금까지는 이 문제를 직접 겪어보진 못했다. 관련 질문을 받은 적은 있었지만, 당시에 명확하게 설명하지 못해 이후에 따로 정리해둔 적이 있을 뿐이다. 그러나 결국 발견했다. 최근 <code class="language-plaintext highlighter-rouge">flask-admin</code> 기반으로 개발된 사내 관리자 페이지를 <code class="language-plaintext highlighter-rouge">django</code>, <code class="language-plaintext highlighter-rouge">react</code>로 리빌딩하는 프로젝트를 진행하면서, 
 차량 구독 신청 내역 조회 API를 개발하는 과정에서 N + 1 Problem 문제를 발견했다. ViewSet과 Serlizer를 이용해 API를 개발하고 있는 와중에 뭔가 의심이 들어 쿼리 로그를 봤더니
 <strong>조회된 레코드 갯수 대로 참조 테이블을 향해 쿼리를 또 날리는 것이다!</strong> 어떤 이슈였는지 밑의 본론을 통해 알아보자.</p>
 
@@ -285,7 +277,7 @@
 
 <h3 id="property-def-data">@property def data</h3>
 
-<p>다음은 <code class="language-plaintext highlighter-rouge">Serializer</code>의 <code class="language-plaintext highlighter-rouge">data</code> 프로퍼티 코드의 일부이다. “조회 API”이기 때문에 <code class="language-plaintext highlighter-rouge">Serializer</code>는 DB Instance를 받아 <code class="language-plaintext highlighter-rouge">self.instance</code>에 저장했을 것이다.</p>
+<p>다음은 <code class="language-plaintext highlighter-rouge">Serializer</code>의 <code class="language-plaintext highlighter-rouge">data</code> 프로퍼티 코드의 일부이다.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@property</span>
 <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
@@ -296,9 +288,11 @@
     <span class="p">...</span> <span class="n">이하</span> <span class="n">생략</span> <span class="bp">...</span>
 </code></pre></div></div>
 
-<p>위에 <code class="language-plaintext highlighter-rouge">self.to_representation</code> 함수를 사용하는 것을 볼 수가 있다. 다음은 <code class="language-plaintext highlighter-rouge">ListSerializer.to_representation</code> 함수의 일부다. <code class="language-plaintext highlighter-rouge">to_representation</code>은 DB 인스턴스를 파라미터로 받고 <code class="language-plaintext highlighter-rouge">dict</code> 형태로 직렬화를 하는 함수로, 보통 Serializer에서 직렬화 해주는 데이터 말고도 다른 추가적인 데이터도 같이 직렬화 해야 할때 해당 함수를 오버라이딩을 하는 경우가 종종 있다.</p>
+<p><code class="language-plaintext highlighter-rouge">Serializer</code>는 DB 인스턴스를 받아 <code class="language-plaintext highlighter-rouge">self.instance</code>에 저장하고 <code class="language-plaintext highlighter-rouge">to_representation</code>을 호출해 직렬화 과정을 수행한다.</p>
 
 <h3 id="listserializerto_representation">ListSerializer.to_representation</h3>
+
+<p>다음은 <code class="language-plaintext highlighter-rouge">ListSerializer.to_representation</code> 함수의 일부다. <code class="language-plaintext highlighter-rouge">to_representation</code>은 DB 인스턴스를 파라미터로 받고 <code class="language-plaintext highlighter-rouge">dict</code> 형태로 직렬화를 하는 함수로, 보통 Serializer에서 직렬화 해주는 데이터 말고도 다른 추가적인 데이터도 같이 직렬화 해야 할때 해당 함수를 오버라이딩을 하는 경우가 종종 있다.</p>
 
 <blockquote>
   <p><code class="language-plaintext highlighter-rouge">ModelSerializer</code>가 아닌 <code class="language-plaintext highlighter-rouge">ListSerializer</code>를 보는 이유는, <code class="language-plaintext highlighter-rouge">list()</code>에서 <code class="language-plaintext highlighter-rouge">serializer</code>를 가져올 때 <code class="language-plaintext highlighter-rouge">self.get_serializer(page, many=True)</code> 처럼 파라미터에 <code class="language-plaintext highlighter-rouge">many=True</code>로 설정하면. <code class="language-plaintext highlighter-rouge">ListSerializer</code>로 매핑이 되기 때문이다. 결국 최상단에 사용되는 Serializer는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>가 아닌 <code class="language-plaintext highlighter-rouge">ListSerializer</code>이고 <code class="language-plaintext highlighter-rouge">ListSerializer</code>의 <code class="language-plaintext highlighter-rouge">child</code>는 <code class="language-plaintext highlighter-rouge">DiarySerializer</code>가 된다. 이 점을 꼭 기억해야 한다.</p>
@@ -355,22 +349,7 @@
 
 <h1 id="끝-회고">끝 (회고)</h1>
 
-<p>이번 문제해결을 통해 깨달은 점이 참 많았다. Django가 항상 만능이 아니라는 점 부터, 그동안 대충 개발해 왔다는 반성 까지…</p>
-
-<h2 id="django-restframework는-만능이-아니다">Django Restframework는 만능이 아니다</h2>
-
-<p>Django는 대표적인 Python Backend Framework으로 각종 템플릿 부터 부속 모듈 까지 생산성을 향상시키기 위한 도구들이 여럿 있고 실제로 생산성이 좋다고 알려져 있다. 
-하지만 <strong>Trade Off</strong> 라는 말이 있다. 어느족이 강점이라면 분명 다른 곳에서는 약점일 경우도 있다는 것이다. Django가 딱 그런게 두드러진 것 같다. 
-당장은 사용하기가 편하지만, 아무생각없이 너무 편하게만 쓴다면, 이 편함에 익숙한 나머지 N + 1 Problem 같은 성능이슈를 못알아 볼 수 도 있다.</p>
-
-<h2 id="한번-짠-코드-다시한번-보자">한번 짠 코드 다시한번 보자</h2>
-
-<p>그렇기 때문에 최근들어 코드 하나하나 작성할 때마다 “내가 왜 이렇게 작성을 하려고 했을 까” 하는 생각을 하려고 노력하고 있고, 가능하면 검증까지 하려고 노력하고 있다. 다시는 위와 같은 일이 일어나지 않게 말이다. 그동안 내가 너무 생각없이 코딩을 해 왔다는 생각이 자주 들고 있다. 그리고 그게 천천히 업보로도 쌓이고 있다. 내가 짠 코드를 스스로 설명하지
-못하는 지경에 올라와 버린 것이다. 지금부터라도 이런 사태가 벌어지는 것을 한시라도 막아야 한다.</p>
-
-<h2 id="db-최적화도-한번-해볼까">DB 최적화도 한번 해볼까?</h2>
-
-<p>이번 문제해겨을 통해서 DB 최적화 혹은 튜링이 관심이 생겼다. 잘못된 DB 쿼리로 인해 API 장애가 일어날 수 있다는 것으 간접적으로 경험하고 있다. 그래서 최근들어 DB 쿼리 로깅을 적극적으로 활용하고 있고. 유데미에서 데이터베이스 관련 강의를 듣고 있다.</p>
+<p>이 경험을 통해, 코드 한줄에도 성능 이슈가 숨어 있을 수 있다는 걸 깨닫게 되었다. 앞으로는 코드 한줄한줄 작성할 때마다 이게 어떤 영향을 끼치는지 한번은 확인하는게 좋을 것 같다. 특히 코드 몇 자로 API가 바로 구현이 되는 <code class="language-plaintext highlighter-rouge">Django</code>에서는 더 신경을 써야 할 것 같다. 편함에 속아 내부적인 상황을 파악하지 않으면 안되니까 말이다.</p>
 
 
                 <div class="
