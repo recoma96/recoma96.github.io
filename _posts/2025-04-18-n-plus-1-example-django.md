@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "N + 1 Problem 해결 사례 (1) - DRF ModelSerializer in List API"
+title:  "N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화"
 date:   2025-04-18 17:00:00 
 categories: "Database"
 summary: "생각없이 Serizlier를 쓰는 순간 나도 모르는 사이 N + 1 Problem이 터질 수 있다. 리스트 조회를 위한 ModelSerializer가 어떻게 N + 1 Problem을 일으키는지, DRF 내부 코드를 통해 알아보자."
@@ -10,17 +10,9 @@ image: ""
 
 # 개요
 
-한참 전에, [Django에서의 N + 1 Problem을 해결하는 방법](/django/2024/12/12/django-n1-problem.html)을 포스팅 한 적이 있었다. 요약하자면, **우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈** 정도가 된다. 해결 방법은 `join`이나 아니면 참조 테이블을 한번더 `select`를 하면 되고, Django에서는 `select_related`와 `prefetch_related`라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.
+한참 전에, [Django에서의 N + 1 Problem을 해결하는 방법](/django/2024/12/12/django-n1-problem.html)을 포스팅 한 적이 있었다. 요약하자면, **우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈** 정도가 된다. 해결 방법은 `join`이나 아니면 참조 테이블을 한번더 `select`를 하면 되고, Django에서는 `select_related`와 `prefetch_related`라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다. 
 
-## 솔직히 고백하자면 난 N + 1 Problem를 경험한 적이 없었다.
-
-사실 N + 1 포스팅을 했던 것은, 예전에 관련 질문을 받았을 때, N + 1 Problem 관련 문제가 나왔는데 제대로 말을 하지 못해서 복기겸 포스팅 했던 것이고... 나는 지금까지 이 이슈를 겪어본 적이 없었다. **아니,
-정확히는 분명히 있었을 텐테 내가 둔해서 몸으로 느끼지 못한 것이 분명하다**. 심지어 1년동안 Django 기반의 신사업 프로젝트를 개발 내지 운영을 하면서도 
-이 N + 1 Problem 이란 녀셕을 한번도 만나 본 적이 없었다. 그런데...
-
-## 그러나 결국 발견했다
-
-최근 `flask-admin` 기반으로 개발된 사내 관리자 페이지를 `django`, `react`로 리빌딩하는 프로젝트를 진행하면서, 
+지금까지는 이 문제를 직접 겪어보진 못했다. 관련 질문을 받은 적은 있었지만, 당시에 명확하게 설명하지 못해 이후에 따로 정리해둔 적이 있을 뿐이다. 그러나 결국 발견했다. 최근 `flask-admin` 기반으로 개발된 사내 관리자 페이지를 `django`, `react`로 리빌딩하는 프로젝트를 진행하면서, 
 차량 구독 신청 내역 조회 API를 개발하는 과정에서 N + 1 Problem 문제를 발견했다. ViewSet과 Serlizer를 이용해 API를 개발하고 있는 와중에 뭔가 의심이 들어 쿼리 로그를 봤더니
 **조회된 레코드 갯수 대로 참조 테이블을 향해 쿼리를 또 날리는 것이다!** 어떤 이슈였는지 밑의 본론을 통해 알아보자.
 
@@ -178,7 +170,7 @@ class DiaryViewSet(
 
 ### @property def data
 
-다음은 `Serializer`의 `data` 프로퍼티 코드의 일부이다. "조회 API"이기 때문에 `Serializer`는 DB Instance를 받아 `self.instance`에 저장했을 것이다.
+다음은 `Serializer`의 `data` 프로퍼티 코드의 일부이다.
 
 ```python
 @property
@@ -190,9 +182,12 @@ def data(self):
     ... 이하 생략 ...
 ```
 
-위에 `self.to_representation` 함수를 사용하는 것을 볼 수가 있다. 다음은 `ListSerializer.to_representation` 함수의 일부다. `to_representation`은 DB 인스턴스를 파라미터로 받고 `dict` 형태로 직렬화를 하는 함수로, 보통 Serializer에서 직렬화 해주는 데이터 말고도 다른 추가적인 데이터도 같이 직렬화 해야 할때 해당 함수를 오버라이딩을 하는 경우가 종종 있다.
+`Serializer`는 DB 인스턴스를 받아 `self.instance`에 저장하고 `to_representation`을 호출해 직렬화 과정을 수행한다.
+
 
 ### ListSerializer.to_representation
+
+다음은 `ListSerializer.to_representation` 함수의 일부다. `to_representation`은 DB 인스턴스를 파라미터로 받고 `dict` 형태로 직렬화를 하는 함수로, 보통 Serializer에서 직렬화 해주는 데이터 말고도 다른 추가적인 데이터도 같이 직렬화 해야 할때 해당 함수를 오버라이딩을 하는 경우가 종종 있다.
 
 > `ModelSerializer`가 아닌 `ListSerializer`를 보는 이유는, `list()`에서 `serializer`를 가져올 때 `self.get_serializer(page, many=True)` 처럼 파라미터에 `many=True`로 설정하면. `ListSerializer`로 매핑이 되기 때문이다. 결국 최상단에 사용되는 Serializer는 `DiarySerializer`가 아닌 `ListSerializer`이고 `ListSerializer`의 `child`는 `DiarySerializer`가 된다. 이 점을 꼭 기억해야 한다.
 
@@ -253,25 +248,6 @@ class DiaryViewSet(
 ```
 
 
-
-
 # 끝 (회고)
 
-이번 문제해결을 통해 깨달은 점이 참 많았다. Django가 항상 만능이 아니라는 점 부터, 그동안 대충 개발해 왔다는 반성 까지...
-
-
-## Django Restframework는 만능이 아니다
-
-Django는 대표적인 Python Backend Framework으로 각종 템플릿 부터 부속 모듈 까지 생산성을 향상시키기 위한 도구들이 여럿 있고 실제로 생산성이 좋다고 알려져 있다. 
-하지만 **Trade Off** 라는 말이 있다. 어느족이 강점이라면 분명 다른 곳에서는 약점일 경우도 있다는 것이다. Django가 딱 그런게 두드러진 것 같다. 
-당장은 사용하기가 편하지만, 아무생각없이 너무 편하게만 쓴다면, 이 편함에 익숙한 나머지 N + 1 Problem 같은 성능이슈를 못알아 볼 수 도 있다.
-
-
-## 한번 짠 코드 다시한번 보자
-
-그렇기 때문에 최근들어 코드 하나하나 작성할 때마다 "내가 왜 이렇게 작성을 하려고 했을 까" 하는 생각을 하려고 노력하고 있고, 가능하면 검증까지 하려고 노력하고 있다. 다시는 위와 같은 일이 일어나지 않게 말이다. 그동안 내가 너무 생각없이 코딩을 해 왔다는 생각이 자주 들고 있다. 그리고 그게 천천히 업보로도 쌓이고 있다. 내가 짠 코드를 스스로 설명하지
-못하는 지경에 올라와 버린 것이다. 지금부터라도 이런 사태가 벌어지는 것을 한시라도 막아야 한다.
-
-## DB 최적화도 한번 해볼까?
-
-이번 문제해겨을 통해서 DB 최적화 혹은 튜링이 관심이 생겼다. 잘못된 DB 쿼리로 인해 API 장애가 일어날 수 있다는 것으 간접적으로 경험하고 있다. 그래서 최근들어 DB 쿼리 로깅을 적극적으로 활용하고 있고. 유데미에서 데이터베이스 관련 강의를 듣고 있다.
+이 경험을 통해, 코드 한줄에도 성능 이슈가 숨어 있을 수 있다는 걸 깨닫게 되었다. 앞으로는 코드 한줄한줄 작성할 때마다 이게 어떤 영향을 끼치는지 한번은 확인하는게 좋을 것 같다. 특히 코드 몇 자로 API가 바로 구현이 되는 `Django`에서는 더 신경을 써야 할 것 같다. 편함에 속아 내부적인 상황을 파악하지 않으면 안되니까 말이다.
