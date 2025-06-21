@@ -1,4 +1,100 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-05-06T16:38:47+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화</title><link href="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html" rel="alternate" type="text/html" title="N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화" /><published>2025-04-18T17:00:00+00:00</published><updated>2025-04-18T17:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django</id><content type="html" xml:base="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html"><![CDATA[<h1 id="개요">개요</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-06-21T03:22:20+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점</title><link href="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html" rel="alternate" type="text/html" title="Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점" /><published>2025-06-20T19:00:00+00:00</published><updated>2025-06-20T19:00:00+00:00</updated><id>https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1</id><content type="html" xml:base="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html"><![CDATA[<h1 id="배경">배경</h1>
+
+<p>약 2주 전, 회사 내에서 꽤 심각한 이슈가 발생했다. CeleryBeat 기반의 배치 프로세스가 동작 중 서버 리빌드로 인해 프로세스가 일시적으로 종료되었고, 이 과정에서 삭제되어야 할 분산락 캐시 데이터가 그대로 남게 되었다. 그 결과, 다음 배치 프로세스가 분산락을 확인하고 “작업이 아직 진행 중”이라 판단하며 실행되지 않는 문제가 생겼다.</p>
+
+<p>다행히 문제는 해결됐지만, 이를 계기로 분산락 사용에 대해 다시 생각하게 되었고, 그 내용을 정리해 보려 한다.</p>
+
+<h2 id="상세">상세</h2>
+
+<p>회사 내 결제 서비스에서는 외부 업체로부터 카드 사용 승인을 받아야 한다. 어느 날, 이 승인 절차가 갑자기 작동하지 않기 시작했다. 보통은 외부 API 문제라면 하루 이내에 해결되는데, 이번엔 3일이 지나도 해결되지 않았다.</p>
+
+<p>문제는 외부 API가 아니라 내부에 있었다. 디버깅 과정에서, 작업 후 삭제되어야 할 분산락 캐시 데이터가 남아 있었고, 이 데이터를 삭제하자 승인 프로세스가 정상적으로 작동하기 시작했다.</p>
+
+<p>즉, <strong>분산락이 남아 있어 이후 작업이 영원히 대기 상태에 빠졌던 것이다.</strong></p>
+
+<h1 id="분산락-distributed-lock-이란">분산락 (Distributed Lock) 이란?</h1>
+
+<h2 id="1-이걸-왜-사용하나요">1. 이걸 왜 사용하나요?</h2>
+
+<p>컴퓨터공학과 출신 또는 비전공이지만 CS를 공부해 봤다면 “동시성”이란 단어를 한번 씩 들어봤을 것이다. 그리고 그 다음에 생각나는 단어는 <code class="language-plaintext highlighter-rouge">mutex</code>라는 단어를 생각할 것이다. 그렇다면 이런 의문이 들을 것이다. 동시성 제어를 할 거면 <code class="language-plaintext highlighter-rouge">mutex</code>를 쓰면 되지 굳이 왜 분산락 얘기가 나오나요?</p>
+
+<p><code class="language-plaintext highlighter-rouge">mutex</code>는 <strong>단일 프로세스 내에서만 유효하다.</strong> 프로세스 간에는 메모리를 공유하지 않기 때문에, 여러 서버나 인스턴스에서 동시에 접근하는 상황에서는 무용지물이다.
+이럴 때, 다중 시스템 간 자원 접근을 제어하기 위한 방법이 필요하며, 그 역할을 하는 것이 분산락이다.</p>
+
+<h2 id="2-어디에-사용하나요">2. 어디에 사용하나요?</h2>
+
+<ul>
+  <li>무중단 배포, 대규모 트래픽 대응을 위해 여러 인스턴스를 띄울 때 발생하는 동시성 이슈 방지</li>
+  <li>멀티프로세스를 통한 병렬 처리 시, 공통 자원(파일, 메모리 등)에 잘못된 값이 저장되는 문제 방지</li>
+</ul>
+
+<p>제약조건(예: UNIQUE)으로 해결할 수 있는 경우도 있지만, 구조적으로 제약조건을 걸 수 없는 상황에서는 분산락이 실질적인 해결책이 된다.</p>
+
+<h2 id="3-redis-기반의-분산락">3. Redis 기반의 분산락</h2>
+
+<p>분산락을 사용하는 방법은 여러가지가 있으나 여기서는 Redis 기반의 분산락에 대해서 설명을 한다. 분산락에 있어서 가장 많이 쓰이는데 주된 이유는 다음과 같다.</p>
+
+<ul>
+  <li>RDB 처럼 디스크 접근이 아닌 메모리 접근으로 속도가 상대적으로 빠르다.</li>
+  <li>Redis는 싱글 스레드 방식으로 요청을 받는다. 즉, 아무리 동시에 요청한다 해도 Redis는 <strong>무조건 순차적으로 요청을 받고 데이터를 관리하는 것이 보장이 된다.</strong> 즉, 동시접근을 100% 할 수 없다는 이야기다.</li>
+</ul>
+
+<h3 id="setnx">setnx?</h3>
+
+<p>과거에는<code class="language-plaintext highlighter-rouge">SETNX</code> 명령어를 사용해 락을 구현하곤 했다</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SETNX mykey "Hello"  # 성공하면 1 반환
+SETNX mykey "World"  # 이미 존재하면 0 반환
+</code></pre></div></div>
+
+<p>하지만 <code class="language-plaintext highlighter-rouge">SETNX</code>는 이미 deprecated 되었으며, 가장 큰 문제는 만료 기한 설정이 불가능하다는 것이다. 락을 획득한 후 프로세스가 예기치 않게 종료되면, 해당 키가 무한히 남아 시스템을 교착 상태에 빠뜨릴 수 있다. 공식 사이트 조차도 이 명령어 대신 <code class="language-plaintext highlighter-rouge">SET</code>을 사용하는 것을 권장하고 있다.</p>
+
+<h3 id="대신-set-nx-ex를-사용하자">대신 SET NX EX를 사용하자.</h3>
+
+<p>그래서 <code class="language-plaintext highlighter-rouge">SETNX</code> 대신 <code class="language-plaintext highlighter-rouge">SET</code>을 권장하고 있다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SET hello "world" NX EX 60
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">NX</code> 플래그를 사용해 <code class="language-plaintext highlighter-rouge">SETNX</code>와 동일한 기능을 낼 수 있고. 추가로 <code class="language-plaintext highlighter-rouge">EX</code>를 통해 유효 기간을 설정할 수 있다. 유효기간을 설정하게 되면, 어떠한 이슈로 프로세스가 Shutdown이 되더라도, 특정 시간이 지나면 사라지기 때문에 분산락 알고리즘을 구현할때, 캐시가 영구적으로 남는 이슈에 대한 부담을 덜을 수 있다. 그래도 PID등 여러 부분들을 체크해야 하기 때문에 여전히 복잡하다.</p>
+
+<h3 id="아니-그냥-라이브러리를-쓰십쇼">아니 그냥 라이브러리를 쓰십쇼</h3>
+
+<p>직접 구현하려고 하지 말고, 검증된 라이브러리를 사용하는 것이 좋다.</p>
+
+<ul>
+  <li>Django: <code class="language-plaintext highlighter-rouge">cache.lock()</code></li>
+  <li>redis-py: <code class="language-plaintext highlighter-rouge">redis.lock()</code></li>
+</ul>
+
+<p>코드를 직접 구현하려다 분산락 때문에 또 다른 장애를 만들 수도 있다.</p>
+
+<h1 id="사용시-주의할-점">사용시 주의할 점</h1>
+
+<p>여타 기술들, 좁게는 라이브러리에서 그렇듯, 분산락은 특적 문제에 대한 해결방안을 제공해 주는 도구일 뿐이지 만병통치약은 아니다. 분산락은 멀티 프로세스가 동일한 시스템의 자원을 사용하는 방식이다. 즉 <strong>다른 시스템에 접속은 무조건 필수이기 대문에 둘 중 하나가 이상이 생기면 일관성에 문제가 일어나기 시작한다</strong>. 아래의 항목에 대해 조심해야 한다.</p>
+
+<h2 id="1-프로세스가-shutdown이-되는-경우">1. 프로세스가 Shutdown이 되는 경우</h2>
+
+<p>작업 중 서버가 재시작되면 락 해제가 되지 않으며, 이후 작업들이 교착 상태에 빠진다. try-catch로도 방지 불가하다.</p>
+
+<p><strong>직업 예상 시간을 기준으로 만료 시간을 설정하면 쉽게 해결을 할 수 있다.</strong> 단, 설정된 시간 동안 후속 작업이 지연될 수 있다는 점은 감수해야 한다.</p>
+
+<p>Redlock, 락 감시자 등의 고급 알고리즘도 있으나 구현 복잡도가 높고, 안정성을 확보하려면 추가적인 설계가 필요하다.</p>
+
+<h2 id="2-캐시-시스템이-shutdown-되는-경우">2. 캐시 시스템이 Shutdown 되는 경우</h2>
+
+<p>나도 아직 경험해 보지 않은 이슈이고, 또 어차피 AWS ElastiCache 같은 외부 서비스를 사용하는 경우가 많아 거의 드물지만 <strong>반대로 캐시 시스템이 Shutdown 되는 경우</strong> 가 있다. 실제로 발생하면 1번보다 더 큰 재앙이 될 수 있다.</p>
+
+<ul>
+  <li>작업 중단 처리: 캐시 시스템을 사용하지 못한다면, 아예 해당 작업에 대해 요청을 못하게 하는 방법이 있다. HTTP로 치면 500에러를 호출하는 정도가 된다. 가장 쉬운 방법이나, 이는 서비스 장애가 될 수 있다.</li>
+  <li>분산락 데이터 백업(replication): 캐시 시스템이 날아가도 기존 서비스는 작동해야 한다. 즉, RDB나 다른 저장소에 분산락이 생길 때 마다 기록을 해 두고, 캐시 시스템에 이상이 발생한다면 분산락 정보를 저장한 저장소가 캐시 시스템을 대신하게 한다. 그나마 서비스 유지가 될 수 있도록 하는 방안이지만, 어떻게 설계하느냐에 다라 구현 방식이 복잡해질 수 있다.</li>
+</ul>
+
+<h1 id="마치며">마치며</h1>
+
+<p>분산락은 단순한 기술처럼 보일 수 있지만, 결국 시스템 전반의 신뢰성과 안정성을 좌우하는 요소다. 철저한 예외 처리가 요구되며, 도입 전에 반드시 설계와 운영 비용을 고려해야 한다.</p>
+
+<p>다음 글에서는 Python 기반의 실제 코드를 통해 이 개념을 어떻게 구현할 수 있는지 살펴보겠다.</p>]]></content><author><name></name></author><category term="distributed_lock" /><category term="redis" /><category term="cache" /><category term="distributed-lock" /><category term="software-architecture" /><category term="" /><summary type="html"><![CDATA[배경]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화</title><link href="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html" rel="alternate" type="text/html" title="N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화" /><published>2025-04-18T17:00:00+00:00</published><updated>2025-04-18T17:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django</id><content type="html" xml:base="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>한참 전에, <a href="/django/2024/12/12/django-n1-problem.html">Django에서의 N + 1 Problem을 해결하는 방법</a>을 포스팅 한 적이 있었다. 요약하자면, <strong>우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈</strong> 정도가 된다. 해결 방법은 <code class="language-plaintext highlighter-rouge">join</code>이나 아니면 참조 테이블을 한번더 <code class="language-plaintext highlighter-rouge">select</code>를 하면 되고, Django에서는 <code class="language-plaintext highlighter-rouge">select_related</code>와 <code class="language-plaintext highlighter-rouge">prefetch_related</code>라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.</p>
 
@@ -1028,31 +1124,4 @@ AWS Secret Access Key <span class="o">[</span><span class="k">****************</
 <span class="n">text</span> <span class="o">=</span> <span class="n">decoded_text</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <span class="c1"># utf-8 디코딩 -&gt; 안녕 월드
-</span></code></pre></div></div>]]></content><author><name></name></author><category term="Computer_Science" /><category term="computer-science" /><category term="data" /><category term="encoding" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Datagrip에서 SSH 터널링으로 데이터베이스 접근하기</title><link href="https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling.html" rel="alternate" type="text/html" title="Datagrip에서 SSH 터널링으로 데이터베이스 접근하기" /><published>2024-12-23T13:00:00+00:00</published><updated>2024-12-23T13:00:00+00:00</updated><id>https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling</id><content type="html" xml:base="https://recoma96.github.io/%EA%B0%9C%EB%B0%9C%EB%8F%84%EA%B5%AC_%EC%82%AC%EC%9A%A9%EB%B2%95/2024/12/23/datagrip-ssh-ternaling.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<p>데이터베이스는 고객의 중요 데이터를 저장하는 매우매우 중요한 시설이다. 그렇기 때문에 어지간한 기업에서는 데이터베이스 보안을 철처히 해놓는다. 내가 다니고 있는 회사도 마찬가지인데,
-일단 데이터베이스를 VPC에 포함시켜 VPC에 포함되는 서비스에서만 사용할 수 있게 했고, Publicy accessible을 False로 세팅함으로써 Security Group에서 0.0.0.0으로 범위를 설정해도 접속하지 못하게 막아놨다. 즉, 사내 IP로는 직접 접속이 불가능하고, 접속할 수 있는 유일한 방법은 오로지 SSH를 통해 운영서버에 접속을 한 다음, 그 운영서버에서 데이터베이스에 접속(mysql-client)해서 SQL문을 타이핑하는 방법이다. 보안상으로는 좋긴 하지만, 데이터베이스 접속을 터미널로 하는 것에 대해 불편함을 가진 적이 많았다. 하지만 데이터베이스 IDE중 하나인 <strong>DataGrip</strong> 에서는 SSH를 통해 데이터베이스를 접속하는 <strong>SSH 터널링</strong>을 지원한다.</p>
-
-<h1 id="사용법">사용법</h1>
-
-<ol>
-  <li>
-    <p>SSH/SSL 탭에 들어간다. 여기서 <strong>Use SSH Tunnel</strong> 을 체크하고 오른쪽에 …을 클릭한다.
-<img src="/assets/img/20241223/1.png" alt="1" /></p>
-  </li>
-  <li>
-    <p>SSH Configuration이라는 창이 뜨는데, 여기서는 데이터베이스에 접속할 서버 정보를 입력하면 된다. 즉 SSH 정보를 입력하면 되는데, 패스워드가 아니니 pem key를 사용할 경우 “Authentication type”에 “Key pair”를 선택하고 Private Key File에 pem키 경로를 입력하면 된다.
-<img src="/assets/img/20241223/2.png" alt="2" /></p>
-  </li>
-  <li>
-    <p>“Test Connection”을 클릭해 접속 여부를 확인한다. 성공했으면 아래와 같은 문구가 뜬다. <strong>데이터베이스에 접속할 서버와의 SSH 연동이 정상적으로 완료되었다는 뜻이다. 절대 데이터베이스 접속에 성공했다는 뜻이 아니다.</strong> 성공했으면 OK를 눌러 다시 뒤로 간다.</p>
-  </li>
-</ol>
-
-<p><img src="/assets/img/20241223/3.png" alt="3" /></p>
-
-<ol>
-  <li>General 탭에 돌아와서 데이터베이스 정보를 입력하면 된다. 여기부터는 일반적인 데이터베이스 접속하는 방법과 일치. Success 표시가 뜨면 연동하는데 성공했단 뜻이고, OK버튼을 누르면 그 다음부터 사용할 수 있다.</li>
-</ol>
-
-<p><img src="/assets/img/20241223/4.png" alt="4" /></p>]]></content><author><name></name></author><category term="개발도구_사용법" /><category term="database" /><category term="ide" /><category term="datagrip" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</span></code></pre></div></div>]]></content><author><name></name></author><category term="Computer_Science" /><category term="computer-science" /><category term="data" /><category term="encoding" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
