@@ -4,7 +4,7 @@ title:  "Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 
 date:   2025-06-21 04:00:00 +0900
 categories: "distributed_lock"
 summary: "신나게 분산락 쓰다가 신나게 시스템 꺼지고 다시 켜지면 신나게 디버깅 해야 함"
-tags: ["redis", "cache", "distributed-lock", "software-architecture", ""]
+tags: ["redis", "cache", "distributed-lock", "software-architecture"]
 image: ""
 ---
 
