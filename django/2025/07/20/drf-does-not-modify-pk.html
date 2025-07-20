@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRF Viewset은 Primary Key를 수정하지 않는다</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- 구글 애널리틱스 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F4S8SQ473J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-F4S8SQ473J');
+    </script>
+
+    <!-- 구글 애드센스 -->
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7546723599526874"
+     crossorigin="anonymous"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            DRF Viewset은 Primary Key를 수정하지 않는다
+        </h2>
+        <p class="font-semibold"><a href="/categories/#Django" class="no-underline text-orange-700 dark:text-blue-200">Django</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2025.07.20 03:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h1 id="개요">개요</h1>
+
+<h2 id="primary-key는-변경되어선-안된다">Primary Key는 변경되어선 안된다</h2>
+
+<p>보통 기본키(Primary Key)는 레코드를 대표하는 식별자이기 때문에, 어지간하면 변경이 되어서는 안되고, 변경되는 것을 막기위해 기본키에는 테이블과는 전혀 무관한 값이 들어가는게 통상적이다.</p>
+
+<h2 id="django도-이걸-염려하고-있다">Django도 이걸 염려하고 있다.</h2>
+
+<p>Django에서도 이 부분에 대해서 당연히 의식을 하고 있고, 개발자가 Primary Key를 바꾸지 못하게 하기 위해 갖은 방법을 쓰고 있는데 어떤게 있는지 한번 알아보자.</p>
+
+<h1 id="django가-pk를-바꿀수-없게-막는-방법">Django가 PK를 바꿀수 없게 막는 방법</h1>
+
+<h2 id="serializer에서-수정-대상-강제-제외">Serializer에서 수정 대상 강제 제외</h2>
+
+<p>한번씩 DRF를 써 보면 눈치 챘을 텐데, <code class="language-plaintext highlighter-rouge">Serializer.Meta</code> 클래스에서 <code class="language-plaintext highlighter-rouge">fields = "__all__"</code>로 설정해도 Swagger에서는 PK가 나타나지 않는다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Serializer
+</span><span class="k">class</span> <span class="nc">DiarySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ShortDiary</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__all__</span><span class="sh">"</span>
+
+
+<span class="c1"># ViewSet
+</span><span class="k">class</span> <span class="nc">DiaryViewSet</span><span class="p">(</span>
+    <span class="n">viewsets</span><span class="p">.</span><span class="n">ModelViewSet</span>
+<span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">select_related</span><span class="p">(</span><span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">).</span><span class="nf">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">DiarySerializer</span>
+
+    <span class="k">def</span> <span class="nf">get_serializer_class</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">retrieve</span><span class="sh">"</span><span class="p">:</span> <span class="n">DiaryDetailSerializer</span><span class="p">,</span>
+        <span class="p">}.</span><span class="nf">get</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">action</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">serializer_class</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>이렇게 코드를 작성하고 Swagger에 접속해 보면</p>
+
+<p><img src="/assets/img/20250720/1.png" alt="swagger-image" /></p>
+
+<p><strong>id 가 없다.</strong> <code class="language-plaintext highlighter-rouge">fields = "__all__"</code> 로 잡아놔도. PK를 바꿀 생각은 하지 말라는 것이다. 그래도 이걸 무시하고 Postman 또는 Curl로 강제로 ID를 바꾸려 해도. 아래의 결과 처럼 변경되지 않는다.</p>
+
+<p><img src="/assets/img/20250720/2.png" alt="change-id-result" /></p>
+
+<p>변경되지 않는 이유는 <code class="language-plaintext highlighter-rouge">update</code> 함수가 작동할 때, <code class="language-plaintext highlighter-rouge">validated_data</code>는 PK를 포함하지 않기 때문에 변경이 되지 않는 것이다.</p>
+
+<h2 id="pk만-다른-동일-레코드-강제-생성">PK만 다른 동일 레코드 강제 생성</h2>
+
+<p>하지만 이런 Django의지를 한번 더 꺾을 수 있는 기회가 한번 있는데, 그건 바로 <strong><code class="language-plaintext highlighter-rouge">Serializer</code>에 억지로 PK를 추가하는 방법</strong> 이다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">validated_data</code>에 PK가 포함이 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiarySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="p">.</span><span class="nc">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>    <span class="c1"># PK 추가
+</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ShortDiary</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__all__</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<p>그리고 API를 요청해 보면 <code class="language-plaintext highlighter-rouge">Response</code> 부분에 <code class="language-plaintext highlighter-rouge">id</code> 가 변경된 것을 확인할 수 있다</p>
+
+<p><img src="/assets/img/20250720/3.png" alt="change-id-result-2" /></p>
+
+<p>그런데 정말 바뀐게 맞을까? DB 테이블을 한번 보자</p>
+
+<h3 id="api-요청-전">API 요청 전</h3>
+
+<p><img src="/assets/img/20250720/4.png" alt="change-before" /></p>
+
+<h3 id="api-요청-후">API 요청 후</h3>
+
+<p><img src="/assets/img/20250720/5.png" alt="change-after" /></p>
+
+<p><strong>바뀐게 아니라 아예 데이터가 새로 추가됐다.</strong> PK를 변경하려던 데이터는 변경 없이 그래도 유지되었고, 변경된 <code class="language-plaintext highlighter-rouge">id</code>를 가지고 전혀 다른 데이터가 복사되었다. 정확한 확인을 위해 로깅된 쿼리를 보자</p>
+
+<h3 id="쿼리-내역">쿼리 내역</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(0.000)
+    UPDATE `short_diary` SET `user_id` = 23, `title` = 'string2', `context` = 'string', `is_deleted` = 0
+    WHERE `short_diary`.`id` = 300;
+(0.004)
+    INSERT INTO `short_diary` (`id`, `user_id`, `title`, `context`, `is_deleted`)
+    VALUES (300, 23, 'string2', 'string', 0);
+</code></pre></div></div>
+
+<p>첫번째 쿼리를 보면 <code class="language-plaintext highlighter-rouge">id = 300</code> 인 데이터를 대상으로 정보를 수정하려고 하고 있다. 그러나 당시 요청했던 API의 URL은 <code class="language-plaintext highlighter-rouge">PUT /diaries/111</code> 이었기 때문에 
+<code class="language-plaintext highlighter-rouge">id</code>가 <code class="language-plaintext highlighter-rouge">111</code> 인 데이터를 검색해야 하는데, 변경 대상 값인 <code class="language-plaintext highlighter-rouge">300</code>으로 검색한 것이다. 그리고 <code class="language-plaintext highlighter-rouge">id</code>가 <code class="language-plaintext highlighter-rouge">300</code>는 따로 없기 때문에 <code class="language-plaintext highlighter-rouge">create</code> 함수가 작동되어 새로 생성한 것이다.</p>
+
+<h3 id="원인이-무엇인가">원인이 무엇인가</h3>
+
+<p><strong>Django ORM 내부에서는 Instance의 PK 를 바꾸는 것을 허용하지 않기 때문이다.</strong> 즉 <code class="language-plaintext highlighter-rouge">instance.pk = &lt;다른값&gt;</code> 이런식으로 어거지로 넣을 경우, <code class="language-plaintext highlighter-rouge">&lt;다른값&gt;</code>에 해당하는 데이터가 없을 때, Django ORM에서는 완전히 새로운 데이터라고 인식을 하기 때문에, 새로 생성하게 된다. <a href="https://docs.djangoproject.com/en/5.1/topics/db/models">공식문서</a> 에서도 이와 관련된 내용이 적혀 있다.</p>
+
+<blockquote>
+  <p>The primary key field is read-only. If you change the value of the primary key on an existing object and then save it, a new object will be created alongside the old one. For example:</p>
+  <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Fruit</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div>  </div>
+  <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> fruit <span class="o">=</span> Fruit.objects.create<span class="o">(</span><span class="nv">name</span><span class="o">=</span><span class="s2">"Apple"</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> fruit.name <span class="o">=</span> <span class="s2">"Pear"</span>
+<span class="o">&gt;&gt;&gt;</span> fruit.save<span class="o">()</span>
+<span class="o">&gt;&gt;&gt;</span> Fruit.objects.values_list<span class="o">(</span><span class="s2">"name"</span>, <span class="nv">flat</span><span class="o">=</span>True<span class="o">)</span>
+QuerySet <span class="o">[</span><span class="s1">'Apple'</span>, <span class="s1">'Pear'</span><span class="o">]&gt;</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<h1 id="결론">결론</h1>
+
+<p>Primary Key는 테이블에서 고유식별자를 나타내기 때문에, 보통 변경됨을 권장하지 않는다. 그래서 관련없는 데이터가 들어가야 한다는 얘기도 있다.
+Django 역시 이러한 내용을 인지하고 있기 때문에 Primary Key를 변경하지 못하게 막고 있다. 따라서, Django 기반 서비스를 만들 경우, DB 설계시 Primary Key 설계를 신중하게 해야 한다.</p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#django">django</a>
+                    
+                    <a class="tag" href="/tags/#database">database</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>

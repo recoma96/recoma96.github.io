@@ -1,4 +1,114 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-07-12T23:21:45+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점</title><link href="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html" rel="alternate" type="text/html" title="Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점" /><published>2025-06-20T19:00:00+00:00</published><updated>2025-06-20T19:00:00+00:00</updated><id>https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1</id><content type="html" xml:base="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html"><![CDATA[<h1 id="배경">배경</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-07-20T12:52:32+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">DRF Viewset은 Primary Key를 수정하지 않는다</title><link href="https://recoma96.github.io/django/2025/07/20/drf-does-not-modify-pk.html" rel="alternate" type="text/html" title="DRF Viewset은 Primary Key를 수정하지 않는다" /><published>2025-07-20T03:00:00+00:00</published><updated>2025-07-20T03:00:00+00:00</updated><id>https://recoma96.github.io/django/2025/07/20/drf-does-not-modify-pk</id><content type="html" xml:base="https://recoma96.github.io/django/2025/07/20/drf-does-not-modify-pk.html"><![CDATA[<h1 id="개요">개요</h1>
+
+<h2 id="primary-key는-변경되어선-안된다">Primary Key는 변경되어선 안된다</h2>
+
+<p>보통 기본키(Primary Key)는 레코드를 대표하는 식별자이기 때문에, 어지간하면 변경이 되어서는 안되고, 변경되는 것을 막기위해 기본키에는 테이블과는 전혀 무관한 값이 들어가는게 통상적이다.</p>
+
+<h2 id="django도-이걸-염려하고-있다">Django도 이걸 염려하고 있다.</h2>
+
+<p>Django에서도 이 부분에 대해서 당연히 의식을 하고 있고, 개발자가 Primary Key를 바꾸지 못하게 하기 위해 갖은 방법을 쓰고 있는데 어떤게 있는지 한번 알아보자.</p>
+
+<h1 id="django가-pk를-바꿀수-없게-막는-방법">Django가 PK를 바꿀수 없게 막는 방법</h1>
+
+<h2 id="serializer에서-수정-대상-강제-제외">Serializer에서 수정 대상 강제 제외</h2>
+
+<p>한번씩 DRF를 써 보면 눈치 챘을 텐데, <code class="language-plaintext highlighter-rouge">Serializer.Meta</code> 클래스에서 <code class="language-plaintext highlighter-rouge">fields = "__all__"</code>로 설정해도 Swagger에서는 PK가 나타나지 않는다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Serializer
+</span><span class="k">class</span> <span class="nc">DiarySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ShortDiary</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__all__</span><span class="sh">"</span>
+
+
+<span class="c1"># ViewSet
+</span><span class="k">class</span> <span class="nc">DiaryViewSet</span><span class="p">(</span>
+    <span class="n">viewsets</span><span class="p">.</span><span class="n">ModelViewSet</span>
+<span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">ShortDiary</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nf">select_related</span><span class="p">(</span><span class="sh">"</span><span class="s">user</span><span class="sh">"</span><span class="p">).</span><span class="nf">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">DiarySerializer</span>
+
+    <span class="k">def</span> <span class="nf">get_serializer_class</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="sh">"</span><span class="s">retrieve</span><span class="sh">"</span><span class="p">:</span> <span class="n">DiaryDetailSerializer</span><span class="p">,</span>
+        <span class="p">}.</span><span class="nf">get</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">action</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">serializer_class</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>이렇게 코드를 작성하고 Swagger에 접속해 보면</p>
+
+<p><img src="/assets/img/20250720/1.png" alt="swagger-image" /></p>
+
+<p><strong>id 가 없다.</strong> <code class="language-plaintext highlighter-rouge">fields = "__all__"</code> 로 잡아놔도. PK를 바꿀 생각은 하지 말라는 것이다. 그래도 이걸 무시하고 Postman 또는 Curl로 강제로 ID를 바꾸려 해도. 아래의 결과 처럼 변경되지 않는다.</p>
+
+<p><img src="/assets/img/20250720/2.png" alt="change-id-result" /></p>
+
+<p>변경되지 않는 이유는 <code class="language-plaintext highlighter-rouge">update</code> 함수가 작동할 때, <code class="language-plaintext highlighter-rouge">validated_data</code>는 PK를 포함하지 않기 때문에 변경이 되지 않는 것이다.</p>
+
+<h2 id="pk만-다른-동일-레코드-강제-생성">PK만 다른 동일 레코드 강제 생성</h2>
+
+<p>하지만 이런 Django의지를 한번 더 꺾을 수 있는 기회가 한번 있는데, 그건 바로 <strong><code class="language-plaintext highlighter-rouge">Serializer</code>에 억지로 PK를 추가하는 방법</strong> 이다. 이렇게 되면 <code class="language-plaintext highlighter-rouge">validated_data</code>에 PK가 포함이 된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DiarySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="p">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="p">.</span><span class="nc">IntegerField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>    <span class="c1"># PK 추가
+</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ShortDiary</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="sh">"</span><span class="s">__all__</span><span class="sh">"</span>
+</code></pre></div></div>
+
+<p>그리고 API를 요청해 보면 <code class="language-plaintext highlighter-rouge">Response</code> 부분에 <code class="language-plaintext highlighter-rouge">id</code> 가 변경된 것을 확인할 수 있다</p>
+
+<p><img src="/assets/img/20250720/3.png" alt="change-id-result-2" /></p>
+
+<p>그런데 정말 바뀐게 맞을까? DB 테이블을 한번 보자</p>
+
+<h3 id="api-요청-전">API 요청 전</h3>
+
+<p><img src="/assets/img/20250720/4.png" alt="change-before" /></p>
+
+<h3 id="api-요청-후">API 요청 후</h3>
+
+<p><img src="/assets/img/20250720/5.png" alt="change-after" /></p>
+
+<p><strong>바뀐게 아니라 아예 데이터가 새로 추가됐다.</strong> PK를 변경하려던 데이터는 변경 없이 그래도 유지되었고, 변경된 <code class="language-plaintext highlighter-rouge">id</code>를 가지고 전혀 다른 데이터가 복사되었다. 정확한 확인을 위해 로깅된 쿼리를 보자</p>
+
+<h3 id="쿼리-내역">쿼리 내역</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(0.000)
+    UPDATE `short_diary` SET `user_id` = 23, `title` = 'string2', `context` = 'string', `is_deleted` = 0
+    WHERE `short_diary`.`id` = 300;
+(0.004)
+    INSERT INTO `short_diary` (`id`, `user_id`, `title`, `context`, `is_deleted`)
+    VALUES (300, 23, 'string2', 'string', 0);
+</code></pre></div></div>
+
+<p>첫번째 쿼리를 보면 <code class="language-plaintext highlighter-rouge">id = 300</code> 인 데이터를 대상으로 정보를 수정하려고 하고 있다. 그러나 당시 요청했던 API의 URL은 <code class="language-plaintext highlighter-rouge">PUT /diaries/111</code> 이었기 때문에 
+<code class="language-plaintext highlighter-rouge">id</code>가 <code class="language-plaintext highlighter-rouge">111</code> 인 데이터를 검색해야 하는데, 변경 대상 값인 <code class="language-plaintext highlighter-rouge">300</code>으로 검색한 것이다. 그리고 <code class="language-plaintext highlighter-rouge">id</code>가 <code class="language-plaintext highlighter-rouge">300</code>는 따로 없기 때문에 <code class="language-plaintext highlighter-rouge">create</code> 함수가 작동되어 새로 생성한 것이다.</p>
+
+<h3 id="원인이-무엇인가">원인이 무엇인가</h3>
+
+<p><strong>Django ORM 내부에서는 Instance의 PK 를 바꾸는 것을 허용하지 않기 때문이다.</strong> 즉 <code class="language-plaintext highlighter-rouge">instance.pk = &lt;다른값&gt;</code> 이런식으로 어거지로 넣을 경우, <code class="language-plaintext highlighter-rouge">&lt;다른값&gt;</code>에 해당하는 데이터가 없을 때, Django ORM에서는 완전히 새로운 데이터라고 인식을 하기 때문에, 새로 생성하게 된다. <a href="https://docs.djangoproject.com/en/5.1/topics/db/models">공식문서</a> 에서도 이와 관련된 내용이 적혀 있다.</p>
+
+<blockquote>
+  <p>The primary key field is read-only. If you change the value of the primary key on an existing object and then save it, a new object will be created alongside the old one. For example:</p>
+  <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Fruit</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="nc">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div>  </div>
+  <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> fruit <span class="o">=</span> Fruit.objects.create<span class="o">(</span><span class="nv">name</span><span class="o">=</span><span class="s2">"Apple"</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> fruit.name <span class="o">=</span> <span class="s2">"Pear"</span>
+<span class="o">&gt;&gt;&gt;</span> fruit.save<span class="o">()</span>
+<span class="o">&gt;&gt;&gt;</span> Fruit.objects.values_list<span class="o">(</span><span class="s2">"name"</span>, <span class="nv">flat</span><span class="o">=</span>True<span class="o">)</span>
+QuerySet <span class="o">[</span><span class="s1">'Apple'</span>, <span class="s1">'Pear'</span><span class="o">]&gt;</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<h1 id="결론">결론</h1>
+
+<p>Primary Key는 테이블에서 고유식별자를 나타내기 때문에, 보통 변경됨을 권장하지 않는다. 그래서 관련없는 데이터가 들어가야 한다는 얘기도 있다.
+Django 역시 이러한 내용을 인지하고 있기 때문에 Primary Key를 변경하지 못하게 막고 있다. 따라서, Django 기반 서비스를 만들 경우, DB 설계시 Primary Key 설계를 신중하게 해야 한다.</p>]]></content><author><name></name></author><category term="Django" /><category term="django" /><category term="database" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점</title><link href="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html" rel="alternate" type="text/html" title="Redis에서의 분산락 사용법 (1) - 분산락의 사용 이유와 주의할 점" /><published>2025-06-20T19:00:00+00:00</published><updated>2025-06-20T19:00:00+00:00</updated><id>https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1</id><content type="html" xml:base="https://recoma96.github.io/distributed_lock/2025/06/20/python-redis-distributed-1.html"><![CDATA[<h1 id="배경">배경</h1>
 
 <p>약 2주 전, 회사 내에서 꽤 심각한 이슈가 발생했다. CeleryBeat 기반의 배치 프로세스가 동작 중 서버 리빌드로 인해 프로세스가 일시적으로 종료되었고, 이 과정에서 삭제되어야 할 분산락 캐시 데이터가 그대로 남게 되었다. 그 결과, 다음 배치 프로세스가 분산락을 확인하고 “작업이 아직 진행 중”이라 판단하며 실행되지 않는 문제가 생겼다.</p>
 
@@ -92,9 +202,7 @@ SETNX mykey "World"  # 이미 존재하면 0 반환
 
 <h1 id="마치며">마치며</h1>
 
-<p>분산락은 단순한 기술처럼 보일 수 있지만, 결국 시스템 전반의 신뢰성과 안정성을 좌우하는 요소다. 철저한 예외 처리가 요구되며, 도입 전에 반드시 설계와 운영 비용을 고려해야 한다.</p>
-
-<p>다음 글에서는 Python 기반의 실제 코드를 통해 이 개념을 어떻게 구현할 수 있는지 살펴보겠다.</p>]]></content><author><name></name></author><category term="distributed_lock" /><category term="redis" /><category term="cache" /><category term="distributed-lock" /><category term="software-architecture" /><summary type="html"><![CDATA[배경]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화</title><link href="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html" rel="alternate" type="text/html" title="N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화" /><published>2025-04-18T17:00:00+00:00</published><updated>2025-04-18T17:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django</id><content type="html" xml:base="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html"><![CDATA[<h1 id="개요">개요</h1>
+<p>분산락은 단순한 기술처럼 보일 수 있지만, 결국 시스템 전반의 신뢰성과 안정성을 좌우하는 요소다. 철저한 예외 처리가 요구되며, 도입 전에 반드시 설계와 운영 비용을 고려해야 한다.</p>]]></content><author><name></name></author><category term="distributed_lock" /><category term="redis" /><category term="cache" /><category term="distributed-lock" /><category term="software-architecture" /><summary type="html"><![CDATA[배경]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화</title><link href="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html" rel="alternate" type="text/html" title="N+1 문제 실전 사례: DRF ModelSerializer와 List API에서의 쿼리 최적화" /><published>2025-04-18T17:00:00+00:00</published><updated>2025-04-18T17:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django</id><content type="html" xml:base="https://recoma96.github.io/database/2025/04/18/n-plus-1-example-django.html"><![CDATA[<h1 id="개요">개요</h1>
 
 <p>한참 전에, <a href="/django/2024/12/12/django-n1-problem.html">Django에서의 N + 1 Problem을 해결하는 방법</a>을 포스팅 한 적이 있었다. 요약하자면, <strong>우리가 사용하는 ORM은 Lazy Loading 기법으로 인해 레코드와 관련된 참조테이블들을 꼭 필요한 때만 가져오기 때문에, 조회된 레코드 갯수 대로 참조 테이블에 쿼리를 날리는 이슈</strong> 정도가 된다. 해결 방법은 <code class="language-plaintext highlighter-rouge">join</code>이나 아니면 참조 테이블을 한번더 <code class="language-plaintext highlighter-rouge">select</code>를 하면 되고, Django에서는 <code class="language-plaintext highlighter-rouge">select_related</code>와 <code class="language-plaintext highlighter-rouge">prefetch_related</code>라는 이름의 함수가 N + 1 Problem을 해결하는 열쇠가 된다.</p>
 
@@ -1022,106 +1130,4 @@ AWS Secret Access Key <span class="o">[</span><span class="k">****************</
 <span class="k">def</span> <span class="nf">test_example</span><span class="p">():</span>
     <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Testing</span><span class="sh">"</span><span class="p">)</span>
 
-</code></pre></div></div>]]></content><author><name></name></author><category term="Testing" /><category term="python" /><category term="testing" /><category term="pytest" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Base64를 사용하는 이유</title><link href="https://recoma96.github.io/computer_science/2024/12/27/base64.html" rel="alternate" type="text/html" title="Base64를 사용하는 이유" /><published>2024-12-27T09:00:00+00:00</published><updated>2024-12-27T09:00:00+00:00</updated><id>https://recoma96.github.io/computer_science/2024/12/27/base64</id><content type="html" xml:base="https://recoma96.github.io/computer_science/2024/12/27/base64.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<p>회사에서 개발과 관련된 일을 하다 보면 OpenAPI를 이용한 기능을 구현할 때가 있다. 그런데 간혹 공공기관의 OpenAPI를 이용하다 보면 대부분 인증 관련 데이터를 Base64로 인코딩을 해달라는 요구가 있다. 심지어 운전면허 검증 API중의 하나인 RIMS API의 경우 body 마저도 AES 암호화에 Base64까지 인코딩을 해야 한다. 아니 어차피 HTTPS로 암호화를 따로 할 텐데 왜 도대체 이런 짓들을 하는 걸까? Base64의 의미와 사용하는 이유를 알아보자.</p>
-
-<h1 id="base64">Base64</h1>
-
-<h2 id="설명">설명</h2>
-
-<p>Base64란 바이너리 데이터를 문자로 64진법 형식으로 인코딩을 하는 방식을 말한다.</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>M</th>
-      <th>a</th>
-      <th>n</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>01001101</td>
-      <td>01100001</td>
-      <td>01101110</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>예를 들어 “Man”을 Base64로 인코딩한다고 하자, 문자(char)의 데이터 크기는 1byte, 즉 8bit이다. Man이라는 문자열의 길이는 총 3byte이므로 8bit + 8bit + 8bit = 24bit이다. Base64는 이걸 64진법으로 인코딩한다고 했는데. 64는 2^6이다. 즉, 24bit를 6bit 단위로 쪼갠 다음, Base64 색인표에 따라 텍스트를 생성한다.<br /><br /></p>
-
-<p>출처: 위키백과
-<img src="/assets/img/20241227/base64-index.png" alt="base64-index" /></p>
-
-<table>
-  <thead>
-    <tr>
-      <th>T</th>
-      <th>W</th>
-      <th>F</th>
-      <th>u</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>010011</td>
-      <td>01<strong>0110</strong></td>
-      <td><strong>0001</strong>01</td>
-      <td>101110</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>이렇게 해서 “Man”에서 “TWFu”로 인코딩이 되었다.</p>
-
-<h3 id="마지막을-로-패딩하는-이유">마지막을 =로 패딩하는 이유</h3>
-
-<p>가끔씩 보면 마지막이 “=”로 끝나는 경우가 있다. 8bit단위에서 6bit단위로 쪼개기 때문에 마지막에 2bit 혹은 4bit가 비게 되는데. 이때는 “=” 기호로 padding을 하게 된다. 예를 들어 <code class="language-plaintext highlighter-rouge">hello world</code>를 base64로 인코딩을 하면 <code class="language-plaintext highlighter-rouge">aGVsbG8gd29ybGQ=</code> 로 나온다. <code class="language-plaintext highlighter-rouge">hello world</code>라는 문자의 길이는 11byte = 88bit이고 이를 6bit로 쪼개면 마지막에 2bit가 비게 되는데, 이 2bit를 대신 <code class="language-plaintext highlighter-rouge">=</code>로 채운 것이다.</p>
-
-<h2 id="단점">단점</h2>
-
-<p>아까 보다시피 “Man”에서 “TWFu”로 인코딩이 되었는데, 3글자에서 4글자로 1글자 더 추가되었다. 비트를 쪼개는 단위가 8bit에서 6bit로 줄면서 그만큼 글자가 늘어났기 때문이다. 즉, Base64 방식은 데이터의 길이가 늘어난다는 단점이 생기게 된다. 데이터가 커질 수록 스토리지에 저장한다던가, 아니면 데이터 통신을 하는데 있어서 상대적으로 부담이 커질 수 밖에 없다. 그럼에도 불구하고 왜 자주 사용을 할까?</p>
-
-<h2 id="사용-이유">사용 이유</h2>
-
-<p><strong>바이너리 데이터를 손실없이 전송할 수 있기 때문이다.</strong> 데이터 중에서는 우리가 알아볼 수 있는 문자 데이터 말고도 바이너리 데이터에 해당되는 그림 파일, 동영상 파일 등이 있다. <strong>이러한 바이너리 데이터들중 일부는 ASCII 코드에 해당하지 않는 경우가 있다.</strong> 그 이유는 문자(char)의 길이는 8bit(1byte)이지만, ASCII의 범위는 0부터 127까지로 7bit이기 때문이다. 즉, 128부터 255 까지는 ASCII 코드에 해당하지 않기 때문에, 수신자는 이 데이터들을 해석하지 못하게 된다. 하지만 <strong>Base64 인코딩을 사용해 바이너리 데이터들을 ASCII형태의 문자열로 변환을 하게 된다면, 수산자는 해당 데이터를 바로 해석을 할 수 있고, 그 이후에 Base64를 포함한 후속 작업을 진행할 수 있게 된다.</strong></p>
-
-<h3 id="예시-이메일-전송시-사용">예시: 이메일 전송시 사용</h3>
-
-<p>이러한 대표적인 예로 메일을 주고받을 때 사용되는 STMP 프로토콜이 있다. 이 프로토콜은 7bit 단위의 데이터만 취급하기 때문에 8bit 이상의 유니코드나, 기타 바이너리 데이터들은 Base64로 6bit 단위로 인코딩을 해서 송수신을 한다.</p>
-
-<h1 id="utf-8-과의-차이점">UTF-8 과의 차이점</h1>
-
-<p>찬혹 UTF-8 인코딩과 헷갈릴 수 있는데 UTF-8은 <em>Unicode Transformation Format - 8bit</em> 의 약자다. 즉, 유니코드를 표현하기 위해 사용되는 인코딩 방식으로, 다양한 언어를 표현할 때 사용된다. 안전성을 목적으로 둔 Base64와는 경우가 다르다.</p>
-
-<h1 id="파이썬에서-base64-사용해-보기-feat-utf-8">파이썬에서 Base64 사용해 보기 (feat. UTF-8)</h1>
-
-<p>파이썬에서는 base64로 인코딩 또는 디코딩을 하는 모듈을 기본으로 제공한다.</p>
-
-<h2 id="인코딩">인코딩</h2>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
-
-<span class="n">text</span> <span class="o">=</span> <span class="sh">'</span><span class="s">안녕 월드</span><span class="sh">'</span>
-<span class="n">utf_text</span> <span class="o">=</span> <span class="n">text</span><span class="p">.</span><span class="nf">encode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">utf_text</span><span class="p">)</span>
-<span class="c1"># 바이너리로 변환 -&gt; b'\xec\x95\x88\xeb\x85\x95 \xec\x9b\x94\xeb\x93\x9c'
-</span>
-<span class="n">encoded_text</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64encode</span><span class="p">(</span><span class="n">utf_text</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
-<span class="c1"># b'7JWI64WVIOyblOuTnA=='
-</span></code></pre></div></div>
-
-<h2 id="디코딩">디코딩</h2>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">base64</span>
-
-<span class="n">encoded_text</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="s">7JWI64WVIOyblOuTnA==</span><span class="sh">'</span>
-<span class="n">decoded_text</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="nf">b64decode</span><span class="p">(</span><span class="n">encoded_text</span><span class="p">)</span>
-<span class="c1"># base64 디코딩 -&gt; b'\xec\x95\x88\xeb\x85\x95 \xec\x9b\x94\xeb\x93\x9c'
-</span>
-<span class="n">text</span> <span class="o">=</span> <span class="n">decoded_text</span><span class="p">.</span><span class="nf">decode</span><span class="p">(</span><span class="sh">'</span><span class="s">utf-8</span><span class="sh">'</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-<span class="c1"># utf-8 디코딩 -&gt; 안녕 월드
-</span></code></pre></div></div>]]></content><author><name></name></author><category term="Computer_Science" /><category term="computer-science" /><category term="data" /><category term="encoding" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</code></pre></div></div>]]></content><author><name></name></author><category term="Testing" /><category term="python" /><category term="testing" /><category term="pytest" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
