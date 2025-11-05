@@ -1,4 +1,155 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-09-14T12:07:20+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">React Hook Form 자동 저장 기능, isDirty로 완성도 높이기</title><link href="https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty.html" rel="alternate" type="text/html" title="React Hook Form 자동 저장 기능, isDirty로 완성도 높이기" /><published>2025-09-14T03:00:00+00:00</published><updated>2025-09-14T03:00:00+00:00</updated><id>https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty</id><content type="html" xml:base="https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty.html"><![CDATA[<h1 id="배경">배경</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-11-05T14:32:36+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">SARGable에 대해서 알아보자</title><link href="https://recoma96.github.io/database/2025/11/05/sargable.html" rel="alternate" type="text/html" title="SARGable에 대해서 알아보자" /><published>2025-11-05T14:00:00+00:00</published><updated>2025-11-05T14:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/11/05/sargable</id><content type="html" xml:base="https://recoma96.github.io/database/2025/11/05/sargable.html"><![CDATA[<h1 id="이슈---서버-터짐">이슈 - 서버 터짐</h1>
+
+<p>이번 블로그 내용은 최근에(블로그 작성 시점) 발생한 “서버 작동 중지”라는 섬뜩한 경험을 기반으로 한다.</p>
+
+<h2 id="첫번째-사망">첫번째 사망</h2>
+
+<p>두 달 전, 특정 주제의 푸시 알림을 발송한 직후 서버가 터지는 일이 발생했다. 알림 발송후 약 1분 동안 트래픽이 급상승하면서 RDS Connection Pool이 한계치를 초과했고, 더 이상 데이터베이스에 접속하지 못한 서버가 그대로 다운된 것이다.
+당시에는 ‘아, 푸시 알림 때문에 순간적으로 트래픽이 몰려서 생긴 문제구나’라고 단순하게 생각했다. 그래서 급한 대로 SQLAlchemy의 커넥션 풀 관련 설정을 일부 조정하는 선에서 이슈를 마무리했다.</p>
+
+<h2 id="두-번째-사망">두 번째 사망</h2>
+
+<p>그리고 두 달이라는 시간이 흘렀다. 그 사이 수많은 푸시 알림을 보냈지만 서버는 아무 문제 없이 튼튼하게 버텨주었다. 당연히 문제가 해결되었다고 생각했다.
+하지만 지난주, 두 달 전과 <strong>동일한 주제</strong>의 푸시 알림을 다시 발송하자 거짓말처럼 서버는 정확히 똑같은 증상을 보이며 다운되었다.</p>
+
+<h2 id="원인">원인?</h2>
+
+<p>뭔가 이상했다. 왜 다른 푸시 알림은 괜찮은데, 유독 이 주제의 푸시 알림에만 서버가 반응하는 걸까?
+Datadog을 통해 지표를 확인해 보니, 원인은 명확해졌다. 서버가 다운되기 직전, 특정 API의 지연 시간이 비정상적으로 치솟아 있었다.</p>
+
+<ul>
+  <li>Total Time: <strong>1h 17m</strong></li>
+  <li>P95 Latency: <strong>24.4s</strong></li>
+  <li>P50 Latency: 1.63s -&gt; <strong>12.9s</strong></li>
+</ul>
+
+<blockquote>
+  <p><strong>P{x} Latency란?</strong> 전체 요청 중 {x}%가 특정 시간(해당 지표 중 P95에서는 24.4초) 이하로 처리되었음을 의미하는 성능 지표다. 소수의 극단적인 케이스를 제외하고 대부분의 사용자가 경험하는 지연 시간을 파악하는 데 유용하다. P95는 소수의 매우 느린 요청에 대해 파익을 쉽게 할 수 있고, P50은 중위 혹은 평균 응답시간을 파악할때 유용하다.</p>
+</blockquote>
+
+<p>천문학적인 지연 시간이었다. 해당 API는 특정 주제의 데이터를 조회하는 단순한 로직이었고, 백엔드 로직보다는 데이터베이스 쿼리에서 병목이 발생했을 확률이 압도적으로 높다고 판단했다.</p>
+
+<p>가설을 검증하기 위해 ORM이 생성한 SQL문을 추출하여 MySQL에서 직접 <code class="language-plaintext highlighter-rouge">EXPLAIN ANALYZE</code>를 실행했다. 결과는 충격적이었다. 예상대로 엄청난 수의 row를 스캔하고 있었고, cost 또한 매우 높았다. 분명히 해당 쿼리의 <code class="language-plaintext highlighter-rouge">WHERE</code> 절에 포함된 날짜 관련 컬럼에는 인덱스가 설정되어 있었는데, 어째서인지 옵티마이저가 인덱스를 전혀 사용하지 않고 있었다. 즉, 날짜 필터 없이 어마어마한 양의 데이터를 부르고 이걸 여러번 순회를 돌다가, 나중가서야 날짜 필터가 돌아갔던 것이다.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 문제가 된 쿼리 (예시)</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">push_target_table</span>
+<span class="k">WHERE</span> <span class="nb">DATE</span><span class="p">(</span><span class="n">created_at</span><span class="p">)</span> <span class="o">=</span> <span class="s1">'2025-11-06'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>바로 <code class="language-plaintext highlighter-rouge">DATE(created_at)</code> 때문이었다. <code class="language-plaintext highlighter-rouge">WHERE</code> 절에서 인덱스가 걸린 컬럼을 함수로 가공하는 순간, 옵티마이저는 더 이상 인덱스를 활용할 수 없게 된다. 이것이 바로 <strong>Non-SARGable</strong> 쿼리의 대표적인 예다.</p>
+
+<h1 id="sargable-non-sargable">SARGable? Non-SARGable?</h1>
+
+<h2 id="sargable">SARGable</h2>
+
+<p><strong>SARGable</strong>은 “Search ARGument-able”의 줄임말로, 데이터베이스가 쿼리를 처리할 때 <strong>인덱스를 활용하여 효율적으로 검색할 수 있는 형태의 조건절</strong>을 의미한다.</p>
+
+<p>SARGable 쿼리는 인덱스 구조를 그대로 활용하여 탐색 범위를 효과적으로 좁힐 수 있다. 예를 들어 <code class="language-plaintext highlighter-rouge">WHERE created_at &gt;= '2025-11-06'</code> 같은 조건은 B-Tree 인덱스에서 특정 지점을 바로 찾아 스캔을 시작할 수 있게 해준다.</p>
+
+<h2 id="non-sargable">Non-SARGable</h2>
+
+<p>반면 <strong>Non-SARGable</strong> 쿼리는 인덱스 컬럼 자체를 가공(함수 사용, 연산 등)하기 때문에, 데이터베이스가 조건을 비교하기 위해 <strong>테이블의 모든 레코드를 하나씩 꺼내어 함수를 실행</strong>해야 한다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">created_at</code>에 인덱스가 있더라도, <code class="language-plaintext highlighter-rouge">WHERE DATE(created_at) = '2025-11-06'</code> 조건은 모든 <code class="language-plaintext highlighter-rouge">created_at</code> 값에 <code class="language-plaintext highlighter-rouge">DATE()</code> 함수를 적용한 후에야 <code class="language-plaintext highlighter-rouge">'2025-11-06'</code>과 비교할 수 있다. 이는 결국 인덱스를 타지 못하고 Full Table Scan으로 이어져 성능 저하의 주범이 된다.</p>
+
+<h3 id="sargable-vs-non-sargable-연산자함수">SARGable vs Non-SARGable 연산자/함수</h3>
+
+<blockquote>
+  <p>위 목록은 대표적인 예시이며, 사용하는 데이터베이스 시스템에 따라 동작이 조금씩 다를 수 있다.</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">구분</th>
+      <th style="text-align: left">SARGable</th>
+      <th style="text-align: left">Non-SARGable</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><strong>비교</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">=</code>, <code class="language-plaintext highlighter-rouge">&gt;</code> ,<code class="language-plaintext highlighter-rouge">&lt;</code>, <code class="language-plaintext highlighter-rouge">&gt;=</code>, <code class="language-plaintext highlighter-rouge">&lt;=</code>, <code class="language-plaintext highlighter-rouge">BETWEEN</code>, <code class="language-plaintext highlighter-rouge">IN</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">!=</code>, <code class="language-plaintext highlighter-rouge">&lt;&gt;</code>, <code class="language-plaintext highlighter-rouge">NOT IN</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>문자열</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">LIKE '검색어%'</code> (접두사 검색)</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">LIKE '%검색어'</code> (중간, 접미사 검색), <code class="language-plaintext highlighter-rouge">SUBSTRING()</code>, <code class="language-plaintext highlighter-rouge">LOWER()</code> 등 함수 사용</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>날짜/시간</strong></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&gt;= '특정일자'</code>, <code class="language-plaintext highlighter-rouge">&lt; '특정일자'</code></td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">DATE()</code>, <code class="language-plaintext highlighter-rouge">YEAR()</code>, <code class="language-plaintext highlighter-rouge">MONTH()</code> 등 함수 사용</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>기타</strong></td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left">컬럼에 직접 산술 연산 (<code class="language-plaintext highlighter-rouge">column * 10 = 100</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="결과">결과</h1>
+
+<p>원인을 파악했으니 해결은 간단했다. 인덱스 컬럼인 <code class="language-plaintext highlighter-rouge">created_at</code>을 가공하지 않도록 쿼리를 수정하는 것이다. <code class="language-plaintext highlighter-rouge">DATE()</code> 함수를 사용하는 대신, 날짜 범위를 직접 지정하는 방식으로 변경했다.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 개선된 쿼리</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">push_target_table</span>
+<span class="k">WHERE</span> <span class="n">created_at</span> <span class="o">&gt;=</span> <span class="s1">'2025-11-06 00:00:00'</span> <span class="k">AND</span> <span class="n">created_at</span> <span class="o">&lt;</span> <span class="s1">'2025-11-07 00:00:00'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>수정된 쿼리로 다시 <code class="language-plaintext highlighter-rouge">EXPLAIN ANALYZE</code>를 실행하자, <strong>cost가 약 85% 감소</strong>했고 옵티마이저가 인덱스를 정상적으로 사용하는 것을 확인할 수 있었다.</p>
+
+<p>개선된 코드를 배포하고 10분 뒤, 지표는 즉각적으로 반응했다.</p>
+
+<ul>
+  <li>P95 Latency: 1.6s -&gt; <strong>0.03s</strong></li>
+  <li>P50 Latency: 1.6s -&gt; <strong>0.03s</strong></li>
+</ul>
+
+<p>다음 날, 문제의 푸시 알림을 다시 한번 발송했다. 이전과 같이 트래픽은 급증했지만, 이번에는 서버가 다운되지 않았다. API 지표는 놀라울 정도로 안정적이었다.</p>
+
+<ul>
+  <li>Total Time: 1h 17m -&gt; <strong>3.56m</strong></li>
+  <li>P95 Latency: 24.4s -&gt; <strong>0.4s</strong></li>
+  <li>P50 Latency: 1.63s -&gt; <strong>0.15s</strong></li>
+</ul>
+
+<p>P95 Latency 기준으로, 평상시에와 트래픽 증폭 시, 성능이 <strong>98%</strong> 감소되었다.</p>
+
+<h1 id="회고">회고</h1>
+
+<p>이번 장애를 통해 두 가지 중요한 교훈을 얻었다.</p>
+
+<ol>
+  <li><strong>ORM을 맹신하지 말고, 배포 전에는 반드시 SQL 성능을 측정하자.</strong> ORM은 편리하지만, 내가 작성한 코드가 어떤 SQL로 변환되고 어떻게 실행될지 항상 의심하고 확인하는 습관이 필요하다. Postman이나 Jmeter, AB같은 테스트툴도 써 보고 <code class="language-plaintext highlighter-rouge">EXPLAIN</code>을 이용해서 리소스가 얼마나 발생하는지 확인하는 습관을 길러야 한다.</li>
+  <li><strong>SQL 성능 최적화는 개발자의 핵심 역량이다.</strong> 단순히 기능 구현을 넘어, 대용량 트래픽 환경에서 서비스 안정성을 책임지기 위해서는 SQL과 데이터베이스에 대한 깊이 있는 학습이 절실히 필요하다는 것을 깨달았다.</li>
+</ol>
+
+<p>늘상 경험하는 거지만, 함부로 대충 개발해서는 안될 것 같다. 로직 하나를 작성하더라도 신중한 테도를 갖도록 하자.</p>
+
+<h2 id="후속-조치">후속 조치?</h2>
+
+<p>해당 이슈를 해결하고 나서, 한 가지 의문이 더 생겼다. 이 API는 별도의 필터 파라미터 없이 항상 같은 데이터를 조회하는데, 데이터가 바뀌는 시점은 매일 자정이다. 즉, 하루 동안은 몇 번을 호출하든 동일한 결과를 반환한다.</p>
+
+<p>그렇다면 굳이 API를 호출할 때마다 매번 데이터베이스에 접근해서 커넥션을 소모하는 것이 과연 효율적일까?</p>
+
+<p>가장 먼저 떠오르는 해결책은 <strong>캐싱(Caching)</strong>이다. 조회 결과를 캐시에 저장해두고 다음 요청부터는 캐시에서 바로 반환하면 DB 부하를 획기적으로 줄일 수 있다. 하지만 과거 캐시와 관련해 여러 이슈를 겪었던 경험이 있어, 이번에는 다른 방법을 모색해보고 싶었다.</p>
+
+<p>그래서 생각한 대안은 <strong>배치 프로세스를 통한 데이터 사전 계산(Pre-calculation)</strong>이다.</p>
+
+<ol>
+  <li><strong>EventBridge</strong>를 사용해 매일 00시에 스케줄링된 이벤트를 발생시킨다.</li>
+  <li>이벤트는 <strong>AWS Lambda</strong> 함수를 트리거한다.</li>
+  <li>Lambda 함수는 최적화된 SQL 쿼리를 실행하여 하루 동안 사용될 데이터를 미리 조회한다.</li>
+  <li>조회된 결과는 S3나 ElastiCache와 같은 특정 스토리지에 JSON 형태로 저장한다.</li>
+  <li>기존 API는 이제 데이터베이스에 직접 쿼리하는 대신, 이 스토리지에 저장된 데이터를 읽어와 반환하도록 수정한다.</li>
+</ol>
+
+<p>이 방식을 통해 API 요청 시점에는 더 이상 데이터베이스에 접근하지 않게 되므로, 푸시 알림으로 인한 순간적인 트래픽 폭증에도 RDS 커넥션에 대한 걱정 없이 안정적으로 서비스를 운영할 수 있을 것이다.</p>]]></content><author><name></name></author><category term="Database" /><category term="database" /><category term="mysql" /><category term="performance-tuning" /><category term="sargable" /><category term="orm" /><summary type="html"><![CDATA[이슈 - 서버 터짐]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">React Hook Form 자동 저장 기능, isDirty로 완성도 높이기</title><link href="https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty.html" rel="alternate" type="text/html" title="React Hook Form 자동 저장 기능, isDirty로 완성도 높이기" /><published>2025-09-14T03:00:00+00:00</published><updated>2025-09-14T03:00:00+00:00</updated><id>https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty</id><content type="html" xml:base="https://recoma96.github.io/frontend/2025/09/14/nextjs-useform-isdirty.html"><![CDATA[<h1 id="배경">배경</h1>
 
 <h2 id="등산-코스-편집기와-자동-저장-기능">등산 코스 편집기와 자동 저장 기능</h2>
 
@@ -1067,135 +1218,4 @@ secret_key     ****************xxxx shared-credentials-file
 <p>그런데 Pycharm 또는 VSCode IDE에서 사용할 경우 어느 Profile을 사용할 건지 고정을 하고 사용해야 한다. 이때는 환경변수로 세팅을 해서 사용한다.</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="o">=</span>&lt;ProfileName&gt;
-</code></pre></div></div>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="iam" /><category term="aws_configure" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">IAM Role이란?</title><link href="https://recoma96.github.io/aws/2025/01/15/iam-role.html" rel="alternate" type="text/html" title="IAM Role이란?" /><published>2025-01-15T08:30:00+00:00</published><updated>2025-01-15T08:30:00+00:00</updated><id>https://recoma96.github.io/aws/2025/01/15/iam-role</id><content type="html" xml:base="https://recoma96.github.io/aws/2025/01/15/iam-role.html"><![CDATA[<h1 id="개요">개요</h1>
-
-<blockquote>
-  <p>IAM</p>
-</blockquote>
-
-<p>AWS 입문을 해 봤다면 <strong>IAM</strong> 이라는 단어는 자주 들어봤을 것이다. IAM은 사용자 또는 AWS 사용 권한에 대한 관리를 하는 웹 서비스로
-보통 사용자를 생성할 때 해당 서비스를 사용하는 것을 볼 수가 있다. IAM 에도 여러가지 세분화가 되어 있는데. 이중에 IAM User는 사용자를 관리하는 항목이다.</p>
-
-<h2 id="iam-user와-aws-configure를-이용한-aws-접근">IAM User와 AWS Configure를 이용한 AWS 접근</h2>
-
-<p>보통 웹 콘솔 말고도 내 컴퓨터나, 서버단에서 AWS 서비스를 사용해야 할 때가 있다. 이 AWS 서비스들을 사용하기 위해 사용자 인증을 하게 되는데 이때 사용되는 툴이 AWS Configure이다.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws configure
-AWS Access Key ID <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
-AWS Secret Access Key <span class="o">[</span><span class="k">****************</span><span class="o">]</span>:
-... 이하 생략 ...
-</code></pre></div></div>
-
-<p>IAM에서 유저를 생성하면 그 유저에 대한 엑세스 키 아이디(Access Key ID)와 시크릿 엑세스 키(Secret Access Key)를 발행하게 되는데, 이 두개를 AWS Configure에 입력을 해야 비로소
-로컬 또는 특정 EC2 서버에서 AWS CLI를 통해 웹 콘솔 없이 AWS 리소스에 접근할 수 있다. 백엔드 서버에서 모듈로 사용하는 경우, 해당 모듈을 사용하기 전에 이 두개를 등록을 해 줘야 한다. 그런데, 
-로컬은 그렇다 쳐도 <strong>EC2에서 이렇게 AWS Configure로 유저 정보를 저장하면 발생하는 문제점이 몇가지 있다.</strong></p>
-
-<ol>
-  <li>파일에 저장하는 방식이기 때문에 정보가 유출될 가능성이 있다.</li>
-  <li>엑세스 키에 기한이 설정되어 있는 경우, 만료됬을 때 AWS 서비스를 사용하는 프로덕트가 정상적으로 작동이 안될 수 있다.</li>
-  <li>실무에서 AWS 정보의 주인이 퇴사를 하게 되면, AWS 정보를 바꿔야 하는 번거로움이 발생하게 된다.</li>
-</ol>
-
-<p>이러한 문제점 때문에 EC2에서 AWS Configure를 사용하지 않고도 AWS를 접근할 수 있는 대안이 생기게 되는데 이게 바로 <strong>IAM Role(IAM 역할)</strong> 이다.</p>
-
-<h1 id="iam-role">IAM Role</h1>
-
-<p>IAM User가 사용자의 권한을 의미한다면 <strong>IAM Role은 특정 AWS 서비스에서 다른 AWS 서비스에 접근하기 위한 권한을 관리하는 항목이다.</strong> 그러니까, IAM User가 “사람 대 서비스” 였다면, IAM Role은 “서비스 대 서비스” 라고 보면 된다. 예를 들어 아까 위에서 설명했던 EC2에서 S3를 접근하고 싶다고 할때, S3를 접근하는 IAM Role를 생성한 다음, 그 IAM Role을 EC2에 부착하면 된다.</p>
-
-<h2 id="사용법">사용법</h2>
-
-<p>이번 IAM Role 목표는, EC2에서 aws-cli로 S3에 있는 버킷과 파일들을 접근하기 위해 Role을 생성해서 EC2에 붙이려고 한다. (aws-cli는 설치가 되어 있다고 가정한다. <a href="https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/getting-started-install.html">aws-cli 설치방법</a>)</p>
-
-<h3 id="role-생성">Role 생성</h3>
-
-<p>IAM에 들어가서 IAM resources의 Roles를 클릭한다.
-<img src="/assets/img/20250115/iam-role-use-1.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>새 Role을 만들어야 하니 Create Role을 선택한다.
-<img src="/assets/img/20250115/iam-role-use-2.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>첫번째 스탭으로 누가 이 Role을 사용하는지 선택한다. 우리는 EC2에서 S3에 접근하는 것이 목표이기 때문에 EC2를 고른다.
-<img src="/assets/img/20250115/iam-role-use-3.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>이번엔 어느 서비스를 접근하는지 골라야 한다. 우리는 S3에 있는 데이터들을 읽는게 목표이기 때문에 AmazonS3ReadOnlyAccess 를 선택한다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-4.png" alt="" /></p>
-
-<blockquote>
-  <p>S3에 있는 데이터들을 <strong>읽기</strong> 만 하기 때문에 가급적 ReadOnly 권한을 설정해 줘야 한다. <strong>왜냐하면 IAM에서 권한을 줄 때 딱 필요한 권한만 주는게 원칙이기 때문이다.</strong> 사실 특정 버킷을 의미하는 Resource도 모든 리소스를 조회하는 “*“가 아닌 조회하고자 하는 특정 버킷들의 arn만 작성해야 하지만 여기까지 하면 너무 길어지니 생략.</p>
-</blockquote>
-
-<p><br /></p>
-
-<p>이제 Role의 이름만 지어주면 된다. 나는 example-for-ec2로 이름지었다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-5.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>다시 IAM Role로 돌아가 보면 생성이 되어있음을 알 수 있다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-6.png" alt="" /></p>
-
-<p><br /></p>
-
-<h3 id="ec2에-붙여넣기">EC2에 붙여넣기</h3>
-
-<p>EC2 인스턴스 중에 IAM Role이 적용되지 않는 인스턴스를 선택한 다음 Actions &gt; Security &gt; Modify IAM Role을 선택한다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-7.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>여기서 아까 만들었던 Role을 선택한다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-8.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>다시 돌아가 보면 IAM Role이 부착되었음을 알 수 있다.</p>
-
-<p><img src="/assets/img/20250115/iam-role-use-9.png" alt="" /></p>
-
-<p><br /></p>
-
-<p>IAM Role이 부착된 EC2를 콘솔로 접근한 다음 아래와 같은 명령어를 입력해 보자 S3 버킷 리스트를 불러올 수 있다면 정상적으로 작동이 된 것이다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
-</span>2024-01-26 09:06:37 bucket1
-2023-11-29 11:01:03 bucket2
-2024-01-26 04:57:58 bucket3
-</code></pre></div></div>
-
-<p>만약 접근이 안된다면 아래와 같은 결과가 나온다.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ubuntu@ip-127-00-00-000:~<span class="nv">$ </span>aws s3 <span class="nb">ls
-
-</span>An error occurred <span class="o">(</span>AccessDenied<span class="o">)</span> when calling the ListBuckets operation: User: arn:aws:sts::00000000000:assumed-role/example-for-ec2/i-000000000000 is not authorized to perform: s3:ListAllMyBuckets because no identity-based policy allows the s3:ListAllMyBuckets action
-</code></pre></div></div>
-
-<p>해석을 하자면 s3 버킷 리스트를 불러오기 위해서는 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code> 라는 권한이 없기 때문에 불러올 수 없다는 뜻이 된다. 이럴 때는 IAM Role이 제대로 부착되어 있는지 확인하고, 부착이 되어 있더라도 <code class="language-plaintext highlighter-rouge">Actions</code>에 <code class="language-plaintext highlighter-rouge">s3:ListAllMyBuckets</code>가 제대로 명시되어 있는지 다시 한번 확인하자.</p>
-
-<h2 id="이밖의-다른-사용법들">이밖의 다른 사용법들</h2>
-
-<p>위에 서술하다시피, IAM Role은 AWS를 사용하는 백엔드가 구축된 EC2 또는 ECS 컨테이너에서 IAM User 대용으로 사용하기도 하지만 이 외에도 여러 용도가 있다.</p>
-
-<h3 id="cloudwatch-logging">Cloudwatch Logging</h3>
-
-<p>서버를 운영하다 보면 무슨 이슈가 발생했다거나 뭔가를 확인하기 위해 로그를 살펴볼 때가 있다. 그런데 로그는 보통 서버 인스턴스 내부에서 출력이 된다. 그렇다고 해서 일일이 EC2 컨테이너에 들어가기에는 많이 번거롭기 때문에 EC2에 있는 로그들을 Cloudwatch로 내보내서 웹상에서 로그를 볼 수 있게 작업을 하는 경우가 있는데, <strong>이는 EC2에서 Cloudwatch라는 서비스를 사용하는, 즉 “서비스 대 서비스”가 되기 때문에 이때 IAM Role이 사용된다.</strong> 정확히는 EC2의 IAM Role에 Cloudwatch 관련 권한을 부여하는 것이다. 이때 권한명은 CloudWatchLogsFullAccess 이다.</p>
-
-<h3 id="aws-lambda">AWS Lambda</h3>
-
-<p><img src="/assets/img/20250115/iam-role-use-10.png" alt="" /></p>
-
-<p>Serverless API 서비스로 유명한 AWS Lambda는 <strong>일단 만들기만 하면 IAM Role이 자동으로 생성된다.</strong> AWS Lambda는 말 그대로 Serverless 이므로 EC2 처럼 프린팅 해서 콘솔상에서 볼 수 있는 방법이 없기 때문에 바로 자동으로 Cloudwatch와 연동이 되는 것이다. 그래서 AWS Lambda에서 로직을 작성할 때 로그를 출력하는 코드를 작성하고 실행을 하면, 그 출력 정보는 Cloudwatch에 바로 기록이 된다.</p>
-
-<h1 id="마치며">마치며</h1>
-
-<p>IAM User가 각각 사용자들의 권한을 관리하는 서비스라면, IAM Role은 서비스 간의 연동 및 사용에 관한 권한을 관리하는 서비스로, AWS 서비스를 관리함에 있어 상당히 비중이 있는 항목이다. 그렇기 때문에 IAM Role에 대해서 공부해 보고 실제로 적용을 하면, AWS를 관리함에 있어 상당히 유용할 수 있다.</p>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="iam" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
+</code></pre></div></div>]]></content><author><name></name></author><category term="AWS" /><category term="aws" /><category term="iam" /><category term="aws_configure" /><summary type="html"><![CDATA[개요]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://recoma96.github.io/" /><media:content medium="image" url="https://recoma96.github.io/" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
