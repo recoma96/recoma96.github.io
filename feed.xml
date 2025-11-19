@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-11-05T14:32:36+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">SARGable에 대해서 알아보자</title><link href="https://recoma96.github.io/database/2025/11/05/sargable.html" rel="alternate" type="text/html" title="SARGable에 대해서 알아보자" /><published>2025-11-05T14:00:00+00:00</published><updated>2025-11-05T14:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/11/05/sargable</id><content type="html" xml:base="https://recoma96.github.io/database/2025/11/05/sargable.html"><![CDATA[<h1 id="이슈---서버-터짐">이슈 - 서버 터짐</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2025-11-19T23:12:08+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">SARGable에 대해서 알아보자</title><link href="https://recoma96.github.io/database/2025/11/05/sargable.html" rel="alternate" type="text/html" title="SARGable에 대해서 알아보자" /><published>2025-11-05T14:00:00+00:00</published><updated>2025-11-05T14:00:00+00:00</updated><id>https://recoma96.github.io/database/2025/11/05/sargable</id><content type="html" xml:base="https://recoma96.github.io/database/2025/11/05/sargable.html"><![CDATA[<h1 id="이슈---서버-터짐">이슈 - 서버 터짐</h1>
 
 <p>이번 블로그 내용은 최근에(블로그 작성 시점) 발생한 “서버 작동 중지”라는 섬뜩한 경험을 기반으로 한다.</p>
 
@@ -118,7 +118,7 @@ Datadog을 통해 지표를 확인해 보니, 원인은 명확해졌다. 서버�
   <li>P50 Latency: 1.63s -&gt; <strong>0.15s</strong></li>
 </ul>
 
-<p>P95 Latency 기준으로, 평상시에와 트래픽 증폭 시, 성능이 <strong>98%</strong> 감소되었다.</p>
+<p>P95 Latency 기준으로, 평상시에와 트래픽 증폭 시, 비용이 <strong>98%</strong> 감소되었다.</p>
 
 <h1 id="회고">회고</h1>
 
