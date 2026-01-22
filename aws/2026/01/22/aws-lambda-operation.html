@@ -160,7 +160,7 @@
 </blockquote>
 
 <p>하지만 회사에서 사용하는 파이썬 버전의 대부분은 3.9로 되어 있다. 메인 서버들은 물론이고 AWS Lambda도 절반 이상이 3.9버전으로 되어 있으니, 당연히 작업을 해야 할 수 밖에 없었다. 아무튼, 그래서 AWS Lambda 목록을 뒤져보고 코드도 살펴보게 되었는데
-현재 관리되고 있는 람다의 개발 혹은 <strong>운영환경이 제대로 되어 있지 않다는 것을 느끼게 되었다.</strong> 아래와 같은 이유로 말이다.</p>
+현재 관리되고 있는 람다의 <strong>개발 혹은 운영환경이 제대로 되어 있지 않다는 것을 느끼게 되었다.</strong> 아래와 같은 이유로 말이다.</p>
 
 <ol>
   <li>개발용/서버용 함수가 분리되어 있지 않다
@@ -169,12 +169,12 @@
       <li>즉, 그동안의 개발환경은 별도의 테스트환경 없이 운영 환경에서 직접 구현을 했다는 얘기인데, 이는 바람직하지 못한 개발 방식 이라고 생각한다.</li>
     </ul>
   </li>
-  <li>팀 내부에서 <strong>어떤 람다가 작동하고 있는지 그리고 어떻게 돌아가는지 알기가 힘들다.</strong>
+  <li>팀 내부에서 어떤 람다가 작동하고 있는지 그리고 어떻게 돌아가는지 알기가 힘들다.
     <ul>
       <li>람다관리대장이 노션 페이지에 따로 있는 것도 아니고 AWS Lambda에 직접 들어가야 알 수 있는데, 이것 마저도 주석이라던가 별도 내용이 들어가 있지 않다.</li>
     </ul>
   </li>
-  <li>AWS Console에서 개발해야 하는 불편함.
+  <li>AWS Console에서 개발해야 하는 불편함
     <ul>
       <li>콘솔에서 개발하는 경우는 장점 보다는 단점이 더 많다고 생각한다. 장점이라면 바로 구현해서 적용할수 있다는 그 점 하나 뿐이고, 단점은 협업시 누가 어떻게 코드를 변경했는 지 알 수 없을 뿐더러, 로컬에서 사용하는 IDE의 혜택을 누릴 수 없다.</li>
     </ul>
@@ -189,11 +189,11 @@
   </li>
 </ol>
 
-<p>그래서 나는 나중에 신규 개발자들도 람다를 구현할 일이 있을 수 있으니, 버전도 올릴 겸 람다 개발 환경을 협업에 유리하게 조성을 진행했다.</p>
+<p>그래서 나는 나중에 신규 개발자들도 람다를 구현할 일이 있을 수 있으니, 버전도 올릴 겸 람다 개발 환경을 협업에 유리하게 조성을 했다.</p>
 
 <h1 id="본론">본론</h1>
 
-<h2 id="구조-람다-코드는-github에서-관리">구조 (람다 코드는 Github에서 관리)</h2>
+<h2 id="구조---람다-코드는-github에서-관리">구조 - 람다 코드는 Github에서 관리</h2>
 
 <p>현재 올라와 있는 람다 코드들 중에 현재 사용하고 있는 람다 코드들을 골라 Github Repository에 전부 옮겼다. 디렉토리 구조는 아래와 같다.</p>
 
@@ -212,7 +212,7 @@
 </code></pre></div></div>
 
 <ul>
-  <li><strong>functions</strong>
+  <li>functions
     <ul>
       <li>이름에 맞게 람다 함수 들어있는 하나의 작은 프로젝트 단위다</li>
       <li>여기서 <code class="language-plaintext highlighter-rouge">handler.py</code> 가 바로 람다 함수가 적혀있는 파일인데. 템플릿은 아래와 같다 (일반적인 람다 함수 템플릿과 유사)
@@ -222,16 +222,16 @@
       </li>
     </ul>
   </li>
-  <li><strong>common</strong>: 여러 Lambda 함수에서 공통으로 사용하는 모듈들을 모아둔 디렉토리
+  <li>common: 여러 Lambda 함수에서 공통으로 사용하는 모듈들을 모아둔 디렉토리
     <ul>
-      <li><strong>db</strong>
+      <li>db
         <ul>
           <li>SQLAlchemy 기반의 ORM 모델과, DB 호출 커스텀 함수가 들어가 있다.</li>
           <li>이전에는 공통 DB 모듈이 사실상 없었고, 있다고 해도 관리가 되지 않아. 사실상 RAW Query를 호출해서 사용하고 있었다.</li>
           <li>이를 해결하기 위해 공통 DB 모듈을 새로 만들고, ORM Model도 구현함으로써, 반복되는 코드들을 어느정도 정리할 수 있었다.</li>
         </ul>
       </li>
-      <li><strong>utils</strong>
+      <li>utils
         <ul>
           <li>기타 여러 람다 함수들에서 공통적으로 사용할 만한 것들은 전부 여기에 있다. (예: 시간 계산, AWS Secret Manager에서 환경변수 가져오기 등)</li>
         </ul>
@@ -243,7 +243,7 @@
 <h2 id="개발-과정">개발 과정</h2>
 
 <blockquote>
-  <p>exmaple_function 이라는 람다 함수를 생성한다고 가정한다.</p>
+  <p><code class="language-plaintext highlighter-rouge">exmaple_function</code> 이라는 람다 함수를 생성한다고 가정한다.</p>
 </blockquote>
 
 <ol>
@@ -279,7 +279,11 @@
       <li>AWS로 배포가 진행이 되고, 람다 함수 정보가 터미널에 출력이 되면 배포 성공</li>
     </ol>
   </li>
-  <li>배포가 완료되고, 브라우저 환경에서 테스트해서 정상적동한다면, 같은 방식으로 운영쪽에도 배포하면 된다.
+  <li>
+    <p>하지만 이대로 람다 함수를 실행하면 작동이 되지 않는다. <strong>런타임 핸들러 함수를 수정해야 하기 때문이다.</strong> 런타임 핸들러 함수는 말 그대로 실행 대상의 함수를 의미한다. 따라서 이걸 <code class="language-plaintext highlighter-rouge">functions.example_function.handler.lambda_handler</code> 로 수정한다. 즉, 실행 대상 함수의 위치와 그 이름을 작성하면 된다.
+ <img src="/assets/img/20260122/2.png" alt="" /></p>
+  </li>
+  <li>브라우저 환경에서 테스트해서 정상적동한다면, 같은 방식으로 운영쪽에도 배포하면 된다.
     <ul>
       <li>함수명은 <code class="language-plaintext highlighter-rouge">example_funciton_prod</code></li>
       <li>배포 명령어는 <code class="language-plaintext highlighter-rouge">shell scripts/deploy.sh example_function prod</code></li>
@@ -307,18 +311,18 @@
     </tr>
     <tr>
       <td>개발/운영 분리 여부</td>
-      <td><strong>X</strong> 운영에서 코딩하고 바로 deploy하는 방식이기 때문에 <strong>이전 코드 이력이 남지 않는다는 게 치명적 단점</strong></td>
-      <td><strong>O</strong> 코드를 Gihtub에서 관리하고 PR -&gt; Merge -&gt; CLI에서 배포 방시긍로 진행하기 때문에 최소한 <strong>코드 이력은 남음</strong></td>
+      <td><strong>X:</strong> 운영에서 코딩하고 바로 deploy하는 방식이기 때문에 <strong>이전 코드 이력이 남지 않는다는 게 치명적 단점</strong></td>
+      <td><strong>O:</strong> 코드를 Gihtub에서 관리하고 PR -&gt; Merge -&gt; CLI에서 배포 방식으로 진행하기 때문에 최소한 <strong>코드 이력은 남음</strong></td>
     </tr>
     <tr>
       <td>외부라이브러리</td>
-      <td>일일히 검색해서 ARN을 긁은 다음, Layer에 추가하는 방식, <strong>관리하려면 일일히 브라우저에 들어가야 함</strong></td>
-      <td>그냥 로컬에서 <code class="language-plaintext highlighter-rouge">pip install</code>로 설치하고 배포하면 자동 적용, 괸라도 로컬에서</td>
+      <td>일일히 검색해서 ARN을 긁은 다음, Layer에 추가하는 방식, 관리하려면 일일히 브라우저에 들어가야 함</td>
+      <td>그냥 로컬에서 <code class="language-plaintext highlighter-rouge">pip install</code>로 설치하고 배포하면 자동 적용. 관리도 로컬에서</td>
     </tr>
     <tr>
       <td>DB 호출 방식</td>
-      <td>pymysql로 DB 접근 코드 직접 구현, ORM 모델도 없어서 전부 SQL문 사용, 공용 라이브러리는 있으나, 괸라가 되고 있는지 알 수 있는 방법이 없음</td>
-      <td>공통 ORM 모듈에 Model이 선언되어 있어서 <strong>ORM Model 그대로 사용 가능</strong></td>
+      <td>pymysql로 DB에 접근하고, 코드도 직접 구현, ORM 모델도 없어서 전부 SQL문 사용, 공용 라이브러리는 있으나, 괸라가 되고 있는지 알 수 있는 방법이 없음</td>
+      <td><strong>이미 프로젝트 안에 ORM Model이 구현되어 있어서 그대로 임포트해서 사용 가능</strong></td>
     </tr>
   </tbody>
 </table>
@@ -327,7 +331,7 @@
 
 <p>과거, 그러니까 내가 막내 개발자였을 때의 개발환경은 팀플레이 보다는 “각자 개발” 위주의 환경이다 보니까, 몇몇 이런 식의 환경들이 팀보다는 특정 개발자 기준으로 정립이 되어 있는 경우가 흔했다. 이중 이번에 포스팅한 Lambda는, 개 중 일부임과 동시에 가장 적나라하게 드러난 경우다. 하지만 오히려 이렇게 돋보였기에 바로 내 눈에 띄였고, 이를 기회로 개발환경을 개선할 수 있었다.</p>
 
-<p>단순히 개선만 한게 아니라, <strong>팀 내 회의를 여러 신입 개발자들에게도 개선된 람다 함수 개발 방법을 가르쳐 주었고, 이들도 역시 이 룰에 따라 개발을 진행했다.</strong> 비록 신입 개발자들은 이전 개발환경을 경험해 본 적이 없지만, 그래도 그들 나름대로 불편함 없이 개발/테스트/배포 까지 할 수 있었고. 이 분들의 람다 작품 중에 하나가 바로 <strong>이미지 최적화 프로세스 로직</strong>이다.</p>
+<p>단순히 개선만 한게 아니라, <strong>팀 내 회의를 열어 신입 개발자들에게도 개선된 람다 함수 개발 방법을 가르쳐 주었고, 이들도 역시 이 룰에 따라 개발을 진행했다.</strong> 비록 신입 개발자들은 이전 개발환경을 경험해 본 적이 없지만, 그래도 그들 나름대로 불편함 없이 개발/테스트/배포 까지 할 수 있었고. 이 분들의 람다 작품 중에 하나가 바로 <strong>이미지 최적화 프로세스 로직</strong>이다.</p>
 <ul>
   <li>이미지 최적화 프로세스 작동 과정: S3 이미지 업로드 -&gt; S3 Trigger 작동 -&gt; 연동된 Lambda로 전달 -&gt; Lambda에서 기존 그림 이미지를 webP로 변환 + 리사이징 -&gt; S3에 다시 업로드
     <ul>
@@ -336,7 +340,7 @@
   </li>
 </ul>
 
-<p><strong>하지만 100% 해결된 것은 아니다.</strong> 아직 해결해야 할 여러 문제들이 남아있다. 전부 해결하고 싶었지만, 당시 연말이었고, 백엔트 팀의 사실상 리더(직책상 아님) 위치였던 내 입장에서는 당장 처리해야 할 업무가 쌓일대로 쌓여있어 아쉽게도 전부 해결하지는 못했고, 핵심적인 요소만 진행했다. 하지만 언젠가는 마저 다 끝내보고 싶다.</p>
+<p>하지만 100% 해결된 것은 아니다. 아직도 해결해야 할 여러 문제들이 남아있다. 전부 해결하고 싶었지만, 당시 연말이었고, 백엔트 팀의 사실상 리더(직책상 아님) 위치였던 내 입장에서는 당장 처리해야 할 업무가 쌓일대로 쌓여있어 아쉽게도 전부 해결하지는 못했고, 핵심적인 요소만 진행했다. 하지만 언젠가는 마저 다 끝내보고 싶다.</p>
 
 <h2 id="추가로-개선해야-할-것들">추가로 개선해야 할 것들</h2>
 
@@ -353,7 +357,7 @@
 <h3 id="프로젝트-별-패키지-관리">프로젝트 별 패키지 관리</h3>
 
 <p>지금까지는 사내 모든 람다 함수가 동일한 라이브러리를 사용해 와서 문제가 없지만, 
-나중에 가면 각 프로젝트 마다 코드 용량이 비대하게 커지게 되는데, <strong>Lambda의 Lambda의 코드 최대 용량은 비압축 기준 250MB, 압축 기준 50MB 때문에 용량초과로 인해 배포가 안되는 참사까지 이어질 수 있다</strong> (<a href="https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/gettingstarted-limits.html">참고</a>). 이를 방지하기 위해 아래와 같은 방식을 도입해야 할 필요가 있다.</p>
+나중에 가면 각 프로젝트 마다 코드 용량이 비대하게 커지게 되는데, <strong>Lambda의 코드 최대 용량은 비압축 기준 250MB, 압축 기준 50MB 이기 때문에 용량초과로 인해 배포가 안되는 참사까지 이어질 수 있다</strong> (<a href="https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/gettingstarted-limits.html">참고</a>). 이를 방지하기 위해 아래와 같은 방식을 도입해야 할 필요가 있다.</p>
 <ul>
   <li><code class="language-plaintext highlighter-rouge">requirements.txt</code> -&gt; <code class="language-plaintext highlighter-rouge">pyproject.toml</code>로 전환</li>
   <li>공용 dependency 구축 (DB 모듈, boto3 등…)</li>
@@ -367,7 +371,7 @@
 
 <h3 id="cicd-자동화-배포">CI/CD 자동화 배포</h3>
 
-<p><strong>람다 개선 프로젝트</strong>의 최종 목표. 하지만 위의 언급된 3가지의 과제부터 해결해야 CI/CD를 도입할 수 있을 것으로 보인다.
+<p>람다 개선 프로젝트의 <strong>최종 목표.</strong> 하지만 위의 언급된 3가지의 과제부터 해결해야 CI/CD를 도입할 수 있을 것으로 보인다.
 좀 더 구조화된 패키징/의존성 관리 구조가 구축되어 있어야, 자동화 배포도 문제없이 이루어질 것이라고 판단했기 때문이다.
 따라서, 이 문제들이 해결된 후에야 비로소 안정적인 자동화 배포 파이프라인 구축을 진행할 수 있을 것이다.</p>
 
