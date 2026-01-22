@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- 구글 애널리틱스 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F4S8SQ473J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-F4S8SQ473J');
+    </script>
+
+    <!-- 구글 애드센스 -->
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7546723599526874"
+     crossorigin="anonymous"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다
+        </h2>
+        <p class="font-semibold"><a href="/categories/#AWS" class="no-underline text-orange-700 dark:text-blue-200">AWS</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2026.01.22 00:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <blockquote>
+  <p><strong>NOTE</strong>: 이 포스트는 필자의 주관적인 의견과 개발 방식이 다분하게 들어가 있으니, 만약 이 방식을 적용하려고 한다면 무조건 적용하기 보다는 한번더 생각해 보시기를 권합니다.</p>
+</blockquote>
+
+<h3 id="tldr">TL;DR</h3>
+<ul>
+  <li>기존 Lambda 환경은 콘솔 개발, Layer 종속, 테스트 불가 문제 존재</li>
+  <li>CLI 기반 배포 스크립트 도입 및 공통 모듈 설계로 구조 개선</li>
+  <li>팀원들이 같은 방식으로 개발/배포 가능해져 협업 효율 향상</li>
+</ul>
+
+<h1 id="개요">개요</h1>
+
+<p>포스팅 날짜로부터 약 한달 전, 이날도 역시 회사에서 코딩을 하던 도중, AWS로부터 권고사항이 들어왔는데 내용은 아래와 같았다.</p>
+
+<blockquote>
+  <p>2025년 12월 15일 부터, AWS Lambda에서, Python 3.9 버전 지원이 중단되니, 그 전에 새 버전으로 업그레이드 해라. 추가로, <strong>2026년 2월 15일 부터 Python3.9 버전의 람다를 사용할 수 없다.</strong></p>
+</blockquote>
+
+<p>하지만 회사에서 사용하는 파이썬 버전의 대부분은 3.9로 되어 있다. 메인 서버들은 물론이고 AWS Lambda도 절반 이상이 3.9버전으로 되어 있으니, 당연히 작업을 해야 할 수 밖에 없었다. 아무튼, 그래서 AWS Lambda 목록을 뒤져보고 코드도 살펴보게 되었는데
+현재 관리되고 있는 람다의 개발 혹은 <strong>운영환경이 제대로 되어 있지 않다는 것을 느끼게 되었다.</strong> 아래와 같은 이유로 말이다.</p>
+
+<ol>
+  <li><strong>개발용/서버용 함수가 분리되어 있지 않다.</strong>
+    <ul>
+      <li>그래서 일부 로직을 변경할 때, 로컬에서 별도의 파이썬 파일을 만들어서 테스트를 해야 하는데, 이는 실제 람다 환경과 상이하기 때문에 제대로 된 테스트가 되지 않는다.</li>
+      <li>즉, 그동안의 개발환경은 별도의 테스트환경 없이 운영 환경에서 직접 구현을 했다는 얘기인데, 이는 바람직하지 못한 개발 방식 이라고 생각한다.</li>
+    </ul>
+  </li>
+  <li>팀 내부에서 <strong>어떤 람다가 작동하고 있는지 그리고 어떻게 돌아가는지 알기가 힘들다.</strong>
+    <ul>
+      <li>람다관리대장이 노션 페이지에 따로 있는 것도 아니고 AWS Lambda에 직접 들어가야 알 수 있는데, 이것 마저도 주석이라던가 별도 내용이 들어가 있지 않다.</li>
+    </ul>
+  </li>
+  <li><strong>AWS Console에서 개발해야 하는 불편함.</strong>
+    <ul>
+      <li>콘솔에서 개발하는 경우는 장점 보다는 단점이 더 많다고 생각한다. 장점이라면 바로 구현해서 적용할수 있다는 그 점 하나 뿐이고, 단점은 협업시 누가 어떻게 코드를 변경했는 지 알 수 없을 뿐더러, 로컬에서 사용하는 IDE의 혜택을 누릴 수 없다.</li>
+    </ul>
+  </li>
+  <li><strong>외부 모듈 임포트를 하기가 상당히 불편하다</strong>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">requests</code>나, <code class="language-plaintext highlighter-rouge">numpy</code> 같은 라이브러리들을 임포트 하려면 Lambda Layer를 추가해야 한다. 이런 식으로 말이다.
+ <img src="/assets/img/20260122/1.png" alt="" />
+ 대상 라이브러리에 해당하는 ARN을 외부에서 긁어서 여기에 넣어야 하는 방식인데, 일단 이 ARN을 찾는 과정부터 번거로울 뿐더러 여러개의 라이브러리를 동시에 사용한다고 하면 골치아파진다.</li>
+      <li>사실 이 부분은 사내에서 <strong>공용 Layer 모듈을 관리해서 AWS에 배포하는 방식으로 어느정도 해결이 되고, 또 처음에는 이런 방식으로 시도를 했었다.</strong> 하지만, 람다 함수들과 동떨어져 있는 거리에서 관리를 했어야 했기 때문에 <strong>결국 관리포인트가 늘어나는 단점</strong>이 있었고, 나는 이 부분에서 불편함을 느껴 과감하게 이 방식을 버리고 다른걸 고안하게 되었다.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>그래서 나는 나중에 신규 개발자들도 람다를 구현할 일이 있을 수 있으니, 버전도 올릴 겸 람다 개발 환경을 협업에 유리하게 조성을 진행했다.</p>
+
+<h1 id="본론">본론</h1>
+
+<h2 id="구조-람다-코드는-github에서-관리">구조 (람다 코드는 Github에서 관리)</h2>
+
+<p>현재 올라와 있는 람다 코드들 중에 현재 사용하고 있는 람다 코드들을 골라 Github Repository에 전부 옮겼다. 디렉토리 구조는 아래와 같다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/
+`- functions
+    `- function_1
+        `- handler.py
+    `- function_2
+        `- handler.py
+    `- common
+        `- utils.py
+        `- db
+`- scripts
+    `- deploy.sh
+`- requirements.txt
+</code></pre></div></div>
+
+<ul>
+  <li><strong>functions</strong>
+    <ul>
+      <li>이름에 맞게 람다 함수 들어있는 하나의 작은 프로젝트 단위다</li>
+      <li>여기서 <code class="language-plaintext highlighter-rouge">handler.py</code> 가 바로 람다 함수가 적혀있는 파일인데. 템플릿은 아래와 같다 (일반적인 람다 함수 템플릿과 유사)
+        <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li><strong>common</strong>: 여러 Lambda 함수에서 공통으로 사용하는 모듈들을 모아둔 디렉토리
+    <ul>
+      <li><strong>db</strong>:
+        <ul>
+          <li>SQLAlchemy 기반의 ORM 모델과, DB 호출 커스텀 함수가 들어가 있다.</li>
+          <li>이전에는 공통 DB 모듈이 사실상 없었고, 있다고 해도 관리가 되지 않아. 사실상 RAW Query를 호출해서 사용하고 있었다.</li>
+          <li>이를 해결하기 위해 공통 DB 모듈을 새로 만들고, ORM Model도 구현함으로써, 반복되는 코드들을 어느정도 정리할 수 있었다.</li>
+        </ul>
+      </li>
+      <li><strong>utils</strong>:
+        <ul>
+          <li>기타 여러 람다 함수들에서 공통적으로 사용할 만한 것들은 전부 여기에 있다. (예: 시간 계산, AWS Secret Manager에서 환경변수 가져오기 등)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="개발-과정">개발 과정</h2>
+
+<blockquote>
+  <p>exmaple_function 이라는 람다 함수를 생성한다고 가정한다.</p>
+</blockquote>
+
+<ol>
+  <li>AWS Lambda Console에 들어가서, <strong>개발용</strong> Lambda 함수를 생성한다.
+    <ul>
+      <li>개발용 Lambda 함수의 접미사는 <code class="language-plaintext highlighter-rouge">_dev</code> 이다. 따라서 <code class="language-plaintext highlighter-rouge">example_function_dev</code> 라는 함수를 생성한다.</li>
+    </ul>
+  </li>
+  <li>로컬로 들어가서 이 프로젝트에 <code class="language-plaintext highlighter-rouge">functions</code> 디렉토리에 들어가서 <code class="language-plaintext highlighter-rouge">example_function</code> 이라는 함수 프로젝트 디렉토리를 만들고, 그 안에 람다 함수를 구현할 <code class="language-plaintext highlighter-rouge">handler.py</code> 파일을 생성한다.</li>
+  <li>함수를 작성한다. 특히 <strong>DB ORM</strong> 사용이 필요할 때는, <strong><code class="language-plaintext highlighter-rouge">DBConfig</code></strong> 라는 이름의 클래스에 접속 정보를 적고 (보통은 환경변수를 사용한다) 이를 활용해 session을 호출하면 된다.</li>
+  <li>개발이 다 되었으면, <strong>테스트를 진행</strong>한다. 일단 로컬에서 개발하는 방식이기 때문에 테스트하는 방법은 무궁무진 하지만 대체적으로 크게 두 가지가 있다.
+    <ul>
+      <li>이 프로젝트는 단순 람다 개발 뿐만 아니라 <strong>테스트코드도 작성할 수 있게 라이브러리 <code class="language-plaintext highlighter-rouge">pytest</code>와 디렉토리 <code class="language-plaintext highlighter-rouge">tests</code>가 조성되어 있다.</strong> 이 디렉토리 안에 평소대로 하는 방식대로 테스트코드를 작성하는 방식.</li>
+      <li>아예 Shell script를 통해 개발쪽으로 배포(밑에 배포 방법 후술)를 하고, AWS Console에서 Test버튼, EventBridge 등, 실제 AWS Service들을 이용하여 실전 테스트를 진행하는 방식.</li>
+    </ul>
+  </li>
+  <li>테스트가 완료되었다고 판단이 되었으면 아래의 <strong>명령어를 입력해 개발쪽으로 배포를 진행한다.</strong>
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sh scripts/deploy.sh example_function dev
+ <span class="c"># sh scripts/deploy.sh {함수명} {dev/prod}</span>
+</code></pre></div>    </div>
+    <p><strong>이 스크립트를 실행하면 아래와 같은 과정을 거쳐서 배포가 된다.</strong></p>
+    <ol>
+      <li><code class="language-plaintext highlighter-rouge">requirements.txt</code>와 <code class="language-plaintext highlighter-rouge">pip</code>를 통해 의존성 설치를 한다.</li>
+      <li>설치된 의존성 파일들과 그 디렉토리들을 <code class="language-plaintext highlighter-rouge">build</code> 디렉토리로 이동한다</li>
+      <li><code class="language-plaintext highlighter-rouge">build</code> 디렉토리를 <code class="language-plaintext highlighter-rouge">zip</code>파일로 압축시킨다.</li>
+      <li>압축시킨 파일을 가지고 <code class="language-plaintext highlighter-rouge">AWS-CLI</code> 를 이용해 람다 함수를 업데이트 한다
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws lambda update-function-code <span class="se">\</span>
+    <span class="nt">--function-name</span> example_function_dev <span class="se">\</span>
+    <span class="nt">--zip-file</span> fileb://<span class="o">{</span>절대경로<span class="o">}</span>/build.zip
+</code></pre></div>        </div>
+      </li>
+      <li>다시 AWS Console -&gt; Lambda로 들어간 다음,</li>
+      <li>AWS로 배포가 진행이 되고, 람다 함수 정보가 터미널에 출력이 되면 배포 성공</li>
+    </ol>
+  </li>
+  <li>배포가 완료되고, 브라우저 환경에서 테스트해서 정상적동한다면, 같은 방식으로 운영쪽에도 배포하면 된다.
+    <ul>
+      <li>함수명은 <code class="language-plaintext highlighter-rouge">example_funciton_prod</code></li>
+      <li>배포 명령어는 <code class="language-plaintext highlighter-rouge">shell scripts/deploy.sh example_function prod</code></li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="개선점">개선점</h2>
+
+<p>개발환경에 있어서 눈에 띄게 깔끔하게 개선이 되었는데, 좋아진 점은 아래와 같다.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>항목</th>
+      <th>개선 전</th>
+      <th>개선 후</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>개발도구</td>
+      <td>AWS Console 브라우저, 각 개발자의 IDE가 아닌 브라우저상에서 개발하기 때문에 익숙해질 때 까지 적응하기 힘듦</td>
+      <td>본인 IDE에서 그대로 개발 가능</td>
+    </tr>
+    <tr>
+      <td>개발/운영 분리 여부</td>
+      <td><strong>X</strong> 운영에서 코딩하고 바로 deploy하는 방식이기 때문에 <strong>이전 코드 이력이 남지 않는다는 게 치명적 단점</strong></td>
+      <td><strong>O</strong> 코드를 Gihtub에서 관리하고 PR -&gt; Merge -&gt; CLI에서 배포 방시긍로 진행하기 때문에 최소한 <strong>코드 이력은 남음</strong></td>
+    </tr>
+    <tr>
+      <td>외부라이브러리</td>
+      <td>일일히 검색해서 ARN을 긁은 다음, Layer에 추가하는 방식, <strong>관리하려면 일일히 브라우저에 들어가야 함</strong></td>
+      <td>그냥 로컬에서 <code class="language-plaintext highlighter-rouge">pip install</code>로 설치하고 배포하면 자동 적용, 괸라도 로컬에서</td>
+    </tr>
+    <tr>
+      <td>DB 호출 방식</td>
+      <td>pymysql로 DB 접근 코드 직접 구현, ORM 모델도 없어서 전부 SQL문 사용, 공용 라이브러리는 있으나, 괸라가 되고 있는지 알 수 있는 방법이 없음</td>
+      <td>공통 ORM 모듈에 Model이 선언되어 있어서 <strong>ORM Model 그대로 사용 가능</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="회고">회고</h1>
+
+<p>과거, 그러니까 내가 막내 개발자였을 때의 개발환경은 팀플레이 보다는 “각자 개발” 위주의 환경이다 보니까, 몇몇 이런 식의 환경들이 팀보다는 특정 개발자 기준으로 정립이 되어 있는 경우가 흔했다. 이중 이번에 포스팅한 Lambda는, 개 중 일부임과 동시에 가장 적나라하게 드러난 경우다. 하지만 오히려 이렇게 돋보였기에 바로 내 눈에 띄였고, 이를 기회로 개발환경을 개선할 수 있었다.</p>
+
+<p>단순히 개선만 한게 아니라, <strong>팀 내 회의를 여러 신입 개발자들에게도 개선된 람다 함수 개발 방법을 가르쳐 주었고, 이들도 역시 이 룰에 따라 개발을 진행했다.</strong> 비록 신입 개발자들은 이전 개발환경을 경험해 본 적이 없지만, 그래도 그들 나름대로 불편함 없이 개발/테스트/배포 까지 할 수 있었고. 이 분들의 람다 작품 중에 하나가 바로 <strong>이미지 최적화 프로세스 로직</strong>이다.</p>
+<ul>
+  <li><strong>이미지 최적화 프로세스 작동 과정:</strong> S3 이미지 업로드 -&gt; S3 Trigger 작동 -&gt; 연동된 Lambda로 전달 -&gt; Lambda에서 기존 그림 이미지를 webP로 변환 + 리사이징 -&gt; S3에 다시 업로드
+    <ul>
+      <li>해당 프로세스 작동 이후로 <strong>특정 도메인 내 이미지 로딩 속도 70% 개선</strong></li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>하지만 100% 해결된 것은 아니다.</strong> 아직 해결해야 할 여러 문제들이 남아있다. 전부 해결하고 싶었지만, 당시 연말이었고, 백엔트 팀의 사실상 리더(직책상 아님) 위치였던 내 입장에서는 당장 처리해야 할 업무가 쌓일대로 쌓여있어 아쉽게도 전부 해결하지는 못했고, 핵심적인 요소만 진행했다. 하지만 언젠가는 마저 다 끝내보고 싶다.</p>
+
+<h2 id="추가로-개선해야-할-것들">추가로 개선해야 할 것들</h2>
+
+<h3 id="모든-코드가-패키징되어-올라가는-문제">모든 코드가 패키징되어 올라가는 문제</h3>
+
+<p>특정 람다 함수에는 그 함수와 관련된 파일만 올라가는게 원칙인데 지금 상황에서는 전부 올라가고 있는 상황이다. 하지만 이건 쉘스크립트에서 함수명과 매칭되는 디렉토리와 common모듈만 따로 뺄 수 있게 코드를 수정하면 금방 끝날 일일 것 같다.</p>
+
+<h3 id="requirementstxt---pyproject로-전환"><code class="language-plaintext highlighter-rouge">requirements.txt</code> -&gt; <code class="language-plaintext highlighter-rouge">pyproject</code>로 전환</h3>
+
+<p>요즘 파이썬 패키지 관리 툴들 중에 날고 기는 <code class="language-plaintext highlighter-rouge">poetry</code>와 <code class="language-plaintext highlighter-rouge">uv</code>가 있는 마당에 나는 아직도 <code class="language-plaintext highlighter-rouge">pip/requirements.txt</code> 방식을 사용했다. 사실 이건 무슨 중요한 이유는 아니고, 이 방식 이전에 사용했던 방식인 “공용 Layer 관리 프로젝트”에서 아마 Layer를 배포할 때, <code class="language-plaintext highlighter-rouge">requirements.txt</code>를 사용해야 한다는 예기를 듣고 그 버릇이 여기까지 온 모양이다. 하지만 이젠 패키징 조차도 로컬에서 진행하기 때문에 <code class="language-plaintext highlighter-rouge">requirements.txt</code>는 버리고 <code class="language-plaintext highlighter-rouge">uv</code>, <code class="language-plaintext highlighter-rouge">pyproject</code> 기반으로 전환해야 할 것 같다.</p>
+
+<p>하지만 바로 시작하기에는 이르고 후술할 항목에 대해서 추가적으로 생각/설계한 다음 진행할 필요가 있다.</p>
+
+<h3 id="프로젝트-별-패키지-관리">프로젝트 별 패키지 관리</h3>
+
+<p>지금까지는 사내 모든 람다 함수가 동일한 라이브러리를 사용해 와서 문제가 없지만, 
+나중에 가면 각 프로젝트 마다 코드 용량이 비대하게 커지게 되는데, <strong>Lambda의 Lambda의 코드 최대 용량은 비압축 기준 250MB, 압축 기준 50MB 때문에 용량초과로 인해 배포가 안되는 참사까지 이어질 수 있다</strong> (<a href="https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/gettingstarted-limits.html">참고</a>). 이를 방지하기 위해 아래와 같은 방식을 도입해야 할 필요가 있다.</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">requirements.txt</code> -&gt; <code class="language-plaintext highlighter-rouge">pyproject.toml</code>로 전환</li>
+  <li>공용 dependency 구축 (DB 모듈, boto3 등…)</li>
+  <li>각 함수 마다 dependency 구축</li>
+  <li>배포 스크립트 코드 변경 -&gt; 공용 dependency와 함수와 매칭되는 depedency만 설치할 수 있게</li>
+</ul>
+
+<blockquote>
+  <p>람다 관련된 할당량은 위의 링크 말고도 AWS에서 로그인 한 후 <strong>Service Quotas -&gt; AWS Services -&gt; AWS Lambda</strong> 를 통해 볼 수 있다.</p>
+</blockquote>
+
+<h3 id="cicd-자동화-배포">CI/CD 자동화 배포</h3>
+
+<p><strong>람다 개선 프로젝트</strong>의 최종 목표. 하지만 위의 언급된 3가지의 과제부터 해결해야 CI/CD를 도입할 수 있을 것으로 보인다.
+좀 더 구조화된 패키징/의존성 관리 구조가 구축되어 있어야, 자동화 배포도 문제없이 이루어질 것이라고 판단했기 때문이다.
+따라서, 이 문제들이 해결된 후에야 비로소 안정적인 자동화 배포 파이프라인 구축을 진행할 수 있을 것이다.</p>
+
+<h1 id="마치며">마치며</h1>
+
+<p>람다 개발 환경 개선은 단순히 기술 부채를 해결하는 작업이 아닌, 개별적으로 진행되었던 개발 방식에서 벗어나, 팀원 모두가 쉽게 개발/기여 할 수 있는 협업 환경의 초석과도 같은 존재다.
+체계적인 구조와 프로세스를 정립함으로써, 신입 개발자도 새로운 기능을 쉽게 성공적으로 구현하는 등 가시적인 성과를 확인할 수 있었다.</p>
+
+<p>물론 아직 해결해야 할 과제는 남아있다. 하지만, 이번 경험은 잘 갖춰진 개발 환경이 팀의 생산성과 서비스 안정성에 미치는 중요성을 제대로 보여주었다. 
+기술의 편리함에 의존하는 것을 넘어 ‘어떻게 잘 사용할 것인가’에 대한 고민이 더 나은 환경/생산성을 발전시킬 수 있는 발판이 된다.</p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#aws">aws</a>
+                    
+                    <a class="tag" href="/tags/#lambda">lambda</a>
+                    
+                    <a class="tag" href="/tags/#devops">devops</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>
