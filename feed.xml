@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2026-01-22T04:10:08+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다</title><link href="https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation.html" rel="alternate" type="text/html" title="AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다" /><published>2026-01-22T00:00:00+00:00</published><updated>2026-01-22T00:00:00+00:00</updated><id>https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation</id><content type="html" xml:base="https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation.html"><![CDATA[<blockquote>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://recoma96.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://recoma96.github.io/" rel="alternate" type="text/html" /><updated>2026-01-22T09:52:44+00:00</updated><id>https://recoma96.github.io/feed.xml</id><title type="html">Recoma In DEV</title><entry><title type="html">AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다</title><link href="https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation.html" rel="alternate" type="text/html" title="AWS Lambda 개발환경 개선기: 콘솔에서 탈출하다" /><published>2026-01-22T00:00:00+00:00</published><updated>2026-01-22T00:00:00+00:00</updated><id>https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation</id><content type="html" xml:base="https://recoma96.github.io/aws/2026/01/22/aws-lambda-operation.html"><![CDATA[<blockquote>
   <p><strong>NOTE</strong>: 이 포스트는 필자의 주관적인 의견과 개발 방식이 다분하게 들어가 있으니, 만약 이 방식을 적용하려고 한다면 무조건 적용하기 보다는 한번더 생각해 보시기를 권합니다.</p>
 </blockquote>
 
@@ -21,7 +21,7 @@
 현재 관리되고 있는 람다의 개발 혹은 <strong>운영환경이 제대로 되어 있지 않다는 것을 느끼게 되었다.</strong> 아래와 같은 이유로 말이다.</p>
 
 <ol>
-  <li><strong>개발용/서버용 함수가 분리되어 있지 않다.</strong>
+  <li>개발용/서버용 함수가 분리되어 있지 않다
     <ul>
       <li>그래서 일부 로직을 변경할 때, 로컬에서 별도의 파이썬 파일을 만들어서 테스트를 해야 하는데, 이는 실제 람다 환경과 상이하기 때문에 제대로 된 테스트가 되지 않는다.</li>
       <li>즉, 그동안의 개발환경은 별도의 테스트환경 없이 운영 환경에서 직접 구현을 했다는 얘기인데, 이는 바람직하지 못한 개발 방식 이라고 생각한다.</li>
@@ -32,12 +32,12 @@
       <li>람다관리대장이 노션 페이지에 따로 있는 것도 아니고 AWS Lambda에 직접 들어가야 알 수 있는데, 이것 마저도 주석이라던가 별도 내용이 들어가 있지 않다.</li>
     </ul>
   </li>
-  <li><strong>AWS Console에서 개발해야 하는 불편함.</strong>
+  <li>AWS Console에서 개발해야 하는 불편함.
     <ul>
       <li>콘솔에서 개발하는 경우는 장점 보다는 단점이 더 많다고 생각한다. 장점이라면 바로 구현해서 적용할수 있다는 그 점 하나 뿐이고, 단점은 협업시 누가 어떻게 코드를 변경했는 지 알 수 없을 뿐더러, 로컬에서 사용하는 IDE의 혜택을 누릴 수 없다.</li>
     </ul>
   </li>
-  <li><strong>외부 모듈 임포트를 하기가 상당히 불편하다</strong>
+  <li>외부 모듈 임포트를 하기가 상당히 불편하다
     <ul>
       <li><code class="language-plaintext highlighter-rouge">requests</code>나, <code class="language-plaintext highlighter-rouge">numpy</code> 같은 라이브러리들을 임포트 하려면 Lambda Layer를 추가해야 한다. 이런 식으로 말이다.
  <img src="/assets/img/20260122/1.png" alt="" />
@@ -82,14 +82,14 @@
   </li>
   <li><strong>common</strong>: 여러 Lambda 함수에서 공통으로 사용하는 모듈들을 모아둔 디렉토리
     <ul>
-      <li><strong>db</strong>:
+      <li><strong>db</strong>
         <ul>
           <li>SQLAlchemy 기반의 ORM 모델과, DB 호출 커스텀 함수가 들어가 있다.</li>
           <li>이전에는 공통 DB 모듈이 사실상 없었고, 있다고 해도 관리가 되지 않아. 사실상 RAW Query를 호출해서 사용하고 있었다.</li>
           <li>이를 해결하기 위해 공통 DB 모듈을 새로 만들고, ORM Model도 구현함으로써, 반복되는 코드들을 어느정도 정리할 수 있었다.</li>
         </ul>
       </li>
-      <li><strong>utils</strong>:
+      <li><strong>utils</strong>
         <ul>
           <li>기타 여러 람다 함수들에서 공통적으로 사용할 만한 것들은 전부 여기에 있다. (예: 시간 계산, AWS Secret Manager에서 환경변수 가져오기 등)</li>
         </ul>
@@ -187,7 +187,7 @@
 
 <p>단순히 개선만 한게 아니라, <strong>팀 내 회의를 여러 신입 개발자들에게도 개선된 람다 함수 개발 방법을 가르쳐 주었고, 이들도 역시 이 룰에 따라 개발을 진행했다.</strong> 비록 신입 개발자들은 이전 개발환경을 경험해 본 적이 없지만, 그래도 그들 나름대로 불편함 없이 개발/테스트/배포 까지 할 수 있었고. 이 분들의 람다 작품 중에 하나가 바로 <strong>이미지 최적화 프로세스 로직</strong>이다.</p>
 <ul>
-  <li><strong>이미지 최적화 프로세스 작동 과정:</strong> S3 이미지 업로드 -&gt; S3 Trigger 작동 -&gt; 연동된 Lambda로 전달 -&gt; Lambda에서 기존 그림 이미지를 webP로 변환 + 리사이징 -&gt; S3에 다시 업로드
+  <li>이미지 최적화 프로세스 작동 과정: S3 이미지 업로드 -&gt; S3 Trigger 작동 -&gt; 연동된 Lambda로 전달 -&gt; Lambda에서 기존 그림 이미지를 webP로 변환 + 리사이징 -&gt; S3에 다시 업로드
     <ul>
       <li>해당 프로세스 작동 이후로 <strong>특정 도메인 내 이미지 로딩 속도 70% 개선</strong></li>
     </ul>
