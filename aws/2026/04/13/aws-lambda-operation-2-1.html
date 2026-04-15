@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Lambda 개발환경 개선기 (2.5): 3편 포스팅 하기 전의 잠깐 회고</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap">
+    <link rel="stylesheet" href="https://spsarolkar.github.io/rouge-theme-preview/css/syntax-gruvbox.dark.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/main.css">
+    <link rel="stylesheet" href="https://recoma96.github.io/assets/css/mathjax.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- 구글 애널리틱스 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-F4S8SQ473J"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-F4S8SQ473J');
+    </script>
+
+    <!-- 구글 애드센스 -->
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7546723599526874"
+     crossorigin="anonymous"></script>
+</head>
+    <body>
+        <nav class="
+        fixed layout-navbar
+        w-full h-16 z-navbar
+        text-light-primary-600 dark:text-dark-primary-default
+        bg-light-primary-400 dark:bg-zinc-800 bg-opacity-80 backdrop-blur-[2px]
+        dark:border-b dark:border-yellow-100
+        shadow-navbar-light dark:shadow-navbar-darkq
+">
+    <div class="
+        w-full
+        flex justify-between items-center
+    ">
+        <i id="navbar-menu-button" class="nav-icon bi bi-list text-4xl xl:invisible"></i>
+
+        <a id="navbar-title" href="/posts" class="
+            text-lg hidden xl:block cursor-pointer no-underline font-bold text-white dark:text-dark-primary-200
+        ">
+            Recoma In DEV
+        </a>
+
+        <i id="navbar-mode-selector" class="nav-icon bi text-2xl"></i>
+    </div>
+</nav>
+
+<ul id="navbar-menu" class="
+    hidden fixed
+    z-30 w-full mt-16 py-6
+    bg-white dark:bg-zinc-950
+    list-none
+    flex flex-col gap-6 text-center
+    shadow-navbar-menu
+">
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/posts">Posts</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/categories">Categories</a></li>
+    <li class="border-buttom text-[1.2em]"><a class="no-underline text-current" href="/about"">About</a></li>
+</ul>
+
+        <div class="web-main-container">
+            <div id="left-side-bar" class="
+    hidden xl:block
+    w-[300px] py-[100px] px-6
+    bg-white dark:bg-zinc-900
+    shadow-layout
+">
+    <div class="w-full text-center">
+        <img src="/assets/img/profile.jpg" width="140px" height="140px"
+            class="mx-auto rounded-full" alt="profile"
+        />
+        <h2 class="font-bold text-rose-400 dark:text-yellow-200">recoma</h2>
+        <p>인생 재밌게 사는 방법 탐구중</p>
+    </div>
+
+    <div class="w-full mt-10 flex flex-wrap justify-center gap-8">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <div class="w-full h-[0px] border-b border-zinc-400 mt-8"></div>
+
+    <div class="mt-8 w-full text-center flex flex-col gap-6">
+        <a class="text-pink-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/posts">Posts</a>
+        <a class="text-lime-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/categories">Categories</a>
+        <a class="text-violet-600 dark:text-dark-text-default font-bold cursor-pointer no-underline" href="/about">About</a>
+    </div>
+</div>
+<div class="w-[1px] bg-gray"></div>
+            <div class="web-main-item">
+                <div class="mb-20">
+    <div class="text-center">
+        <h2 class="
+            px-10 py-4 inline-block
+            bg-orange-100 text-orange-600 dark:text-yellow-200
+            dark:bg-transparent dark:border-double dark:border dark:border-yellow-200 rounded-md
+            shadow-paper-styled
+        ">
+            AWS Lambda 개발환경 개선기 (2.5): 3편 포스팅 하기 전의 잠깐 회고
+        </h2>
+        <p class="font-semibold"><a href="/categories/#AWS" class="no-underline text-orange-700 dark:text-blue-200">AWS</a></p>
+    </div>
+    
+    <div class="mt-10">
+        <p class="text-[0.8em]">Posted <strong class="no-underline">2026.04.13 21:00</strong></p>
+        <p class="text-[0.8em] -mt-2">By <strong class="no-underline">recoma</strong></p>
+    </div>
+
+    <div class="
+        mt-6 h-[2px] bg-gradient-to-r
+        from-white via-lime-400 to-white
+        dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+    "></div>
+
+    
+</div>
+                <h3 id="지난-이야기들">지난 이야기들</h3>
+
+<ol>
+  <li><a href="/aws/2026/01/22/aws-lambda-operation.html">AWS Lambda 개발환경 개선기 (1): 콘솔에서 탈출하다</a></li>
+  <li><a href="/aws/2026/01/29/aws-lambda-operation-2.html">AWS Lambda 개발환경 개선기 (2): CLI 기반 배포에서 CI/CD 구축 까지</a></li>
+</ol>
+
+<h3 id="tldr">TL;DR</h3>
+
+<ul>
+  <li>AWS Lambda CI/CD를 구축하면서 팀 내에서 람다 변경사항을 PR과 코드리뷰 중심으로 공유할 수 있게 됐다.</li>
+  <li>다만 급하게 구축한 만큼 공통 모듈 반영, 패키지 구조, 운영 환경 차이 같은 문제들을 뒤늦게 보완해야 했다.</li>
+  <li>이번 글은 그 과정을 짧게 회고하는 글이고, 다음 3편에서는 Docker로 C 기반 라이브러리 호환성 문제를 해결한 이야기를 다룬다.</li>
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h1 id="cicd-구축-후-달라진-점">CI/CD 구축 후 달라진 점</h1>
+
+<p>2026년 1월, 사내에 AWS Lambda CI/CD 구축을 완료한 이후 2개월 동안 우리 백엔드 팀 개발자들이 여러모로 잘 사용하고 있다.
+과거에는 웹 콘솔로 개발하고 바로 배포하는 방식이었다 보니, 누가 어떤 람다 함수를 만들고 수정했는지 공유조차 되지 않았고, AWS Lambda를 겨우 뒤지거나 옆의 개발자에게 물어봐서야 알 수 있었다.
+하지만 CI/CD를 구축한 이후, 람다를 새로 만들거나 수정하려면 무조건 Github PR을 통해 배포해야 하고, 코드리뷰를 반드시 진행해야 배포 승인이 되는 구조가 되어 팀 내 개발자들이 어떤 람다 함수가 바뀌었는지 바로 인지할 수 있었다. 즉, <strong>AWS Lambda에 대한 개발 파이프라인이 구축된 것이다.</strong>
+지금은 주로 새로운 배치 프로세스들이 이 파이프라인을 통해 개발이 되고 있다.</p>
+
+<h1 id="하지만-완벽하지는-않았다">하지만 완벽하지는 않았다</h1>
+
+<h2 id="왜-급하게-만들었는가">왜 급하게 만들었는가</h2>
+
+<p>사실 돌아보면, 나는 이 CI/CD 구축을 조금 성급하게 진행해왔던 것 같다. 구축 자체는 비교적 최근이었지만, 계획은 신입 개발자들이 입사할 때쯤인 7~8개월 전이었기 때문에 더 이상 질질 끌면 안 된다고 판단했었다.
+전임자가 퇴사하고 나 혼자 팀에 남아있었을 때는 크게 문제가 되지 않았지만, 신입들이 입사한 이후에는 <strong>어떤 게 개발되었고 어떤 게 반영되었는지 제대로 공유되어야 할 필요성이 생기게 되었다.</strong>
+특히 AWS Lambda 쪽은 이런 면에서 가장 취약했기 때문에 한참 전에 CI/CD를 도입하려고 했었다.
+하지만 이 당시 사내에서는 “차량 대여” 관련 신사업 운영 안정화가 가장 최우선이었고, 이로 인해 나는 야근까지 할 정도로 매우 바빴던 상황이었기 때문에 뭔가 다른 일을 할 수가 없었다.
+CI/CD 구축은 거진 반년 동안 할 생각도 못했던 것이다.</p>
+
+<p><br /></p>
+
+<p>그렇게 시간이 지나, 2025년 12월이 되어서야 어느 정도 신사업 안정화가 이루어졌고 업무가 느슨해지면서 기회가 생겼다. 이때부터 나는 “개발 퍼포먼스 향상”이라는 명분으로 “AWS Lambda 개발 파이프라인 구축”이라는 Task를 진행하겠다고 공개적으로 못을 박았다. <a href="/aws/2026/01/22/aws-lambda-operation.html">그리고 이걸 이틀 만에 구축했다.</a> 하지만 이때는 그냥 단순히 람다 코드를 Github으로 옮기는 수준이었기 때문에 CI/CD라고 하기에는 한참 부족한 수준이었다. 약 한 달이 지난 후, 새해가 되자마자 터졌던 이슈들을 간신히 수습하고서야 <a href="/aws/2026/01/29/aws-lambda-operation-2.html">CI/CD 구축을 완료할 수 있었다.</a> 하지만 이것도 몇 가지 이슈들이 있었다.</p>
+
+<h2 id="구축-이후-드러난-이슈들">구축 이후 드러난 이슈들</h2>
+
+<h3 id="해결-공통-모듈-코드-반영이-안-되는-이슈">[해결] 공통 모듈 코드 반영이 안 되는 이슈</h3>
+<p><a href="/aws/2026/01/29/aws-lambda-operation-2.html">람다 개선 2편</a>에서 언급한 내용으로, Repository에는 ORM 관련 코드나 한국 시간을 가져오는 함수 등 모든 람다 함수가 공통적으로 사용하는 공통 모듈들이 구현되어 있다. 본래 구조는 <code class="language-plaintext highlighter-rouge">git diff</code>를 활용해 변경된 람다 함수들만 골라 배포하는 방식으로 구축되었지만, <strong>공통 모듈에 대해서는 전혀 고려되지 않았다.</strong>
+해결 방법은 그렇게 어렵지 않았다. <code class="language-plaintext highlighter-rouge">git diff</code>는 그대로 사용하되, 변경된 코드들 중에서 <code class="language-plaintext highlighter-rouge">common</code> 디렉토리 안의 코드가 변경된 게 확인되면 배포 대상을 모든 람다 함수로 설정할 수 있게 했다.
+<code class="language-plaintext highlighter-rouge">printf</code>를 사용해서 변경된 파일들을 모두 출력한 다음 <strong><code class="language-plaintext highlighter-rouge">functions/common/</code>으로 시작한 파일이 하나라도 감지가 되면, <code class="language-plaintext highlighter-rouge">find</code>를 활용해 <code class="language-plaintext highlighter-rouge">functions/</code>에 있는 모든 함수들을 타깃으로 설정할 수 있게 조치했다.</strong></p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>list_all_functions<span class="o">()</span> <span class="o">{</span>
+  find <span class="s2">"</span><span class="nv">$FUNCTIONS_DIR</span><span class="s2">"</span> <span class="nt">-mindepth</span> 1 <span class="nt">-maxdepth</span> 1 <span class="nt">-type</span> d <span class="se">\</span>
+    <span class="o">!</span> <span class="nt">-name</span> common <span class="se">\</span>
+    <span class="o">!</span> <span class="nt">-name</span> __pycache__ <span class="se">\</span>
+    <span class="nt">-exec</span> <span class="nb">basename</span> <span class="o">{}</span> <span class="se">\;</span> <span class="se">\</span>
+    | <span class="nb">sort</span>
+<span class="o">}</span>
+
+<span class="nv">changed_paths</span><span class="o">=</span><span class="si">$(</span>git diff <span class="nt">--name-only</span> <span class="s2">"</span><span class="nv">$FROM_SHA</span><span class="s2">"</span> <span class="s2">"</span><span class="nv">$TO_SHA</span><span class="s2">"</span><span class="si">)</span>
+
+<span class="k">if </span><span class="nb">printf</span> <span class="s1">'%s\n'</span> <span class="s2">"</span><span class="nv">$changed_paths</span><span class="s2">"</span> | <span class="nb">grep</span> <span class="nt">-Eq</span> <span class="s1">'^functions/common/'</span> <span class="se">\</span>
+  <span class="o">||</span> <span class="nb">printf</span> <span class="s1">'%s\n'</span> <span class="s2">"</span><span class="nv">$changed_paths</span><span class="s2">"</span> | <span class="nb">grep</span> <span class="nt">-Eq</span> <span class="s1">'^functions/__init__\.py$'</span><span class="p">;</span> <span class="k">then
+  </span>list_all_functions
+  <span class="nb">exit </span>0
+<span class="k">fi</span>
+</code></pre></div></div>
+
+<h3 id="해결-패키지-공유로-인한-코드량-초과">[해결] 패키지 공유로 인한 코드량 초과</h3>
+<p>이것도 역시 <a href="/aws/2026/01/29/aws-lambda-operation-2.html">람다 개선 2편</a>에서 잠깐 언급한 내용으로, AWS Lambda에서 감당할 수 있는 코드량은 한정되어 있다. 이전 리포지토리의 구조는 모든 함수가 하나의 패키지 파일 <code class="language-plaintext highlighter-rouge">requirements.txt</code>을 바라보고 있는 구조로 되어 있다. 이렇게 되면 어떤 람다 함수에서는 전혀 사용하지 않는 모듈들도 <code class="language-plaintext highlighter-rouge">pip</code>를 통해 코드를 내려받게 됨으로써 쓸모 없는 코드들이 람다 함수 내에 쌓이게 된 것이다.</p>
+
+<p>이를 해결하기 위해 최상위 루트에 있는 <code class="language-plaintext highlighter-rouge">requirements.txt</code>의 내용물을 <code class="language-plaintext highlighter-rouge">functions/</code> 디렉토리 안에 있는 함수 디렉토리별로 분리를 하고, 이에 맞춰 스크립트도 일부 수정을 했다.</p>
+
+<h2 id="아직-남아-있는-과제">아직 남아 있는 과제</h2>
+
+<h3 id="미해결-람다-configuration까지-코드화">[미해결] 람다 Configuration까지 코드화</h3>
+
+<p>코드 자체는 CI/CD 구축이 이루어졌지만, Permission 설정이나 환경변수 같은 Configure 관련 설정은 아직 구축되지 않았다.</p>
+
+<ul>
+  <li>Permission 관리, EventBridge, APIGateway 연동 같은 설정 프로세스를 코드화하려면 <code class="language-plaintext highlighter-rouge">terraform</code>이라는 도구를 사용해야 하나, 러닝 커브가 꽤 높은 편이기 때문에 우선순위에서 한참 밀려 있는 상태다.</li>
+  <li>환경변수 설정의 경우 <code class="language-plaintext highlighter-rouge">terraform</code> 말고도 다른 우회 방법이 있는지 찾아보고 있는 중이다. 일단 <code class="language-plaintext highlighter-rouge">Github Action</code>이나 <code class="language-plaintext highlighter-rouge">AWS Secrets Manager</code>에서 모든 함수의 환경변수를 관리하자는 의견이 나오긴 했는데, 이렇게 하면 관리가 제대로 될지는 의문이다.</li>
+</ul>
+
+<h2 id="다음-편에서-다룰-문제">다음 편에서 다룰 문제</h2>
+
+<h3 id="해결-numpy-pillow-등-c-기반-라이브러리-호환성-이슈"><strong>[해결] numpy, pillow 등 C 기반 라이브러리 호환성 이슈</strong></h3>
+<p><strong>곧 있을 3편에 대해 본격적으로 설명하게 될 주제이다.</strong> 사내 업무 중에 “카드발급 대상 리스트를 배송업체에 이메일로 발송하는 업무”가 있는데, 이걸 담당하는 회계 직원이 퇴사를 하는 바람에 담당자가 공석이 되면서, 이를 자동화 하는 작업이 필요했다. 스크립트를 작성하고, 개발용 람다로 배포한 다음, Test 버튼을 눌러 테스트해 봤더니 numpy 모듈을 import 할 수 없다는 에러가 발생했다.</p>
+
+<p>수소문을 해 봤더니, AWS Lambda는 AWS Linux 기반의 환경으로 구성되어 있고, Github Action에서는 Ubuntu 환경에서 패키지를 설치했기 때문에 호환이 되지 않은 것으로 추측된다. 따라서 이를 Docker를 사용해서 해결했다.</p>
+
+<h1 id="회고">회고</h1>
+
+<p>이번 AWS Lambda CI/CD 구축을 돌아보면, 분명 잘한 점도 있었고 아쉬운 점도 있었다.</p>
+
+<p><br /></p>
+
+<h2 id="잘한-점">잘한 점</h2>
+
+<p>우선 잘한 점은, 이번에는 내가 이 작업을 직접 주도해서 끝까지 밀고 갔다는 것이다. 이전에도 Github Action을 사용한 배포 스크립트를 다뤄본 적은 있었지만, 그때는 보조로 투입되었거나 선배 개발자가 만들어 둔 것을 기반으로 유지보수하는 정도에 가까웠다. 대체로 서버 코드를 빌드해서 ECR에 올리고, 서버에서 이미지를 받아 실행하는 흐름을 따라가는 수준이었다. 반면 이번에는 AWS Lambda 개발 파이프라인 자체를 처음부터 고민하고, 실제 팀에서 사용할 수 있는 형태로 구축했다는 점에서 의미가 컸다.</p>
+
+<p><br /></p>
+
+<p>사실 나는 메인 서비스 개발을 할 때뿐 아니라, 2년 전 TF로 참여했던 프로젝트에서도 Lambda를 웹 콘솔에서 직접 개발하는 방식이 늘 복잡하고 불편하다고 느끼고 있었다. 하지만 그 당시에는 대부분 다 이런 식으로 진행한다고 생각했었기 때문에 별다른 조치를 취하지 않았다. 하지만 이번에는 이 개선 작업을 실제 행동으로 옮겼고, 그 결과 팀의 개발 방식 자체를 조금이나마 바꿀 수 있었다. 이번 일을 하면서, 사람이 인생을 살면서 천 번 말하는 것보다 한 번 제대로 행동하는 것이 환경을 바꾼다는 말을 꽤 실감하게 됐다.</p>
+
+<p><br /></p>
+
+<h2 id="아쉬웠던-점">아쉬웠던 점</h2>
+
+<p>반대로 못한 점도 분명했다. 나는 너무 급한 마음으로 이 작업을 성급하게 진행했고, 그 과정에서 놓친 것들이 생각보다 많았다. 공통 모듈 반영 문제나 패키지 구조 문제처럼, 구축 직후가 아니라 시간이 조금 지난 뒤에야 보완된 부분들이 적지 않았다. 물론 스타트업이라는 환경 자체가 빠르게 움직여야 하고, 여기에 AI 트렌드까지 겹치면서 요즘은 더더욱 속도전이 중요해진 것은 사실이다. 하지만 그렇다고 해서 빠르게 만든다는 이유로 디테일을 놓쳐도 되는 것은 아니라는 점을 다시 느꼈다.</p>
+
+<p><br /></p>
+
+<p>올해 초인 2026년에 회사에서 발생했던 대량 결제 사고를 떠올려 봐도 결국은 사소한 부분을 주기적으로 점검하지 못해서 문제가 커진 경우였다. 내가 작년에 겪었던 여러 이슈들 역시 돌이켜 보면 대부분은 엄청 복잡한 기술 문제라기보다는, 작은 디테일을 제때 챙기지 못해서 시작된 것들이 많았다. 결국 개발자는 속도만으로 평가받는 것이 아니라, 빠르게 움직이면서도 중요한 디테일을 놓치지 않을 때 비로소 신뢰를 얻는다고 생각한다.</p>
+
+<p><br /></p>
+
+<h2 id="앞으로-고쳐야-할-점">앞으로 고쳐야 할 점</h2>
+
+<p>그래서 앞으로 고쳐야 할 점도 비교적 분명하다. 나는 문제를 발견했을 때 그냥 지나치지 않고 추진해서 환경을 바꾸는 실행력은 어느 정도 갖추고 있지만, 그 실행 이후의 검증과 마무리에서 빈틈이 생기지 않도록 더 의식적으로 점검해야 한다. 즉, “일단 만들고 나중에 보완하자”에서 끝나는 것이 아니라, 처음 설계할 때부터 공통 모듈, 배포 범위, 의존성, 운영 환경 차이 같은 주변 조건까지 함께 체크하는 습관을 더 들여야 한다. 속도를 내는 능력은 유지하되, 그 속도 위에 디테일과 검증을 같이 올리는 것. 그게 이번 일을 통해 내가 가장 분명하게 얻은 다음 과제라고 생각한다.</p>
+
+<p><br /></p>
+
+<p>이번 글은 3편으로 넘어가기 전에 잠깐 숨을 고르며 돌아본 회고에 가깝다. 다음 편에서는 여기서 짧게 언급했던 <code class="language-plaintext highlighter-rouge">numpy</code>, <code class="language-plaintext highlighter-rouge">pillow</code> 같은 C 기반 라이브러리 호환성 문제를 어떻게 Docker로 풀어냈는지 조금 더 본격적으로 정리해보려고 한다.</p>
+
+
+                <div class="
+                    mt-6 h-[2px] bg-gradient-to-r
+                    from-white via-cyan-400 to-white
+                    dark:from-zinc-900 dark:via-yellow-200 dark:to-zinc-900
+                "></div>
+                <div class="px-4 py-4 flex flex-wrap justify-start gap-x-2.5 gap-y-1.5">
+                    
+                    <a class="tag" href="/tags/#aws">aws</a>
+                    
+                    <a class="tag" href="/tags/#lambda">lambda</a>
+                    
+                    <a class="tag" href="/tags/#devops">devops</a>
+                    
+                </div>
+
+                <script src="https://utteranc.es/client.js"
+                    repo="recoma96/recoma96.github.io"
+                    issue-term="url"
+                    label="blog"
+                    theme="github-light"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>
+        </div>
+
+        <div class="
+    absolute xl:px-[140px] px-mobileX
+    w-full bottom-0 flex flex-col pb-10
+    text-ornage-800 text-sm text-white font-footer
+    bg-lime-600 dark:bg-zinc-900 bg-opacity-80
+    dark:border-t shadow-footer-light
+    z-footer
+">
+    <div class="w-full flex flex-wrap justify-center gap-6 mt-6 xl:hidden">
+        
+<a href="https://github.com/recoma96" class="social-icon text-inherit"><i class="bi bi-github social-icon-color" alt="github"></i></a>
+
+
+
+<a href="mailto:seokbong60@gmail.com" class="social-icon text-inherit"><i class="bi bi-envelope-fill social-icon-color" alt="email"></i></a>
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="leading-relaxed justify-between mt-6 flex">
+        <div>
+            <p>Designed by <a href="https://github.com/recoma96" class="no-underline text-blue-800 dark:text-yellow-200">recoma96</a></p>
+            <p>Theme by <a href="https://github.com/recoma96/lollineon" class="no-underline text-blue-800 dark:text-yellow-200">LolliNeon</a></p>
+        </div>
+        <p>Powered by <a href="https://jekyllrb.com/docs/themes" class="no-underline text-blue-800 dark:text-yellow-200">jekyll</a></p>
+    </div>
+</div>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/util.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/layout.js"></script>
+<script type="text/javascript" src="https://recoma96.github.io/assets/js/navbar.js"></script>
+    </body>
+</html>
