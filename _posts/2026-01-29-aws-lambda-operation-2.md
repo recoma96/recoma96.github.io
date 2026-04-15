@@ -446,3 +446,8 @@ jobs:
 ### 람다 Configuration도 코드레벨로?
 
 코드 배포는 자동화가 이루어졌지만, 람다 Config 설정은 아직 AWS Console에서 그대로 진행한다. (예: permission 설정, 환경변수 설정 등). `terraform`으로 설정 마저도 코드화 할 수 있다고는 들었는데, 이것도 어떻게 할 지 고민중이다.
+
+
+<br>
+
+다음화: [AWS Lambda 개발환경 개선기 (2.5): 3편 포스팅 하기 전의 잠깐 회고](/aws/2026/04/14/aws-lambda-operation-2-1.html)
