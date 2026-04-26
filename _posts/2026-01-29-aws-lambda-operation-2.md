@@ -450,4 +450,4 @@ jobs:
 
 <br>
 
-다음화: [AWS Lambda 개발환경 개선기 (2.5): 3편 포스팅 하기 전의 잠깐 회고](/aws/2026/04/14/aws-lambda-operation-2-1.html)
+다음화: [AWS Lambda 개발환경 개선기 (2.5): 3편 포스팅 하기 전의 잠깐 회고](/aws/2026/04/13/aws-lambda-operation-2-1.html)
